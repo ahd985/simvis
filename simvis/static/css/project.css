@@ -1,0 +1,137 @@
+.alert-debug {
+  background-color: #fff;
+  border-color: #d6e9c6;
+  color: #000; }
+
+.alert-error {
+  background-color: #f2dede;
+  border-color: #eed3d7;
+  color: #b94a48; }
+
+.navbar {
+  border-radius: 0px; }
+
+@media (max-width: 47.9em) {
+  .navbar-nav .nav-item {
+    display: inline-block;
+    float: none;
+    width: 100%; }
+  .navbar-nav .nav-item + .nav-item {
+    margin-left: 0; }
+  .nav.navbar-nav.pull-xs-right {
+    float: none !important; } }
+
+[hidden][style="display: block;"] {
+  display: block !important; }
+
+.d3-context-menu {
+  position: absolute;
+  display: none;
+  background-color: #f2f2f2;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  min-width: 150px;
+  border: 1px solid #d4d4d4;
+  z-index: 1200; }
+
+.d3-context-menu ul {
+  list-style-type: none;
+  margin: 4px 0px;
+  padding: 0px;
+  cursor: default; }
+
+.d3-context-menu ul li {
+  padding: 4px 16px; }
+
+.d3-context-menu ul li:hover {
+  background-color: #4677f8;
+  color: #fefefe; }
+
+.panel {
+  border-style: solid;
+  border-width: 3px;
+  border-color: #ffffff;
+  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
+  padding: 20px;
+  padding: 1.25rem;
+  background: #00BCD4;
+  color: #333333; }
+
+.ssv-control {
+  width: 100%;
+  height: 100%; }
+
+.full-width {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: initial; }
+
+.full-height {
+  height: 100%;
+  margin-top: auto;
+  margin-bottom: auto;
+  max-height: initial; }
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+h1 {
+  color: white; }
+
+.simdraw-title {
+  border-bottom-width: 1px;
+  border-bottom-color: #424242;
+  border-bottom-style: solid;
+  background-color: #01579B; }
+
+.simdraw-visual {
+  height: 90vh;
+  max-height: 90vh; }
+
+html {
+  height: 100%; }
+
+body {
+  min-height: 100%; }
+
+.draw-container {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%; }
+
+.left-sidebar-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+  background: grey; }
+
+.draw-svg {
+  position: absolute;
+  top: 0;
+  left: 200px;
+  background: green; }
+
+.shape-select-container {
+  display: block; }
+
+.shape-item {
+  overflow: hidden;
+  width: 40px;
+  height: 40px;
+  padding: 1px; }
+
+.shape-icon {
+  width: 36px;
+  height: 36px;
+  display: block;
+  position: relative;
+  overflow: hidden;
+  cursor: move;
+  left: 2px;
+  top: 2px; }

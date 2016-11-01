@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block navbar %}
+
+{% endblock %}
+
+{% block container %}
+    <div class="draw-container">
+        <div class="left-sidebar-container">
+            <div class="shape-select-container">
+                <div class="shape-select">
+                    {% for a in shape_icons %}
+                    <a class="shape-item">
+                        <svg class="shape-icon">
+                            {{ a|escape|safe }}
+                        </svg>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" class="draw-svg" height="100%" width="100%">
+            <rect class="svg-background" width="100%" height="100%" fill="none"></rect>
+        </svg>
+    </div>
+{% endblock %}
+
+
