@@ -41,10 +41,12 @@ d3.contextMenu = function (menu, openCallback) {
 	};
 };
 
+/*
 window.onresize = function() {
     var bbox = d3.select('.draw-visual').node().getBoundingClientRect();
     d3.select("#draw-svg").attr("viewbox", "(0 0 " + bbox.width + " " + bbox.height + ")")
 };
+*/
 
 function simdraw_context() {
     this.elements = {};
@@ -59,6 +61,8 @@ function simdraw_context() {
         } else if (type == 'path') {
             this.elements[id] = new path(type, id)
         }
+
+        return this.elements[id]
     }
 
     this.get_element = function(id) {
@@ -90,7 +94,7 @@ function element(type, id, pos, dims) {
     this.id = id;
     this.pos = pos;
     this.dims = dims;
-    this.element_id = "element"
+    this.element_id = "element";
     this.style = {fill:"grey", stroke:"black", cursor:"move"};
     // Outline
     this.outline_id = "outline";
@@ -135,7 +139,7 @@ function element(type, id, pos, dims) {
     ];
 
     this.initialize = function() {
-        var g = d3.select("#draw-svg")
+        var g = d3.select(".diagram")
             .append("g")
             .datum(this.pos)
             .attr("transform", "translate(" + [ this.pos.x,this.pos.y ] + ") scale(1,1)")
@@ -292,7 +296,7 @@ function path(type, id) {
         .curve(d3.curveLinear);
 
     path.set_element = function(element) {
-        element.attr("d", function(d) {return path.line_function(d.path) + "Z"})
+        element.attr("d", function(d) {return path.line_function(d.path) + "Z"});
     }
 
     path.set_outline = function(outline) {
@@ -340,13 +344,18 @@ function path(type, id) {
     return path
 }
 
+// Add shape to drawing
+$(".shape-item").on("click", function() {
+    context.add_element('rect', 'rect-1');
+});
+
 context = null;
 $(document).ready(function() {
     context = new simdraw_context();
     context.initialize();
-    context.add_element('rect', 'rect-1');
-    context.add_element('circle', 'circle-1');
-    context.add_element('path', 'path-1');
+    //context.add_element('rect', 'rect-1');
+    //context.add_element('circle', 'circle-1');
+    //context.add_element('path', 'path-1');
 });
 
 

@@ -16,9 +16,10 @@ var gulp = require('gulp'),
       pixrem = require('gulp-pixrem'),
       uglify = require('gulp-uglify'),
       imagemin = require('gulp-imagemin'),
-      exec = require('gulp-exec'),
+      exec = require('child_process').exec,
       runSequence = require('run-sequence'),
-      browserSync = require('browser-sync');
+      browserSync = require('browser-sync'),
+      babel = require('gulp-babel');
 
 
 // Relative paths function
@@ -56,7 +57,7 @@ gulp.task('styles', function() {
     .pipe(gulp.dest(paths.css));
 });
 
-// Javascript minification
+// Javascript downgrading and minification
 gulp.task('scripts', function() {
   return gulp.src(paths.js + '/project.js')
     .pipe(plumber()) // Checks for errors
@@ -74,7 +75,7 @@ gulp.task('imgCompression', function(){
 
 // Run django server
 gulp.task('runServer', function() {
-  exec('python manage.py runserver', function (err, stdout, stderr) {
+  exec('$PYTHON_PATH manage.py runserver', function (err, stdout, stderr) {
     console.log(stdout);
     console.log(stderr);
   });
@@ -83,7 +84,7 @@ gulp.task('runServer', function() {
 // Browser sync server for live reload
 gulp.task('browserSync', function() {
     browserSync.init(
-      [paths.css + "/*.css", paths.js + "*.js", paths.templates + '*.html'], {
+      [paths.css + "/*.css", paths.js + "/*.js", paths.templates + '/*.html'], {
         proxy:  "localhost:8000"
     });
 });
