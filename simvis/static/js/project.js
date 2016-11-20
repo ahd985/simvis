@@ -48,102 +48,99 @@ window.onresize = function() {
 };
 */
 
-function simdraw_context() {
-    this.elements = {};
+class SimDraw {
+    constructor() {
+        this.elements = {};
+        this.active_element = null;
+    }
 
-    this.active_element = null
-
-    this.add_element = function(type, id) {
+    add_element(type, id) {
         if (type == 'rect') {
-            this.elements[id] = new rect(type, id)
+            this.elements[id] = new Rect(type, id)
         } else if (type == 'circle') {
-            this.elements[id] = new circle(type, id)
+            this.elements[id] = new Circle(type, id)
         } else if (type == 'path') {
-            this.elements[id] = new path(type, id)
+            this.elements[id] = new Path(type, id)
         }
 
         return this.elements[id]
     }
 
-    this.get_element = function(id) {
+    get_element(id) {
         return this.elements[id]
     }
 
-    this.activate_element = function(id) {
+    activate_element(id) {
         this.active_element != null && this.elements[this.active_element].deactivate()
-        this.elements[id].activate()
+        this.elements[id].activate();
         this.active_element = id;
     }
 
-    this.deactivate_element = function() {
+    deactivate_element() {
         this.active_element != null && this.elements[this.active_element].deactivate()
         this.active_element = null;
     }
 
-    this.delete_element = function(id) {
+    delete_element(id) {
 
     }
 
-    this.initialize = function() {
+    initialize() {
         d3.select(".draw-container").on("click", context.deactivate_element())
     }
 }
 
-function element(type, id, pos, dims) {
-    this.type = type;
-    this.id = id;
-    this.pos = pos;
-    this.dims = dims;
-    this.element_id = "element";
-    this.style = {fill:"grey", stroke:"black", cursor:"move"};
-    // Outline
-    this.outline_id = "outline";
-    this.outline_style = {fill:"none", stroke:"black", "stroke-width":"1px", "stroke-dasharray":"5,5"};
-    this.outline_type = 'rect';
-    this.outline_attr = {visibility:"hidden"}
-    // Resizer
-    this.resizer_id = "resizer";
-    this.resizer_style = {fill:"red"};
-    this.resizer_type = 'circle';
-    this.resizer_attr = {r:2, cursor:"se-resize", visibility:"hidden"}
+class Element {
+    constructor(type, id, pos, dims) {
+        this.type = type;
+        this.id = id;
+        this.pos = pos;
+        this.dims = dims;
+        this.element_id = "element";
+        this.style = {fill: "grey", stroke: "black", cursor: "move"};
+        // Outline
+        this.outline_id = "outline";
+        this.outline_style = {fill: "none", stroke: "black", "stroke-width": "1px", "stroke-dasharray": "5,5"};
+        this.outline_type = 'rect';
+        this.outline_attr = {visibility: "hidden"};
+        // Resizer
+        this.resizer_id = "resizer";
+        this.resizer_style = {fill: "red"};
+        this.resizer_type = 'circle';
+        this.resizer_attr = {r: 2, cursor: "se-resize", visibility: "hidden"};
 
-    this.set_element = function() {};
-    this.set_resizer = function() {};
-    this.set_outline = function() {};
-    this.drag_move_func = function(d) {};
-    this.drag_resize_func = function(d) {};
-
-    this.menu = [
-        {
-            title: 'Move Forward',
-            action: function(elm, d, i) {
-                next_sib = elm.parentNode.nextSibling
-                if (next_sib != null) {
-                    if (next_sib.nextSibling != null) {
-                        elm.parentNode.parentNode.insertBefore(elm.parentNode, next_sib.nextSibling)
-                    } else {
-                        elm.parentNode.parentNode.appendChild(elm.parentNode)
+        this.menu = [
+            {
+                title: 'Move Forward',
+                action: function (elm, d, i) {
+                    next_sib = elm.parentNode.nextSibling;
+                    if (next_sib != null) {
+                        if (next_sib.nextSibling != null) {
+                            elm.parentNode.parentNode.insertBefore(elm.parentNode, next_sib.nextSibling)
+                        } else {
+                            elm.parentNode.parentNode.appendChild(elm.parentNode)
+                        }
+                    }
+                }
+            },
+            {
+                title: 'Move Backwards',
+                action: function (elm, d, i) {
+                    prev_sib = elm.parentNode.previousSibling;
+                    if (prev_sib != null) {
+                        elm.parentNode.parentNode.insertBefore(elm.parentNode, prev_sib)
                     }
                 }
             }
-        },
-        {
-            title: 'Move Backwards',
-            action: function(elm, d, i) {
-                prev_sib = elm.parentNode.previousSibling
-                if (prev_sib != null) {
-                   elm.parentNode.parentNode.insertBefore(elm.parentNode, prev_sib)
-                }
-            }
-        }
-    ];
+        ];
+    }
 
-    this.initialize = function() {
+    initialize() {
         var g = d3.select(".diagram")
             .append("g")
             .datum(this.pos)
             .attr("transform", "translate(" + [ this.pos.x,this.pos.y ] + ") scale(1,1)")
-            .attr("id", this.id)
+            .attr("id", this.id);
 
         g.append(this.type)
             .attr("id", this.element_id)
@@ -168,9 +165,9 @@ function element(type, id, pos, dims) {
         this.render(this.dims)
     }
 
-    this.render = function(dims) {
+    render(dims) {
         var g = d3.select("#" + this.id);
-        datum = g.datum();
+        var datum = g.datum();
         for (var attr in dims) {datum[attr] = dims[attr]};
         g.datum(datum);
 
@@ -183,130 +180,156 @@ function element(type, id, pos, dims) {
         this.set_resizer(resizer);
     }
 
-    this.move = function(event) {
+    move(event) {
         var g = d3.select("#" + this.id);
         var datum = g.datum();
         datum.x += event.x;
-        datum.y += event.y
+        datum.y += event.y;
         g.datum(datum)
             .attr("transform", function(d,i){
                 return "translate(" + [ d.x,d.y ] + ")";
             });
     }
 
-    this.activate = function() {
+    activate() {
         var g = d3.select("#" + this.id);
-        g.select("#" + this.outline_id).attr("visibility","visible")
+        g.select("#" + this.outline_id).attr("visibility","visible");
         g.selectAll("#" + this.resizer_id).each(function() {d3.select(this).attr("visibility","visible")})
     }
 
-    this.deactivate = function() {
+    deactivate() {
         var g = d3.select("#" + this.id);
-        g.select("#" + this.outline_id).attr("visibility","hidden")
+        g.select("#" + this.outline_id).attr("visibility","hidden");
         g.selectAll("#" + this.resizer_id).each(function() {d3.select(this).attr("visibility","hidden")})
     }
 }
 
-function rect(type, id) {
-    var default_pos = {x:0, y:0};
-    var default_dims = {width:50, height:50, margin:5};
-    var rect = new element(type, id, default_pos, default_dims);
+class Rect extends Element {
+    constructor(type, id) {
+        var default_pos = {x:0, y:0};
+        var default_dims = {width:50, height:50, margin:5};
+        super(type, id, default_pos, default_dims);
 
-    rect.set_element = function(element) {
-        element.attr("x", function(d) {return d.margin})
+        this.drag_move = d3.drag()
+            .subject(function() {return {x:0, y:0}})
+            .on("drag", function() {
+                context.get_element(this.parentNode.id).move(d3.event)
+            });
+        this.drag_resize = d3.drag()
+            .on("drag", function(d) {
+                context.get_element(this.parentNode.id)
+                    .render({height:Math.max(1,d3.event.y - 2*d.margin), width:Math.max(1,d3.event.x - 2*d.margin)})
+            });
+
+        this.initialize();
+    }
+
+    set_element(element) {
+        element.attr("x", function(d) {console.log(d); return d.margin})
             .attr("y", function(d) {return d.margin})
             .attr("height", function(d) {return d.height})
             .attr("width", function(d) {return d.width})
     }
 
-    rect.set_outline = function(outline) {
+    set_outline(outline) {
         outline.attr("height", function(d) {return d.height + 2*d.margin})
             .attr("width", function(d) {return d.width + 2*d.margin})
     }
 
-    rect.set_resizer = function(resizer) {
+    set_resizer(resizer) {
         resizer.attr("cx", function(d) {return d.width + 2*d.margin})
             .attr("cy", function(d) {return d.height + 2*d.margin})
     }
-
-    rect.drag_move = d3.drag()
-        .subject(function() {return {x:0, y:0}})
-        .on("drag", function() {
-            context.get_element(this.parentNode.id).move(d3.event)
-        });
-
-    rect.drag_resize = d3.drag()
-        .on("drag", function(d) {
-            context.get_element(this.parentNode.id)
-                .render({height:Math.max(1,d3.event.y - 2*d.margin), width:Math.max(1,d3.event.x - 2*d.margin)})
-        });
-
-    rect.initialize();
-
-    return rect
 }
 
-function circle(type, id) {
-    var default_pos = {x:0, y:0};
-    var default_dims = {r:25, margin:5};
-    var circle = new element(type, id, default_pos, default_dims);
+class Circle extends Element {
+    constructor(type, id) {
+        var default_pos = {x: 0, y: 0};
+        var default_dims = {r: 25, margin: 5};
+        super(type, id, default_pos, default_dims);
 
-    circle.set_element = function(element) {
+        this.drag_move = d3.drag()
+            .subject(function() {return {x:0, y:0}})
+            .on("drag", function() {
+                context.get_element(this.parentNode.id).move(d3.event)
+            });
+
+        this.drag_resize = d3.drag()
+            .on("drag", function(d) {
+                var datum = d3.select("#" + this.parentNode.id).datum();
+                context.get_element(this.parentNode.id)
+                    .render({r:Math.max(Math.min(d3.event.x/2,d3.event.y/2) - datum.margin,1), margin:datum.margin})
+            });
+
+        this.initialize()
+    }
+
+    set_element(element) {
         element.attr("r", function(d) {return d.r})
             .attr("cx", function(d) {return d.r + d.margin})
             .attr("cy", function(d) {return d.r + d.margin})
     }
 
-    circle.set_resizer = function(resizer) {
+    set_resizer(resizer) {
         resizer.attr("cx", function(d) {return 2*(d.r + d.margin)})
             .attr("cy", function(d) {return 2*(d.r + d.margin)})
     }
 
-    circle.set_outline = function(outline) {
+    set_outline(outline) {
         outline.attr("height", function(d) {return 2*d.r + 2*d.margin})
             .attr("width", function(d) {return 2*d.r + 2*d.margin})
     }
-
-    circle.drag_move = d3.drag()
-        .subject(function() {return {x:0, y:0}})
-        .on("drag", function() {
-            context.get_element(this.parentNode.id).move(d3.event)
-        });
-
-    circle.drag_resize = d3.drag()
-        .on("drag", function(d) {
-            var datum = d3.select("#" + this.parentNode.id).datum();
-            context.get_element(this.parentNode.id)
-                .render({r:Math.max(Math.min(d3.event.x/2,d3.event.y/2) - datum.margin,1), margin:datum.margin})
-        });
-
-    circle.initialize();
-
-    return circle
 }
 
-function path(type, id) {
-    var default_pos = {x:0, y:0};
-    var default_dims = {path:[{x:0, y:0}, {x:50, y:50}, {x:0, y:50}], "x-range":[0,50], "y-range":[0,50], margin:5};
-    var path = new element(type, id, default_pos, default_dims);
+class Path extends Element {
+    constructor(type, id) {
+        var default_pos = {x: 0, y: 0};
+        var default_dims = {
+            path: [{x: 0, y: 0}, {x: 50, y: 50}, {x: 0, y: 50}],
+            "x-range": [0, 50],
+            "y-range": [0, 50],
+            margin: 5
+        };
+        super(type, id, default_pos, default_dims);
 
-    path.line_function = d3.line()
-        .x(function(d) {return d.x})
-        .y(function(d) {return d.y})
-        .curve(d3.curveLinear);
+        this.drag_move = d3.drag()
+            .subject(function() {return {x:0, y:0}})
+            .on("drag", function() {
+                context.get_element(this.parentNode.id).move(d3.event)
+            });
 
-    path.set_element = function(element) {
+        this.drag_resize = d3.drag()
+            .on("drag", function(d,i) {
+                var d_path = d3.select("#" + this.parentNode.id).datum().path;
+                d_path[i].x = d3.event.x;
+                d_path[i].y = d3.event.y;
+                context.get_element(this.parentNode.id)
+                    .render({path:d_path,
+                             "x-range":[d3.min(d_path, function(d) {return d.x}), d3.max(d_path, function(d) {return d.x})],
+                             "y-range":[d3.min(d_path, function(d) {return d.y}), d3.max(d_path, function(d) {return d.y})]})
+            });
+
+
+        this.line_function = d3.line()
+            .x(function(d) {return d.x})
+            .y(function(d) {return d.y})
+            .curve(d3.curveLinear);
+
+        this.initialize()
+    }
+
+    set_element(element) {
         element.attr("d", function(d) {return path.line_function(d.path) + "Z"});
     }
 
-    path.set_outline = function(outline) {
+    set_outline(outline) {
         outline.attr("height", function(d) {return d["y-range"][1] - d["y-range"][0] + 2*d.margin})
             .attr("width", function(d) {return d["x-range"][1] - d["x-range"][0] + 2*d.margin})
             .attr("x", function(d) {return d["x-range"][0] - d.margin})
             .attr("y", function(d) {return d["y-range"][0] - d.margin})
     }
 
-    path.set_resizer = function(resizer) {
+    set_resizer(resizer) {
         parent = d3.select(resizer.node().parentNode);
         parent.selectAll("#" + this.resizer_id)
             .data(parent.datum().path)
@@ -321,27 +344,6 @@ function path(type, id) {
             .styles(this.resizer_style)
             .call(this.drag_resize)
     }
-
-    path.drag_move = d3.drag()
-        .subject(function() {return {x:0, y:0}})
-        .on("drag", function() {
-            context.get_element(this.parentNode.id).move(d3.event)
-        });
-
-    path.drag_resize = d3.drag()
-        .on("drag", function(d,i) {
-            var d_path = d3.select("#" + this.parentNode.id).datum().path;
-            d_path[i].x = d3.event.x
-            d_path[i].y = d3.event.y
-            context.get_element(this.parentNode.id)
-                .render({path:d_path,
-                         "x-range":[d3.min(d_path, function(d) {return d.x}), d3.max(d_path, function(d) {return d.x})],
-                         "y-range":[d3.min(d_path, function(d) {return d.y}), d3.max(d_path, function(d) {return d.y})]})
-        });
-
-    path.initialize();
-
-    return path
 }
 
 // Add shape to drawing
@@ -351,7 +353,7 @@ $(".shape-item").on("click", function() {
 
 context = null;
 $(document).ready(function() {
-    context = new simdraw_context();
+    context = new SimDraw();
     context.initialize();
     //context.add_element('rect', 'rect-1');
     //context.add_element('circle', 'circle-1');
