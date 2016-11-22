@@ -138,6 +138,14 @@ body {
   left: 2px;
   top: 2px; }
 
+.shape-svg-container {
+  visibility: visible; }
+
+.shape-svg {
+  fill: #ffffff;
+  pointer-events: all;
+  stroke: #000000; }
+
 .diagram-container {
   position: absolute;
   right: 0px;

@@ -9,10 +9,10 @@
         <div class="left-sidebar-container">
             <div class="shape-select-container">
                 <div class="shape-select">
-                    {% for a in shape_icons %}
-                    <a class="shape-item">
+                    {% for k,v in shape_icons.items %}
+                    <a class="shape-item" id={{ k }}>
                         <svg class="shape-icon">
-                            {{ a|escape|safe }}
+                            {{ v|escape|safe }}
                         </svg>
                     </a>
                     {% endfor %}
@@ -21,7 +21,11 @@
         </div>
         <div class="diagram-container">
             <div class="diagram-background"></div>
-            <svg class="diagram"></svg>
+            <svg class="diagram">
+                <rect class="diagram-space" style="width:100%;height:100%;fill: #ffffff;fill-opacity:0;pointer-events:all;">
+
+                </rect>
+            </svg>
         </div>
     </div>
 {% endblock %}

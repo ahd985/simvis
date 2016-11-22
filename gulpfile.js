@@ -60,6 +60,7 @@ gulp.task('styles', function() {
 // Javascript downgrading and minification
 gulp.task('scripts', function() {
   return gulp.src(paths.js + '/project.js')
+    .pipe(babel({presets: ['es2015']}))
     .pipe(plumber()) // Checks for errors
     .pipe(uglify()) // Minifies the js
     .pipe(rename({ suffix: '.min' }))

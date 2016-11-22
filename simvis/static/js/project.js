@@ -71,22 +71,18 @@ class SimDraw {
     }
 
     activate_element(id) {
-        this.active_element != null && this.elements[this.active_element].deactivate()
+        this.active_element != null && this.elements[this.active_element].deactivate();
         this.elements[id].activate();
         this.active_element = id;
     }
 
     deactivate_element() {
-        this.active_element != null && this.elements[this.active_element].deactivate()
+        this.active_element != null && this.elements[this.active_element].deactivate();
         this.active_element = null;
     }
 
     delete_element(id) {
 
-    }
-
-    initialize() {
-        d3.select(".draw-container").on("click", context.deactivate_element())
     }
 }
 
@@ -113,7 +109,7 @@ class Element {
             {
                 title: 'Move Forward',
                 action: function (elm, d, i) {
-                    next_sib = elm.parentNode.nextSibling;
+                    var next_sib = elm.parentNode.nextSibling;
                     if (next_sib != null) {
                         if (next_sib.nextSibling != null) {
                             elm.parentNode.parentNode.insertBefore(elm.parentNode, next_sib.nextSibling)
@@ -126,7 +122,7 @@ class Element {
             {
                 title: 'Move Backwards',
                 action: function (elm, d, i) {
-                    prev_sib = elm.parentNode.previousSibling;
+                    var prev_sib = elm.parentNode.previousSibling;
                     if (prev_sib != null) {
                         elm.parentNode.parentNode.insertBefore(elm.parentNode, prev_sib)
                     }
@@ -146,7 +142,7 @@ class Element {
             .attr("id", this.element_id)
             .styles(this.style)
             .call(this.drag_move)
-            .on("dblclick", function() {
+            .on("click", function() {
                 context.activate_element(this.parentNode.id)
             })
             .on("contextmenu", d3.contextMenu(this.menu));
@@ -225,7 +221,7 @@ class Rect extends Element {
     }
 
     set_element(element) {
-        element.attr("x", function(d) {console.log(d); return d.margin})
+        element.attr("x", function(d) {return d.margin})
             .attr("y", function(d) {return d.margin})
             .attr("height", function(d) {return d.height})
             .attr("width", function(d) {return d.width})
@@ -285,9 +281,9 @@ class Path extends Element {
     constructor(type, id) {
         var default_pos = {x: 0, y: 0};
         var default_dims = {
-            path: [{x: 0, y: 0}, {x: 50, y: 50}, {x: 0, y: 50}],
+            path: [{x: 0, y: 0}, {x: 50, y: 0}],
             "x-range": [0, 50],
-            "y-range": [0, 50],
+            "y-range": [0, 0],
             margin: 5
         };
         super(type, id, default_pos, default_dims);
@@ -319,7 +315,12 @@ class Path extends Element {
     }
 
     set_element(element) {
-        element.attr("d", function(d) {return path.line_function(d.path) + "Z"});
+        var line_function = d3.line()
+            .x(function(d) {return d.x})
+            .y(function(d) {return d.y})
+            .curve(d3.curveLinear);
+
+        element.attr("d", function(d) {return line_function(d.path) + "Z"});
     }
 
     set_outline(outline) {
@@ -347,17 +348,29 @@ class Path extends Element {
 }
 
 // Add shape to drawing
-$(".shape-item").on("click", function() {
-    context.add_element('rect', 'rect-1');
+d3.selectAll(".shape-item").on("click", function() {
+    var element_type = this.id;
+    context.add_element(element_type, guid());
 });
 
 context = null;
 $(document).ready(function() {
     context = new SimDraw();
-    context.initialize();
-    //context.add_element('rect', 'rect-1');
-    //context.add_element('circle', 'circle-1');
-    //context.add_element('path', 'path-1');
+    console.log(d3.select(".diagram-background"))
+    d3.select(".diagram-space").on("click", function() {
+            console.log("click");
+            context.deactivate_element();
+    })
 });
+
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return "s" + s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
 
 
