@@ -12,4 +12,9 @@ urlpatterns = [
         view=views.draw_view,
         name='draw'
     ),
+    url(
+        regex=r'^data-upload$',
+        view=views.data_upload,
+        name='data_upload'
+    )
 ]

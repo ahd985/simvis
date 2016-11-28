@@ -52,6 +52,11 @@ class SimDraw {
     constructor() {
         this.elements = {};
         this.active_element = null;
+
+        var self = this;
+        d3.select(".diagram-space").on("click", function() {
+            self.deactivate_element()
+        })
     }
 
     add_element(type, id) {
@@ -353,14 +358,91 @@ d3.selectAll(".shape-item").on("click", function() {
     context.add_element(element_type, guid());
 });
 
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
 context = null;
 $(document).ready(function() {
     context = new SimDraw();
-    console.log(d3.select(".diagram-background"))
-    d3.select(".diagram-space").on("click", function() {
-            console.log("click");
-            context.deactivate_element();
-    })
+    $("#data-upload-btn").on("click", function() {
+        $("#data-upload-modal").modal("toggle")
+    });
+    $(function () {
+        $('#fileupload').fileupload({
+            dataType: 'json',
+            done: function (e, response) {
+                $(".pre-upload").css("visibility", "hidden");
+                $(".post-upload").css("visibility", "visible");
+                var container = $("#data-table").get()[0];
+                var hot = new Handsontable(container, {
+                    data: response.result.data,
+                    rowHeaders: true,
+                });
+                hot.updateSettings({
+                    contextMenu: {
+                        callback: function (key, options) {
+                            if (key === 'header_add') {
+                                row = hot.getSelected()[0]
+                            }
+                        },
+                        items: {
+                            "header_add": {
+                                name: 'Add to header',
+                                disabled: function () {
+                                    // if first row, disable this option
+                                    return hot.getSelected()[0] === 0;
+                                }
+                            }
+                        }
+                    },
+                    cells: function (row, col, prop) {
+                        var cellProperties = {};
+
+                        if (row > 0) {
+                            cellProperties.readOnly = true;
+                        }
+
+                        return cellProperties;
+                    }
+                })
+            },
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#progress .bar').css(
+                    'width',
+                    progress + '%'
+                );
+            }
+        })
+    });
 });
 
 function guid() {

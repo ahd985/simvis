@@ -103,13 +103,37 @@ body {
   height: 100%;
   width: 100%; }
 
+.top-sidebar-container {
+  position: absolute;
+  top: 0;
+  height: 100px;
+  left: 0;
+  right: 0;
+  background: #EEEEEE; }
+
 .left-sidebar-container {
   position: absolute;
   left: 0;
-  top: 0;
+  top: 100px;
   bottom: 0;
   width: 200px;
   background: #EEEEEE; }
+
+.right-sidebar-container {
+  position: absolute;
+  right: 0;
+  top: 100px;
+  bottom: 0;
+  width: 200px;
+  background: #EEEEEE; }
+
+.diagram-container {
+  position: absolute;
+  left: 200px;
+  top: 100px;
+  bottom: 0px;
+  right: 200px;
+  overflow: auto; }
 
 .shape-select-container {
   display: block;
@@ -146,22 +170,14 @@ body {
   pointer-events: all;
   stroke: #000000; }
 
-.diagram-container {
-  position: absolute;
-  right: 0px;
-  left: 200px;
-  top: 0px;
-  bottom: 0px;
-  overflow: auto; }
-
 .diagram-background {
-  position: absolute;
+  position: relative;
   border-width: 1px;
   overflow: hidden;
   left: 0px;
   top: 0px;
   right: 0px;
-  bottom: 0px;
+  height: 100%;
   border-color: #cacaca;
   border-style: solid;
   background-color: white;
@@ -171,4 +187,7 @@ body {
 
 .diagram {
   width: 100%;
-  height: 100%; }
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0; }
