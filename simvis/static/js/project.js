@@ -52,11 +52,22 @@ class SimDraw {
     constructor() {
         this.elements = {};
         this.active_element = null;
+        this.headers = null;
+        this.data_sample = null;
+        this.data_manipulation = null;
 
         var self = this;
         d3.select(".diagram-space").on("click", function() {
             self.deactivate_element()
-        })
+        });
+
+        // Build static menus
+        new ElementMenu();
+        new PropertiesMenu();
+        // Enable menu buttons
+        d3.selectAll(".menu-item").on("click", function() {
+            context.add_element(this.id, guid());
+        });
     }
 
     add_element(type, id) {
@@ -77,7 +88,7 @@ class SimDraw {
 
     activate_element(id) {
         this.active_element != null && this.elements[this.active_element].deactivate();
-        this.elements[id].activate();
+        this.gen_element_context_menu(this.elements[id].activate());
         this.active_element = id;
     }
 
@@ -88,6 +99,152 @@ class SimDraw {
 
     delete_element(id) {
 
+    }
+
+    set_headers(headers) {
+        this.headers = headers
+    }
+
+    set_data_sample(data_sample) {
+        this.data_sample = data_sample
+    }
+
+    set_data_manipulation(data_manipulation) {
+        this.data_manipulation = data_manipulation
+    }
+
+    gen_element_context_menu(element) {
+
+    }
+}
+
+class SideBarMenu {
+    constructor(config) {
+        this.config = config;
+        this.render();
+    }
+
+    render() {
+        var menu = d3.select("#" + this.config.id).append("div");
+        var self = this;
+        this.config.menu_sections.map(function(section) {
+            var section_div = menu.append("div").attr("class", "menu-select-container");
+
+            // Add section title
+            section_div.append("div").text(section.title);
+
+            // Add section content
+            if (section.layout == "sm-square") {
+                self.render_sm_square(section_div, section.contents)
+            } else if (section.layout == "form") {
+                self.render_form(section_div, section.contents)
+            }
+        })
+
+    }
+
+    render_sm_square(section_div, contents) {
+        var content_div = section_div.append("div").attr("class", "menu-select");
+        contents.map(function(content) {
+            var btn = content_div.append("a")
+                .attr("id", content.id)
+                .attr("class", "menu-item")
+                .append("svg")
+                .attr("class", "menu-icon")
+                .append("g")
+                .attr("class", "shape-svg-container")
+                .attr("transform", "translate(0.5,0.5)")
+                .append(content.type)
+                .attr("class", "shape-svg");
+
+            for (var prop in content) {
+                if (prop != "type" && prop != "id") {
+                    btn.attr(prop, content[prop])
+                }
+            }
+        })
+    }
+
+    render_form(section_div, contents) {
+        var content_div = section_div.append("div").attr("class", "menu-select");
+        contents.map(function(content) {
+            if (content.type == "select") {
+                var select = content_div.append("select");
+                content.options.map(function(option) {
+                    select.append("option")
+                        .attr("value", option.value)
+                        .html(option.title);
+                });
+            } else if (content.type == "radio") {
+                var radio = content_div.append("radio");
+                content.inputs.map(function(input) {
+                    radio.append("input")
+                        .attr("type", "radio")
+                        .attr("value", input.value);
+                    radio.append("span").html(input.title)
+                });
+            }
+        })
+    }
+}
+
+class ElementMenu extends SideBarMenu {
+    constructor() {
+        var config = {
+            "id":"left-sidebar-container",
+            "menu_sections":[
+                {
+                    "title":"Elements",
+                    "layout":"sm-square",
+                    "contents":[
+                        {"type":"rect", "id": "rect", "x":2, "y":10, "height":16, "width":31},
+                        {"type":"circle", "id": "circle", "r":8, "cx":18, "cy":18},
+                        {"type":"path", "id": "path", "d":"M2,18L31,18Z"}
+                    ]
+                }
+            ]
+        };
+        super(config);
+    }
+}
+
+class PropertiesMenu extends SideBarMenu {
+    constructor() {
+        var config = {
+            "id":"right-sidebar-container",
+            "menu_sections":[
+                {
+                    "title":"Paper Size",
+                    "layout":"form",
+                    "contents":[
+                        {
+                            "type":"select",
+                            "options": [
+                                    {"title":"Regular", "value":"portrait"},
+                                    {"title":"Wide", "value":"landscape"}
+                                ]
+                        },
+                        {
+                            "type":"radio",
+                            "inputs":[
+                                {"title":"Portrait", "value":"portrait"},
+                                {"title":"Landscape", "value":"landscape"}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+        super(config);
+    }
+}
+
+class ConditionMenu extends SideBarMenu {
+    constructor() {
+        var properties = {
+            "conditions":[]
+        };
+        super(properties);
     }
 }
 
@@ -109,6 +266,8 @@ class Element {
         this.resizer_style = {fill: "red"};
         this.resizer_type = 'circle';
         this.resizer_attr = {r: 2, cursor: "se-resize", visibility: "hidden"};
+
+        this.context_menu
 
         this.menu = [
             {
@@ -223,6 +382,29 @@ class Rect extends Element {
             });
 
         this.initialize();
+
+        var element_data = {
+            conditions: [
+                {
+                    color_levels:[372.7401979757573,408.50419817952684,444.2681983832963],
+                    color_scale:['#fdd49e','#fdbb84','#fc8d59'],
+                    data:[380],
+                    description:"Vapor Temp",
+                    id:"element_0",
+                    opacity:1,
+                    report:false,
+                    type:"background",
+                    unit:"K"
+                }
+            ],
+            description: "Quench Tank",
+            ids: ['element'],
+            type: "cell",
+            x_series:[0]
+        };
+
+        var demo = ssv.create_demo_element('draw-svg', element_data).update(0,0);
+        console.log(demo)
     }
 
     set_element(element) {
@@ -352,12 +534,6 @@ class Path extends Element {
     }
 }
 
-// Add shape to drawing
-d3.selectAll(".shape-item").on("click", function() {
-    var element_type = this.id;
-    context.add_element(element_type, guid());
-});
-
 // using jQuery
 function getCookie(name) {
     var cookieValue = null;
@@ -404,13 +580,23 @@ $(document).ready(function() {
                 var container = $("#data-table").get()[0];
                 var hot = new Handsontable(container, {
                     data: response.result.data,
-                    rowHeaders: true,
+                    rowHeaders: true
                 });
                 hot.updateSettings({
                     contextMenu: {
                         callback: function (key, options) {
                             if (key === 'header_add') {
-                                row = hot.getSelected()[0]
+                                var selected_row = hot.getSelected()[0];
+                                var header = hot.getDataAtRow(0);
+                                var header_add = hot.getDataAtRow(selected_row);
+                                header = header.map(function(e, i) {
+                                    return header_add[i] != "" ? e + ", " + header_add[i] : e
+                                });
+
+                                hot.alter('remove_row', selected_row);
+                                header.map(function(e, i) {
+                                    hot.setDataAtCell(0, i, e)
+                                });
                             }
                         },
                         items: {
@@ -432,7 +618,14 @@ $(document).ready(function() {
 
                         return cellProperties;
                     }
-                })
+                });
+
+                $("#submit-data-btn").on("click", function() {
+                    var data = hot.getData();
+                    context.set_headers(data[0]);
+                    context.set_data_sample(data.slice(1));
+                    $("#data-upload-modal").modal("toggle");
+                });
             },
             progressall: function (e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);

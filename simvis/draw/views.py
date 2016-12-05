@@ -15,7 +15,7 @@ def draw_view(request):
     with open('simvis/data/shape_icons.json') as f:
         shape_icons = json.load(f)
 
-    return render_to_response('pages/draw.html', {"form": form, "shape_icons": shape_icons})
+    return render_to_response('pages/draw.html', {"form": form})
 
 
 def data_upload(request):

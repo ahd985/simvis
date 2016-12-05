@@ -186,7 +186,16 @@ body {
   background: #EEEEEE;
 }
 
-.right-sidebar-container {
+#left-sidebar-container {
+  position: absolute;
+  left: 0;
+  top: 100px;
+  bottom: 0;
+  width: 200px;
+  background: #EEEEEE;
+}
+
+#right-sidebar-container {
   position: absolute;
   right: 0;
   top: 100px;
@@ -210,6 +219,12 @@ body {
   overflow: hidden;
 }
 
+.menu-select-container {
+  display: block;
+  padding: 5px;
+  overflow: hidden;
+}
+
 .shape-item {
   overflow: hidden;
   width: 40px;
@@ -221,11 +236,32 @@ body {
   background-position: 50% 50%;
 }
 
-.shape-item:hover {
+.menu-item {
+  overflow: hidden;
+  width: 40px;
+  height: 40px;
+  padding: 1px;
+  display: inline-block;
+  border-radius: 2px;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+
+.menu-item:hover {
   border: 1px solid #BDBDBD;
 }
 
 .shape-icon {
+  width: 36px;
+  height: 36px;
+  display: block;
+  overflow: hidden;
+  cursor: move;
+  left: 2px;
+  top: 2px;
+}
+
+.menu-icon {
   width: 36px;
   height: 36px;
   display: block;

@@ -58,6 +58,7 @@ DEBUG_TOOLBAR_CONFIG = {
         'debug_toolbar.panels.redirects.RedirectsPanel',
     ],
     'SHOW_TEMPLATE_CONTEXT': True,
+    'JQUERY_URL': ''
 }
 
 # django-extensions
