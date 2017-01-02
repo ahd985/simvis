@@ -13,6 +13,11 @@ urlpatterns = [
         name='draw'
     ),
     url(
+        regex=r'^2$',
+        view=views.draw_view2,
+        name='draw2'
+    ),
+    url(
         regex=r'^data-upload$',
         view=views.data_upload,
         name='data_upload'

@@ -18,6 +18,15 @@ def draw_view(request):
     return render_to_response('pages/draw.html', {"form": form})
 
 
+def draw_view2(request):
+    form = UploadFileForm()
+
+    with open('simvis/data/shape_icons.json') as f:
+        shape_icons = json.load(f)
+
+    return render_to_response('pages/draw2.html', {"form": form})
+
+
 def data_upload(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)

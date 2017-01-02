@@ -61,16 +61,26 @@ class SimDraw {
             self.deactivate_element()
         });
 
+        this.func_map = {
+            "add_element": this.add_element
+        }
+
         // Build static menus
         new ElementMenu();
         new PropertiesMenu();
+
+        // Build dynamic menus
+        this.element_context_menu = new ElementContextMenu();
+
         // Enable menu buttons
+        var self = this;
         d3.selectAll(".menu-item").on("click", function() {
-            context.add_element(this.id, guid());
+            self.func_map[this.getAttribute("action")].call(self, this.id);
         });
     }
 
-    add_element(type, id) {
+    add_element(type) {
+        var id = guid();
         if (type == 'rect') {
             this.elements[id] = new Rect(type, id)
         } else if (type == 'circle') {
@@ -90,11 +100,21 @@ class SimDraw {
         this.active_element != null && this.elements[this.active_element].deactivate();
         this.gen_element_context_menu(this.elements[id].activate());
         this.active_element = id;
+        this.activate_element_context_menu(this.elements[id])
+    }
+
+    activate_element_context_menu(element) {
+        this.element_context_menu.show()
     }
 
     deactivate_element() {
         this.active_element != null && this.elements[this.active_element].deactivate();
         this.active_element = null;
+        this.deactivate_element_context_menu()
+    }
+
+    deactivate_element_context_menu() {
+        this.element_context_menu.hide()
     }
 
     delete_element(id) {
@@ -125,7 +145,7 @@ class SideBarMenu {
     }
 
     render() {
-        var menu = d3.select("#" + this.config.id).append("div");
+        var menu = d3.select("#" + this.config.container).append("div").attr("id", this.config.id);
         var self = this;
         this.config.menu_sections.map(function(section) {
             var section_div = menu.append("div").attr("class", "menu-select-container");
@@ -138,6 +158,8 @@ class SideBarMenu {
                 self.render_sm_square(section_div, section.contents)
             } else if (section.layout == "form") {
                 self.render_form(section_div, section.contents)
+            } else if (section.layout == "buttons") {
+                self.render_buttons(section_div, section.contents)
             }
         })
 
@@ -148,6 +170,7 @@ class SideBarMenu {
         contents.map(function(content) {
             var btn = content_div.append("a")
                 .attr("id", content.id)
+                .attr("action", content.action)
                 .attr("class", "menu-item")
                 .append("svg")
                 .attr("class", "menu-icon")
@@ -166,17 +189,17 @@ class SideBarMenu {
     }
 
     render_form(section_div, contents) {
-        var content_div = section_div.append("div").attr("class", "menu-select");
+        var content_div = section_div.attr("class", "menu-select");
         contents.map(function(content) {
             if (content.type == "select") {
-                var select = content_div.append("select");
+                var select = content_div.append("div").append("select");
                 content.options.map(function(option) {
                     select.append("option")
                         .attr("value", option.value)
                         .html(option.title);
                 });
             } else if (content.type == "radio") {
-                var radio = content_div.append("radio");
+                var radio = content_div.append("div").append("radio");
                 content.inputs.map(function(input) {
                     radio.append("input")
                         .attr("type", "radio")
@@ -186,20 +209,32 @@ class SideBarMenu {
             }
         })
     }
+
+    render_buttons(section_div, contents) {
+        var content_div = section_div.attr("class", "menu-select");
+        contents.map(function(content) {
+            content_div.append("div").append("button")
+                .attr("class", "menu-item")
+                .attr("action", content.action)
+                .html(content.title);
+        })
+    }
 }
 
 class ElementMenu extends SideBarMenu {
     constructor() {
         var config = {
-            "id":"left-sidebar-container",
+            "container":"left-sidebar-container",
+            "id":"element-menu",
+            "contextual":false,
             "menu_sections":[
                 {
                     "title":"Elements",
                     "layout":"sm-square",
                     "contents":[
-                        {"type":"rect", "id": "rect", "x":2, "y":10, "height":16, "width":31},
-                        {"type":"circle", "id": "circle", "r":8, "cx":18, "cy":18},
-                        {"type":"path", "id": "path", "d":"M2,18L31,18Z"}
+                        {"type":"rect", "action":"add_element", "id": "rect", "x":2, "y":10, "height":16, "width":31},
+                        {"type":"circle", "action":"add_element", "id": "circle", "r":8, "cx":18, "cy":18},
+                        {"type":"path", "action":"add_element", "id": "path", "d":"M2,18L31,18Z"}
                     ]
                 }
             ]
@@ -208,10 +243,43 @@ class ElementMenu extends SideBarMenu {
     }
 }
 
+class ElementContextMenu extends SideBarMenu {
+    constructor(element_type) {
+        var config = {
+            "container":"right-sidebar-container",
+            "id":"element-context-menu",
+            "contextual":true,
+            "menu_sections":[
+                {
+                    "title":"Conditions",
+                    "layout":"buttons",
+                    "contents":[
+                        {"title":"Add Condition", "action":"add_condition"},
+                    ]
+                },
+            ]
+        };
+        super(config);
+
+        // Hide menu initially
+        this.hide()
+    }
+
+    show(options) {
+        d3.select("#element-context-menu").style("display", "block")
+    }
+
+    hide() {
+        d3.select("#element-context-menu").style("display", "none")
+    }
+}
+
 class PropertiesMenu extends SideBarMenu {
     constructor() {
         var config = {
-            "id":"right-sidebar-container",
+            "container":"right-sidebar-container",
+            "id":"properties-menu",
+            "contextual":"false",
             "menu_sections":[
                 {
                     "title":"Paper Size",
@@ -404,7 +472,6 @@ class Rect extends Element {
         };
 
         var demo = ssv.create_demo_element('draw-svg', element_data).update(0,0);
-        console.log(demo)
     }
 
     set_element(element) {

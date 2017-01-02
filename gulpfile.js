@@ -20,6 +20,7 @@ var gulp = require('gulp'),
       runSequence = require('run-sequence'),
       browserSync = require('browser-sync'),
       babel = require('gulp-babel');
+      browserify = require('gulp-browserify');
 
 
 // Relative paths function
@@ -59,9 +60,10 @@ gulp.task('styles', function() {
 
 // Javascript downgrading and minification
 gulp.task('scripts', function() {
-  return gulp.src(paths.js + '/project.js')
-    .pipe(babel({presets: ['es2015']}))
+  return gulp.src(paths.js + '/project2.js')
+    .pipe(babel({presets: ['es2015', 'stage-0', 'react']}))
     .pipe(plumber()) // Checks for errors
+    .pipe(browserify({debug: true}))
     .pipe(uglify()) // Minifies the js
     .pipe(rename({ suffix: '.min' }))
     .pipe(gulp.dest(paths.js));
@@ -102,7 +104,7 @@ gulp.task('default', function() {
 // Watch
 gulp.task('watch', ['default'], function() {
   gulp.watch(paths.sass + '/*.scss', ['styles']);
-  gulp.watch(paths.js + '/*.js', ['scripts']);
+  gulp.watch([paths.js + '/*.js', '!' + paths.js + '/*.min.js'], ['scripts']);
   gulp.watch(paths.images + '/*', ['imgCompression']);
   gulp.watch('templates/*.html');
 });
