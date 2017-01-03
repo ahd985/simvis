@@ -161,14 +161,14 @@ body {
   min-height: 100%;
 }
 
-.draw-container {
+#draw-menu {
   padding:0;
   margin:0;
   height: 100%;
   width: 100%;
 }
 
-.top-sidebar-container {
+#top-sidebar-menu {
   position: absolute;
   top: 0;
   height: 100px;
@@ -177,7 +177,7 @@ body {
   background: #EEEEEE;
 }
 
-.left-sidebar-container {
+.left-sidebar-menu {
   position: absolute;
   left: 0;
   top: 100px;
@@ -186,7 +186,7 @@ body {
   background: #EEEEEE;
 }
 
-#left-sidebar-container {
+#left-sidebar-menu {
   position: absolute;
   left: 0;
   top: 100px;
@@ -195,7 +195,7 @@ body {
   background: #EEEEEE;
 }
 
-#right-sidebar-container {
+#right-sidebar-menu {
   position: absolute;
   right: 0;
   top: 100px;
@@ -312,4 +312,12 @@ body {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.display-block {
+  display: block;
+}
+
+.display-none {
+  display: none;
 }

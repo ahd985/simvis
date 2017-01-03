@@ -6,8 +6,34 @@
 
 {% block container %}
     <div id="draw-container">
-
     </div>
+    <div class="modal fade" id="data-upload-modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Data Upload</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="pre-upload">
+                        <input id="fileupload" type="file" name="file" data-url="data-upload" multiple>
+                        <div id="progress">
+                            <div class="bar" style="width: 0%;height: 18px; background: green;"></div>
+                        </div>
+                    </div>
+                    <div class="post-upload" style="visibility:hidden">
+                        <div id="data-table"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submit-data-btn">Submit Data</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 {% endblock %}
 
 
