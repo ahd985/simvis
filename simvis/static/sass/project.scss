@@ -186,6 +186,15 @@ body {
   background: #EEEEEE;
 }
 
+#left-sidebar, #right-sidebar {
+  background: #EEEEEE;
+  top: auto;
+}
+
+#top-sidebar {
+  margin: 0;
+}
+
 #left-sidebar-menu {
   position: absolute;
   left: 0;
@@ -215,10 +224,10 @@ body {
 
 .diagram-container {
   position: absolute;
-  left: 200px;
-  top: 100px;
-  bottom: 0px;
-  right: 200px;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
   overflow: auto;
 }
 
@@ -320,4 +329,28 @@ body {
 
 .display-none {
   display: none;
+}
+
+.diagram-space {
+  width:100%;
+  height:100%;
+  fill: #ffffff;
+  fill-opacity:0;
+  pointer-events:all;
+}
+
+.draw-sidebar {
+  top: auto;
+}
+
+.element-outline {
+  fill: none;
+  stroke: black;
+  stroke-width: 1px;
+  stroke-dasharray: 5,5
+}
+
+.resizer-circle {
+  fill: red;
+  cursor: se-resize;
 }

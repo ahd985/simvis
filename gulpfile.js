@@ -19,8 +19,10 @@ var gulp = require('gulp'),
       exec = require('child_process').exec,
       runSequence = require('run-sequence'),
       browserSync = require('browser-sync'),
-      babel = require('gulp-babel');
-      browserify = require('gulp-browserify');
+      babel = require('gulp-babel'),
+      browserify = require('browserify'),
+      source = require('vinyl-source-stream'),
+      buffer = require('vinyl-buffer');
 
 
 // Relative paths function
@@ -60,13 +62,18 @@ gulp.task('styles', function() {
 
 // Javascript downgrading and minification
 gulp.task('scripts', function() {
-  return gulp.src(paths.js + '/project2.js')
+  gulp.src(paths.js + '/src/*.jsx')
     .pipe(babel({presets: ['es2015', 'stage-0', 'react']}))
     .pipe(plumber()) // Checks for errors
-    .pipe(browserify({debug: true}))
-    .pipe(uglify()) // Minifies the js
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(gulp.dest(paths.js));
+    .pipe(gulp.dest(paths.js + '/src'));
+
+  return browserify({entries: paths.js + '/src/simvis.js', debug: true})
+    .bundle()
+    .pipe(source('simvis.min.js'))
+    .pipe(buffer())
+    //.pipe(uglify())
+    .pipe(plumber()) // Checks for errors
+    .pipe(gulp.dest(paths.js))
 });
 
 // Image compression
@@ -104,7 +111,7 @@ gulp.task('default', function() {
 // Watch
 gulp.task('watch', ['default'], function() {
   gulp.watch(paths.sass + '/*.scss', ['styles']);
-  gulp.watch([paths.js + '/*.js', '!' + paths.js + '/*.min.js'], ['scripts']);
+  gulp.watch([paths.js + '/src/*.jsx'], ['scripts']);
   gulp.watch(paths.images + '/*', ['imgCompression']);
   gulp.watch('templates/*.html');
 });
