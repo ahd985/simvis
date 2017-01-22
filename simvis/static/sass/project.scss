@@ -297,6 +297,7 @@ body {
   fill: #ffffff;
   pointer-events: all;
   stroke: #000000;
+  stroke-width: 2;
 }
 
 .diagram-background {
@@ -343,7 +344,7 @@ body {
   top: auto;
 }
 
-.element-outline {
+.shape-outline {
   fill: none;
   stroke: black;
   stroke-width: 1px;
@@ -353,4 +354,8 @@ body {
 .resizer-circle {
   fill: red;
   cursor: se-resize;
+}
+
+rect {
+  vector-effect:non-scaling-stroke
 }

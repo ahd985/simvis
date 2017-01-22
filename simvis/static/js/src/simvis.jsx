@@ -33,11 +33,25 @@ class NavBar extends Component{
 class DrawContainer extends Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            shapes: []
+        };
+
+        this.addShape = this.addShape.bind(this);
+    }
+
+    addShape(shape) {
+        this.setState((prevState, props) => {
+            return {shapes: prevState.shapes.concat(shape)};
+        });
     }
 
     render() {
+        const shapeHandlers = {addShape: this.addShape};
+
         return (
-            <DrawMenu />
+            <DrawMenu shapeHandlers={shapeHandlers} shapes={this.state.shapes}/>
         )
     }
 }

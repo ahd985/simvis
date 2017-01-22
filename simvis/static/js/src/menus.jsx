@@ -2,34 +2,25 @@ import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar } from 'semantic-ui-react'
 
 import Diagram from './diagram.js'
+import shapes from './shapes'
 
 export default class DrawMenu extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            elements: []
-        };
-
-        this.addElement = this.addElement.bind(this);
-    }
-
-    addElement(e, {id}) {
-
+        this.shapeHandlers = this.props.shapeHandlers;
     }
 
     render() {
-        const elements = this.state.elements;
-
         return (
             <div className="draw-menu">
                 <div>
                     <TopMenu />
-                    <LeftSideBarMenu addElement={this.addElement}/>
+                    <LeftSideBarMenu shapeHandlers={this.shapeHandlers}/>
                     <RightSideBarMenu />
                     <div className="diagram-container">
                         <div className="diagram-background"></div>
-                        <Diagram element={this.state.elements}/>
+                        <Diagram shapes={this.props.shapes}/>
                     </div>
                 </div>
             </div>
@@ -68,17 +59,13 @@ class LeftSideBarMenu extends Component {
 
         this.state = {
             visible: true,
-            icons: [
-                {"id": 1, "type":"rect", "attr": {"x":2, "y":10, "height":16, "width":31}},
-                {"id": 2, "type":"circle", "attr": {"r":8, "cx":18, "cy":18}},
-                {"id": 3, "type":"path", "attr": {"d":"M2,18L31,18Z"}}
-            ]
         };
 
+        this.shapeHandlers = this.props.shapeHandlers;
         this.toggleVisibility = this.toggleVisibility.bind(this)
     }
 
-    toggleVisibility(e) {
+    toggleVisibility() {
         this.setState((prevState, props) => {
             return {visible: !prevState.visible};
         });
@@ -89,7 +76,7 @@ class LeftSideBarMenu extends Component {
         return (
             <Sidebar animation='overlay' direction="left" width='thin' visible={visible} id="left-sidebar">
                 <Button onClick={this.toggleVisibility}>Toggle Visibility</Button>
-                <GriddedSubMenu icons={this.state.icons} />
+                <GriddedSubMenu shapeHandlers={this.shapeHandlers}/>
             </Sidebar>
         )
     }
@@ -100,7 +87,7 @@ class RightSideBarMenu extends Component {
         super(props);
 
         this.state = {
-            visible: true,
+            visible: true
         };
 
         this.toggleVisibility = this.toggleVisibility.bind(this)
@@ -125,19 +112,30 @@ class RightSideBarMenu extends Component {
 class GriddedSubMenu extends Component {
     constructor(props) {
         super(props);
+
+        this.getShape = this.getShape.bind(this);
+        this.addShape = props.shapeHandlers.addShape;
+    }
+
+    getShape(e, shape) {
+        this.addShape(shape)
     }
 
     render() {
         const num_cols = 3;
+        var getShape = this.getShape;
+
         return (
             <Grid container textAlign={"center"} columns={num_cols} padded>
-                {this.props.icons.map(function(icon, i) {
+                {shapes.map(function(shape, i) {
                     return (
                         <Grid.Column>
-                            <a id={icon.id} className="menu-item">
-                                <svg className="menu-icon">
+                            <a id={shape.id} className="menu-item" name={shape.name} onClick={(e) => getShape(e, shape)}>
+                                <svg className="menu-icon" width="40" height="40" viewBox="0 0 100 100" preserveAspectRatio="xMinYMin">
                                     <g className="shape-svg-container">
-                                        <icon.type className="shape-svg" {...icon.attr}/>
+                                        <g className="shape-svg">
+                                            <shape.tag />
+                                        </g>
                                     </g>
                                 </svg>
                             </a>
