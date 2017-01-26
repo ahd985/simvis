@@ -12,7 +12,6 @@ export default class shapeContainer extends Component {
                 stroke: "black",
                 cursor: "move"
             },
-            toggled: false,
             controlledPosition: {
                 x: 400,
                 y: 400
@@ -34,9 +33,7 @@ export default class shapeContainer extends Component {
     }
 
     toggle(e) {
-        this.setState((prevState, props) => {
-            return {toggled: !prevState.toggled};
-        });
+        this.props.shapeHandlers.setSelectedShape(this.props.uuid);
     }
 
     handleMove(e, ui) {
@@ -71,18 +68,19 @@ export default class shapeContainer extends Component {
     }
 
     render() {
+        const min_dim = 5;
         const {height, width} = this.state.dims;
-        const dH = this.state.deltaDims.height;
-        const dW = this.state.deltaDims.width;
+        const dH = Math.max(this.state.deltaDims.height, -width + min_dim);
+        const dW = Math.max(this.state.deltaDims.width, -height + min_dim);
 
-        const visibility_style = {"visibility": this.state.toggled ? "visible" : "hidden"};
+        const visibility_style = {"visibility": this.props.toggled ? "visible" : "hidden"};
         const translate = `translate(${this.state.controlledPosition.x}, ${this.state.controlledPosition.y})`;
         const dObject = {dX:dW, dY:dH};
 
         const outline_handle_size = 5;
 
         return (
-            <g transform={translate} vector-effect="non-scaling-stroke">
+            <g transform={translate}>
                 <g style={this.state.style} onClick={this.toggle}>
                     <Draggable grid={[5,5]} onDrag={this.handleMove} axis={"none"}>
                         <g>

@@ -14,13 +14,19 @@ export default class DrawMenu extends Component {
     render() {
         return (
             <div className="draw-menu">
-                <div>
+                <div className="draw-menu-top">
                     <TopMenu />
+                </div>
+                <div className="draw-menu-bottom">
                     <LeftSideBarMenu shapeHandlers={this.shapeHandlers}/>
-                    <RightSideBarMenu />
-                    <div className="diagram-container">
-                        <div className="diagram-background"></div>
-                        <Diagram shapes={this.props.shapes}/>
+                    <RightSideBarMenu selectedShape={this.props.selectedShape} />
+                    <div className="diagram-wrapper">
+                        <div className="diagram-container">
+                            <div className="diagram-background"></div>
+                            <Diagram shapes={this.props.shapes}
+                                     shapeHandlers={this.shapeHandlers}
+                                     selectedShape={this.props.selectedShape}/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -128,10 +134,12 @@ class GriddedSubMenu extends Component {
         return (
             <Grid container textAlign={"center"} columns={num_cols} padded>
                 {shapes.map(function(shape, i) {
+                    const viewbox = `${shape.bbox.x0-5} ${shape.bbox.y0-5} ${shape.bbox.w0+10} ${shape.bbox.h0+10}`;
+
                     return (
-                        <Grid.Column>
+                        <Grid.Column key={i}>
                             <a id={shape.id} className="menu-item" name={shape.name} onClick={(e) => getShape(e, shape)}>
-                                <svg className="menu-icon" width="40" height="40" viewBox="0 0 100 100" preserveAspectRatio="xMinYMin">
+                                <svg className="menu-icon" width="40" height="40" viewBox={viewbox} preserveAspectRatio="xMidYMid">
                                     <g className="shape-svg-container">
                                         <g className="shape-svg">
                                             <shape.tag />

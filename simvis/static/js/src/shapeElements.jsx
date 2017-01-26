@@ -16,8 +16,8 @@ export class Rect extends Component {
 
         const x1 = x + width;
         const y1 = y + height;
-        const dDX = dX * x1 / w0;
-        const dDY = dY * y1 / h0;
+        const dDX = dX * (x1 - x0) / w0;
+        const dDY = dY * (y1 - y0) / h0;
 
         // Calculate split fraction to adjust x / width and y / height
         const xFrac = (x - x0) / (x1 - x0);
@@ -67,23 +67,25 @@ export class Circle extends Component {
         let cx = this.props.cx;
         let cy = this.props.cy;
 
-        const x1 = cx + r;
-        const y1 = cy + r;
-        const dDX = dX * x1 / w0;
-        const dDY = dY * y1 / h0;
+        let x1 = cx + r;
+        let y1 = cy + r;
+        const dDX = dX * (x1 - x0) / w0;
+        const dDY = dY * (y1 - y0) / h0;
 
         // Calculate split fraction to adjust x / width and y / height
-        const xFrac = (cx - r - x0) / (x1 - x0);
-        const yFrac = (cy - r - y0) / (y1 - y0);
+        let xFrac = (cx - r - x0) / (x1 - x0);
+        xFrac = xFrac + (1 - xFrac)/2;
+        let yFrac = (cy - r - y0) / (y1 - y0);
+        yFrac = yFrac + (1 - yFrac)/2;
 
         cx = cx + xFrac * dDX;
         cy = cy + yFrac * dDY;
-        r = r + Math.min((1-xFrac) / 2 * dDX, (1-yFrac) / 2 * dDY);
+        r = r + Math.min((1-xFrac) * dDX, (1-yFrac) * dDY);
 
         const attr = {
-            cx:this.props.cx,
-            cy:this.props.cy,
-            r:this.props.r + (this.props.dX**2 + this.props.dY**2)**0.5
+            cx:cx,
+            cy:cy,
+            r:r
         };
 
         return(
@@ -111,19 +113,28 @@ export class Ellipse extends Component {
         let cx = this.props.cx;
         let cy = this.props.cy;
 
-        const x1 = cx + r;
-        const y1 = cy + r;
-        const dDX = dX * x1 / w0;
-        const dDY = dY * y1 / h0;
+        const x1 = cx + rx;
+        const y1 = cy + ry;
+        const dDX = dX * (x1 - x0) / w0;
+        const dDY = dY * (y1 - y0) / h0;
 
         // Calculate split fraction to adjust x / width and y / height
-        const xFrac = (cx - r - x0) / (x1 - x0);
-        const yFrac = (cy - r - y0) / (y1 - y0);
+        let xFrac = (cx - rx - x0) / (x1 - x0);
+        xFrac = xFrac + (1 - xFrac)/2;
+        let yFrac = (cy - ry - y0) / (y1 - y0);
+        yFrac = yFrac + (1 - yFrac)/2;
 
         cx = cx + xFrac * dDX;
         cy = cy + yFrac * dDY;
-        rx = rx + (1-xFrac) / 2 * dDX;
-        ry = ry + (1-yFrac) / 2 * dDY;
+        rx = rx + (1-xFrac) * dDX;
+        ry = ry + (1-yFrac) * dDY;
+
+        const attr = {
+            cx:cx,
+            cy:cy,
+            rx:rx,
+            ry:ry
+        };
 
         return(
             <ellipse {...attr} />
@@ -149,24 +160,35 @@ export class Path extends Component {
         let d = this.props.d;
 
         d = svgpath(d).rel();
-        let height=0;
-        let width=0;
-        let x = Number.MAX_SAFE_INTEGER;
-        let y = Number.MAX_SAFE_INTEGER;
+        let x1, x2, y1, y2;
+        let x1Temp, x2Temp, y1Temp, y2Temp;
 
         // Get height/width
         d.iterate((segment, index, xs, ys) => {
-            width += segment.x;
-            height += segment.y;
-            x = Math.min(x, segment.x);
-            y = Math.min(y, segment.y)
+            if (index == 1) {
+                x1Temp = xs;
+                y1Temp = ys
+            }
+
+            if (index == d.segments.length - 1) {
+                segment[0] != "v" ? x2Temp = xs + segment[segment.length-2] : x2Temp = xs;
+                segment[0] != "h" ? y2Temp = ys + segment[segment.length-1] : y2Temp = ys;
+            }
         });
 
-        // Calculate split fraction to adjust x / width and y / height
-        const xFrac = (x - x0) / (x + width - x0);
-        const yFrac = (y - y0) / (y + height - y0);
+        x1 = Math.min(x1Temp, x2Temp);
+        x2 = Math.max(x1Temp, x2Temp);
+        y1 = Math.min(y1Temp, y2Temp);
+        y2 = Math.max(y1Temp, y2Temp);
 
-        d = d.scale(1 + (1-xFrac) * dX, 1 + (1-yFrac) * dY)
+        const width = x2 - x1;
+        const height = y2 - y1;
+
+        // Calculate split fraction to adjust x / width and y / height
+        const xFrac = (x1 - x0) / (x1 + width - x0);
+        const yFrac = (y1 - y0) / (y1 + height - y0);
+
+        d = d.scale(1 + (1-xFrac) * dX / w0, 1 + (1-yFrac) * dY / h0)
             .translate(xFrac * dX, yFrac * dY)
             .toString();
 
@@ -179,7 +201,7 @@ export class Path extends Component {
 }
 
 Path.propTypes = {
-    d: React.PropTypes.string.isRequired
+    d: React.PropTypes.any.isRequired
 };
 
 export default class Shape extends Component {
@@ -188,14 +210,25 @@ export default class Shape extends Component {
     }
 
     render() {
+        let shape;
+        if (this.props.children.constructor === Array)  {
+            shape = this.props.children.map((child, i) => {
+                return React.cloneElement(child, {
+                    objectBBox: this.props.objectBBox,
+                    dObject: this.props.dObject,
+                    key: i
+                })
+            })
+        } else {
+            shape = React.cloneElement(this.props.children, {
+                objectBBox: this.props.objectBBox,
+                dObject: this.props.dObject
+            })
+        }
+
         return (
             <g>
-                {
-                    React.cloneElement(this.props.children, {
-                        objectBBox: this.props.objectBBox,
-                        dObject: this.props.dObject
-                    })
-                }
+                {shape}
             </g>
         )
     }
