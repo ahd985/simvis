@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 
-import { Menu, Modal, Button } from 'semantic-ui-react'
+import { Menu } from 'semantic-ui-react'
 import uuidV4 from 'uuid/v4'
 
 import DrawMenu from './menus.js'
@@ -26,7 +26,6 @@ class NavBar extends Component{
                 <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick} />
                 <Menu.Item name='messages' active={activeItem === 'messages'} onClick={this.handleItemClick} />
                 <Menu.Item name='friends' active={activeItem === 'friends'} onClick={this.handleItemClick} />
-                <ImportDataModal />
             </Menu>
         )
     }
@@ -38,11 +37,14 @@ class DrawContainer extends Component {
 
         this.state = {
             shapes: [],
-            selectedShape: null
+            selectedShape: null,
+            data: null,
+            dataHeaders: null
         };
 
         this.addShape = this.addShape.bind(this);
         this.setSelectedShape = this.setSelectedShape.bind(this);
+        this.addData = this.addData.bind(this)
     }
 
     addShape(shape) {
@@ -56,32 +58,19 @@ class DrawContainer extends Component {
         this.setState({selectedShape: uuid});
     }
 
+    addData(data, headers) {
+        this.setState({data:data, dataHeaders:headers})
+    }
+
     render() {
         const shapeHandlers = {addShape:this.addShape, setSelectedShape:this.setSelectedShape};
+        const dataHandlers = {addData:this.addData};
 
         return (
             <DrawMenu shapeHandlers={shapeHandlers}
+                      dataHandlers={dataHandlers}
                       shapes={this.state.shapes}
                       selectedShape={this.state.selectedShape}/>
-        )
-    }
-}
-
-class ImportDataModal extends Component {
-    constructor(props) {
-        super(props)
-    }
-
-    render() {
-        return (
-            <Modal trigger={<Button>Import Data</Button>}>
-                <Modal.Header>Import Data</Modal.Header>
-                <Modal.Content image>
-                    <Modal.Description>
-                        <input id="fileupload" type="file" name="file" data-url="data-upload" multiple/>
-                    </Modal.Description>
-                </Modal.Content>
-            </Modal>
         )
     }
 }

@@ -9,11 +9,6 @@ urlpatterns = [
     # URL pattern for the main view
     url(
         regex=r'^$',
-        view=views.draw_view,
-        name='draw'
-    ),
-    url(
-        regex=r'^2$',
         view=views.draw_view2,
         name='draw2'
     ),

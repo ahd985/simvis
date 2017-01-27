@@ -1,5 +1,10 @@
 import React, { Component } from 'react'
-import { Button, Icon, Menu, Grid, Segment, Sidebar } from 'semantic-ui-react'
+import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal } from 'semantic-ui-react'
+import Dropzone from 'react-dropzone'
+import request from 'superagent'
+import 'superagent-django-csrf'
+
+import Handsontable from 'handsontable/dist/handsontable.full'
 
 import Diagram from './diagram.js'
 import shapes from './shapes'
@@ -16,6 +21,7 @@ export default class DrawMenu extends Component {
             <div className="draw-menu">
                 <div className="draw-menu-top">
                     <TopMenu />
+                    <ImportDataModal dataHandlers={this.props.dataHandlers}/>
                 </div>
                 <div className="draw-menu-bottom">
                     <LeftSideBarMenu shapeHandlers={this.shapeHandlers}/>
@@ -30,6 +36,135 @@ export default class DrawMenu extends Component {
                     </div>
                 </div>
             </div>
+        )
+    }
+}
+
+class ImportDataModal extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            firstModalOpen:false,
+            secondModalOpen:false,
+            data:null
+        };
+
+        this.onDrop = this.onDrop.bind(this);
+        this.openSecondModal = this.openSecondModal.bind(this);
+        this.closeSecondModal = this.closeSecondModal.bind(this);
+        this.addData = this.addData.bind(this);
+    }
+
+    onDrop(files) {
+        let data = new FormData();
+        data.append('file', files[0], files[0].name);
+
+        let addData = this.addData;
+
+        const req = request.post('data-upload')
+            .send(data)
+            .end(function(err, res) {
+                // TODO - error catching
+                addData(res.body.data)
+            });
+
+        this.openSecondModal()
+    }
+
+    openSecondModal() {
+        // First, get data from file upload
+
+        this.setState({
+            secondModalOpen:true
+        })
+    }
+
+    closeSecondModal() {
+        this.setState({
+            secondModalOpen:false
+        });
+
+        this.props.dataHandlers.addData(this.state.data, this.state.headers)
+    }
+
+    addData(data) {
+        this.setState({
+            data:data
+        })
+    }
+
+    render() {
+        const {secondModalOpen, data} = this.state;
+
+        let secondModalContent = <div id="hot-container"/>;
+        if (this.state.data) {
+            const container = document.getElementById('hot-container');
+            var hot = new Handsontable(container, {
+                data:data,
+                rowHeaders: true
+            });
+            hot.updateSettings({
+                contextMenu: {
+                    callback: function (key, options) {
+                        if (key === 'header_add') {
+                            var selected_row = hot.getSelected()[0];
+                            var header = hot.getDataAtRow(0);
+                            var header_add = hot.getDataAtRow(selected_row);
+                            header = header.map(function(e, i) {
+                                return header_add[i] != "" ? e + ", " + header_add[i] : e
+                            });
+
+                            hot.alter('remove_row', selected_row);
+                            header.map(function(e, i) {
+                                hot.setDataAtCell(0, i, e)
+                            });
+                        }
+                    },
+                    items: {
+                        "header_add": {
+                            name: 'Add to header',
+                            disabled: function () {
+                                // if first row, disable this option
+                                return hot.getSelected()[0] === 0;
+                            }
+                        }
+                    }
+                },
+                cells: function (row, col, prop) {
+                    var cellProperties = {};
+
+                    if (row > 0) {
+                        cellProperties.readOnly = true;
+                    }
+
+                    return cellProperties;
+                }
+            });
+        }
+
+        return (
+            <Modal trigger={<Button>Import Data</Button>} size='small'>
+                <Modal.Header>Import Data</Modal.Header>
+                <Modal.Content image>
+                    <Modal.Description>
+                        <Dropzone onDrop={this.onDrop} multiple={false}>
+                            <div>Try dropping some files here, or click to select files to upload.</div>
+                        </Dropzone>
+                    </Modal.Description>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Modal dimmer={false} open={secondModalOpen} onOpen={this.openSecondModal} onClose={this.closeSecondModal} size='small'>
+                        <Modal.Header>Data Manipulation</Modal.Header>
+                        <Modal.Content>
+                            {secondModalContent}
+                        </Modal.Content>
+                        <Modal.Actions>
+                            <Button icon='check' content='All Done' onClick={this.close} />
+                        </Modal.Actions>
+                    </Modal>
+                </Modal.Actions>
+            </Modal>
         )
     }
 }
