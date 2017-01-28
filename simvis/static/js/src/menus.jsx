@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal } from 'semantic-ui-react'
+import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message } from 'semantic-ui-react'
 import Dropzone from 'react-dropzone'
 import request from 'superagent'
 import 'superagent-django-csrf'
@@ -12,8 +12,6 @@ import shapes from './shapes'
 export default class DrawMenu extends Component {
     constructor(props) {
         super(props);
-
-        this.shapeHandlers = this.props.shapeHandlers;
     }
 
     render() {
@@ -21,17 +19,18 @@ export default class DrawMenu extends Component {
             <div className="draw-menu">
                 <div className="draw-menu-top">
                     <TopMenu />
-                    <ImportDataModal dataHandlers={this.props.dataHandlers}/>
                 </div>
                 <div className="draw-menu-bottom">
-                    <LeftSideBarMenu shapeHandlers={this.shapeHandlers}/>
+                    <LeftSideBarMenu shapeHandlers={this.props.shapeHandlers}/>
                     <RightSideBarMenu selectedShape={this.props.selectedShape} />
+
                     <div className="diagram-wrapper">
                         <div className="diagram-container">
                             <div className="diagram-background"></div>
                             <Diagram shapes={this.props.shapes}
-                                     shapeHandlers={this.shapeHandlers}
-                                     selectedShape={this.props.selectedShape}/>
+                                     shapeHandlers={this.props.shapeHandlers}
+                                     selectedShape={this.props.selectedShape}
+                                     contextMenuHandler={this.props.contextMenuHandler}/>
                         </div>
                     </div>
                 </div>
@@ -51,8 +50,9 @@ class ImportDataModal extends Component {
         };
 
         this.onDrop = this.onDrop.bind(this);
+        this.openFirstModal = this.openFirstModal.bind(this);
         this.openSecondModal = this.openSecondModal.bind(this);
-        this.closeSecondModal = this.closeSecondModal.bind(this);
+        this.close = this.close.bind(this);
         this.addData = this.addData.bind(this);
     }
 
@@ -72,20 +72,28 @@ class ImportDataModal extends Component {
         this.openSecondModal()
     }
 
-    openSecondModal() {
-        // First, get data from file upload
+    openFirstModal() {
+        this.setState({
+            firstModalOpen:true
+        })
+    }
 
+    openSecondModal() {
         this.setState({
             secondModalOpen:true
         })
     }
 
-    closeSecondModal() {
-        this.setState({
-            secondModalOpen:false
-        });
+    close(data) {
+        if (data) {
+            this.props.dataHandlers.addData(data.slice(1), data[0])
+        }
 
-        this.props.dataHandlers.addData(this.state.data, this.state.headers)
+        this.setState({
+            secondModalOpen:false,
+            firstModalOpen:false,
+            data:null
+        });
     }
 
     addData(data) {
@@ -95,14 +103,15 @@ class ImportDataModal extends Component {
     }
 
     render() {
-        const {secondModalOpen, data} = this.state;
+        const {firstModalOpen, secondModalOpen, data} = this.state;
 
-        let secondModalContent = <div id="hot-container"/>;
+        let secondModalContent = <div id="hot-container"></div>;
         if (this.state.data) {
             const container = document.getElementById('hot-container');
             var hot = new Handsontable(container, {
                 data:data,
-                rowHeaders: true
+                rowHeaders: true,
+                stretchH: "all"
             });
             hot.updateSettings({
                 contextMenu: {
@@ -144,23 +153,31 @@ class ImportDataModal extends Component {
         }
 
         return (
-            <Modal trigger={<Button>Import Data</Button>} size='small'>
+            <Modal trigger={<Menu.Item onClick={this.openFirstModal}>Import Data</Menu.Item>} size='small' open={firstModalOpen} onClose={() => this.close(null)}>
                 <Modal.Header>Import Data</Modal.Header>
                 <Modal.Content image>
                     <Modal.Description>
-                        <Dropzone onDrop={this.onDrop} multiple={false}>
-                            <div>Try dropping some files here, or click to select files to upload.</div>
+                        <Dropzone onDrop={this.onDrop} multiple={false} className="dropzone">
+                            <div className="dropzone-area">Try dropping some files here, or click to select files to upload.</div>
                         </Dropzone>
                     </Modal.Description>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Modal dimmer={false} open={secondModalOpen} onOpen={this.openSecondModal} onClose={this.closeSecondModal} size='small'>
+                    <Modal dimmer={false} open={secondModalOpen} onOpen={this.openSecondModal} size='small'>
                         <Modal.Header>Data Manipulation</Modal.Header>
                         <Modal.Content>
+                            <Message>
+                                <Message.Header>
+                                    We did our best to import your data as intended.  Adjust the column names of your data if desired.
+                                </Message.Header>
+                                <p>
+                                    Hint: right-click a row to add it to the header columns as text
+                                </p>
+                            </Message>
                             {secondModalContent}
                         </Modal.Content>
                         <Modal.Actions>
-                            <Button icon='check' content='All Done' onClick={this.close} />
+                            <Button content='All Done' onClick={() => this.close(hot.getData())} />
                         </Modal.Actions>
                     </Modal>
                 </Modal.Actions>
@@ -172,23 +189,12 @@ class ImportDataModal extends Component {
 class TopMenu extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {activeItem: 'home'};
-        this.handleItemClick = this.handleItemClick.bind(this)
-    }
-
-    handleItemClick(e, {name}) {
-        this.setState({activeItem: name});
     }
 
     render() {
-        const { activeItem } = this.state;
-
         return (
             <Menu id="top-sidebar">
-                <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick} />
-                <Menu.Item name='messages' active={activeItem === 'messages'} onClick={this.handleItemClick} />
-                <Menu.Item name='friends' active={activeItem === 'friends'} onClick={this.handleItemClick} />
+                <ImportDataModal/>
             </Menu>
         )
     }

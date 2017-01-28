@@ -285,3 +285,22 @@ rect {
   position: relative;
   height: 100%;
   width: 100%; }
+
+.dropzone {
+  width: 100%;
+  height: 200px;
+  border-width: 2px;
+  border-color: #666666;
+  border-style: dashed;
+  border-radius: 5px;
+  display: table; }
+
+.dropzone-area {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center; }
+
+#hot-container {
+  width: 100%;
+  height: 350px;
+  overflow: hidden; }

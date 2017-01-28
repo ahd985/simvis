@@ -18,6 +18,7 @@ export default class Diagram extends Component {
     render() {
         const shapeHandlers = this.props.shapeHandlers;
         const selectedShape = this.props.selectedShape;
+        const contextMenuHandler = this.props.contextMenuHandler;
 
         return (
             <svg className="diagram" id="draw-svg">
@@ -29,7 +30,8 @@ export default class Diagram extends Component {
                         <ShapeContainer uuid={shapeData.uuid} {...shape}
                                         shapeHandlers={shapeHandlers}
                                         toggled={shapeData.uuid == selectedShape}
-                                        key={i}/>
+                                        key={i}
+                                        contextMenuHandler={contextMenuHandler}/>
                     )
                 })}
             </svg>

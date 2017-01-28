@@ -44,7 +44,8 @@ class DrawContainer extends Component {
 
         this.addShape = this.addShape.bind(this);
         this.setSelectedShape = this.setSelectedShape.bind(this);
-        this.addData = this.addData.bind(this)
+        this.addData = this.addData.bind(this);
+        this.contextMenuHandler = this.contextMenuHandler.bind(this);
     }
 
     addShape(shape) {
@@ -60,6 +61,13 @@ class DrawContainer extends Component {
 
     addData(data, headers) {
         this.setState({data:data, dataHeaders:headers})
+
+        console.log(data, headers)
+    }
+
+    contextMenuHandler(e, uuid) {
+        alert(e)
+        alert(uuid)
     }
 
     render() {
@@ -70,7 +78,8 @@ class DrawContainer extends Component {
             <DrawMenu shapeHandlers={shapeHandlers}
                       dataHandlers={dataHandlers}
                       shapes={this.state.shapes}
-                      selectedShape={this.state.selectedShape}/>
+                      selectedShape={this.state.selectedShape}
+                      contextMenuHandler={this.contextMenuHandler}/>
         )
     }
 }

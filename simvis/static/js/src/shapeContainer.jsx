@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 
 import Draggable from 'react-draggable';
 
+import { Menu, Popup } from 'semantic-ui-react';
+
 export default class shapeContainer extends Component {
     constructor(props) {
         super(props);
@@ -24,12 +26,13 @@ export default class shapeContainer extends Component {
                 height: 0,
                 width: 0
             },
-            ratioLock: this.props.ratioLock
+            ratioLock: this.props.ratioLock,
         };
 
         this.toggle = this.toggle.bind(this);
         this.handleMove = this.handleMove.bind(this);
         this.handleResize = this.handleResize.bind(this);
+        this.handleContextMenu = this.handleContextMenu.bind(this);
     }
 
     toggle(e) {
@@ -67,6 +70,11 @@ export default class shapeContainer extends Component {
         });
     }
 
+    handleContextMenu(e) {
+        e.preventDefault();
+        this.props.contextMenuHandler(e, this.props.uuid)
+    }
+
     render() {
         const min_dim = 5;
         const {height, width} = this.state.dims;
@@ -83,7 +91,7 @@ export default class shapeContainer extends Component {
             <g transform={translate}>
                 <g style={this.state.style} onClick={this.toggle}>
                     <Draggable grid={[5,5]} onDrag={this.handleMove} axis={"none"}>
-                        <g>
+                        <g onContextMenu={this.handleContextMenu}>
                             <this.props.tag dObject={dObject}/>
                         </g>
                     </Draggable>
