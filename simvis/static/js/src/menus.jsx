@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message } from 'semantic-ui-react'
+import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup } from 'semantic-ui-react'
 import Dropzone from 'react-dropzone'
 import request from 'superagent'
 import 'superagent-django-csrf'
@@ -12,11 +12,35 @@ import shapes from './shapes'
 export default class DrawMenu extends Component {
     constructor(props) {
         super(props);
+
+        this.state={
+            contextMenuActive:false,
+            contextMenuStyle:{}
+        };
+
+        this.contextMenuHandler = this.contextMenuHandler.bind(this);
+        this.closeContextMenu = this.closeContextMenu.bind(this)
+    }
+
+    contextMenuHandler(e, uuid) {
+        this.setState({
+            contextMenuActive:true,
+            contextMenuStyle:{position:"absolute", left:e.clientX, top:e.clientY},
+        });
+    }
+
+    closeContextMenu() {
+        this.setState({
+            contextMenuActive:false
+        });
     }
 
     render() {
         return (
             <div className="draw-menu">
+                <ShapeContextMenu contextMenuActive={this.state.contextMenuActive}
+                                  contextMenuStyle={this.state.contextMenuStyle}
+                                  close={this.closeContextMenu}/>
                 <div className="draw-menu-top">
                     <TopMenu />
                 </div>
@@ -30,11 +54,36 @@ export default class DrawMenu extends Component {
                             <Diagram shapes={this.props.shapes}
                                      shapeHandlers={this.props.shapeHandlers}
                                      selectedShape={this.props.selectedShape}
-                                     contextMenuHandler={this.props.contextMenuHandler}/>
+                                     contextMenuHandler={this.contextMenuHandler}/>
                         </div>
                     </div>
                 </div>
             </div>
+        )
+    }
+}
+
+class ShapeContextMenu extends Component {
+    constructor(props) {
+        super(props)
+
+        this.handleClick = this.handleClick.bind(this)
+    }
+
+    handleClick() {
+        this.props.close()
+    }
+
+    render() {
+        const menu = <Menu secondary vertical>
+            <Menu.Item name='moveForward' onClick={this.handleClick}/>
+            <Menu.Item name='moveBackwards' onClick={this.handleClick}/>
+        </Menu>;
+
+        return (
+            <Popup open={this.props.contextMenuActive} content={menu}
+                   style={this.props.contextMenuStyle} basic on='click'
+                   onClose={this.props.close}/>
         )
     }
 }
@@ -193,8 +242,12 @@ class TopMenu extends Component {
 
     render() {
         return (
-            <Menu id="top-sidebar">
-                <ImportDataModal/>
+            <Menu id="top-sidebar" size="mini">
+                <Menu.Item name="moveForward"><Icon name='move' /></Menu.Item>
+                <Menu.Item name="moveBackwards"><Icon name='move' /></Menu.Item>
+                <Menu.Menu position='right'>
+                    <ImportDataModal/>
+                </Menu.Menu>
             </Menu>
         )
     }
