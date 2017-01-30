@@ -47,6 +47,8 @@ class DrawContainer extends Component {
         this.addShape = this.addShape.bind(this);
         this.setSelectedShape = this.setSelectedShape.bind(this);
         this.addData = this.addData.bind(this);
+        this.moveShapeForward = this.moveShapeForward.bind(this);
+        this.moveShapeBackwards = this.moveShapeBackwards.bind(this);
     }
 
     addShape(shape) {
@@ -62,8 +64,30 @@ class DrawContainer extends Component {
 
     addData(data, headers) {
         this.setState({data:data, dataHeaders:headers});
+    }
 
-        console.log(data, headers)
+    moveShapes(uuids, step) {
+        let topPosition=-1;
+        step == -1 ? topPosition=0 : null;
+        const movePositions = this.state.data.map((d, i) => {
+            let ind = uuids.indexOf(d.uuid);
+            topPosition == -1 && ind > -1 ? topPosition = i : null;
+            return ind > -1
+        });
+
+        let updatedData = this.state.data;
+        let movedData = [];
+        for (let i=0; i < positions.length; i++) {
+            if (movePositions[i]) {
+                movedData.push(updatedData[i]);
+                updatedData.splice(i,1);
+            }
+        }
+        updatedData.splice(topPosition, 0, movedData.length);
+
+        this.setState({
+            data:updatedData
+        })
     }
 
     render() {
