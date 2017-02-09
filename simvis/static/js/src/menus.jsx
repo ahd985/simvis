@@ -15,7 +15,9 @@ export default class DrawMenu extends Component {
 
         this.state={
             contextMenuActive:false,
-            contextMenuStyle:{}
+            contextMenuStyle:{},
+            contextUUIDs:null,
+            style:{"stroke-width":10}
         };
 
         this.contextMenuHandler = this.contextMenuHandler.bind(this);
@@ -26,12 +28,14 @@ export default class DrawMenu extends Component {
         this.setState({
             contextMenuActive:true,
             contextMenuStyle:{position:"absolute", left:e.clientX, top:e.clientY},
+            contextUUIDs:[uuid]
         });
     }
 
     closeContextMenu() {
         this.setState({
-            contextMenuActive:false
+            contextMenuActive:false,
+            contextUUIDs:null
         });
     }
 
@@ -40,21 +44,24 @@ export default class DrawMenu extends Component {
             <div className="draw-menu">
                 <ShapeContextMenu contextMenuActive={this.state.contextMenuActive}
                                   contextMenuStyle={this.state.contextMenuStyle}
-                                  close={this.closeContextMenu}/>
+                                  close={this.closeContextMenu}
+                                  moveShapes={this.props.shapeHandlers.moveShapes}
+                                  contextUUIDs={this.state.contextUUIDs}/>
                 <div className="draw-menu-top">
                     <TopMenu />
                 </div>
                 <div className="draw-menu-bottom">
                     <LeftSideBarMenu shapeHandlers={this.props.shapeHandlers}/>
-                    <RightSideBarMenu selectedShape={this.props.selectedShape} />
+                    <RightSideBarMenu selectedShapes={this.props.selectedShapes} />
 
                     <div className="diagram-wrapper">
                         <div className="diagram-container">
                             <div className="diagram-background"></div>
                             <Diagram shapes={this.props.shapes}
                                      shapeHandlers={this.props.shapeHandlers}
-                                     selectedShape={this.props.selectedShape}
-                                     contextMenuHandler={this.contextMenuHandler}/>
+                                     selectedShapes={this.props.selectedShapes}
+                                     contextMenuHandler={this.contextMenuHandler}
+                                     style={this.state.style}/>
                         </div>
                     </div>
                 </div>
@@ -65,19 +72,40 @@ export default class DrawMenu extends Component {
 
 class ShapeContextMenu extends Component {
     constructor(props) {
-        super(props)
+        super(props);
 
-        this.handleClick = this.handleClick.bind(this)
+        this.moveForwards = this.moveForwards.bind(this);
+        this.moveBackwards = this.moveBackwards.bind(this);
+        this.moveToFront = this.moveToFront.bind(this);
+        this.moveToBack = this.moveToBack.bind(this)
     }
 
-    handleClick() {
+    moveForwards() {
+        this.props.moveShapes(this.props.contextUUIDs, 1);
+        this.props.close()
+    }
+
+    moveBackwards() {
+        this.props.moveShapes(this.props.contextUUIDs, -1);
+        this.props.close()
+    }
+
+    moveToFront() {
+        this.props.moveShapes(this.props.contextUUIDs, "F");
+        this.props.close()
+    }
+
+    moveToBack() {
+        this.props.moveShapes(this.props.contextUUIDs, "B");
         this.props.close()
     }
 
     render() {
         const menu = <Menu secondary vertical>
-            <Menu.Item name='moveForward' onClick={this.handleClick}/>
-            <Menu.Item name='moveBackwards' onClick={this.handleClick}/>
+            <Menu.Item name='moveForwards' onClick={this.moveForwards}/>
+            <Menu.Item name='moveBackwards' onClick={this.moveBackwards}/>
+            <Menu.Item name='moveToFront' onClick={this.moveToFront}/>
+            <Menu.Item name='moveToBack' onClick={this.moveToBack}/>
         </Menu>;
 
         return (
@@ -287,23 +315,37 @@ class RightSideBarMenu extends Component {
         super(props);
 
         this.state = {
-            visible: true
+            visible: true,
+            activeItem: 'style'
         };
 
-        this.toggleVisibility = this.toggleVisibility.bind(this)
+        this.handleTabClick = this.handleTabClick.bind(this);
     }
 
-    toggleVisibility(e) {
-        this.setState((prevState, props) => {
-            return {visible: !prevState.visible};
-        });
+    handleTabClick(e, {name}) {
+        this.setState({activeItem: name})
     }
 
     render() {
         const { visible } = this.state;
+        const { activeItem } = this.state;
+
+        let menu;
+        if (activeItem === 'style') {
+            menu = <div>XXX</div>
+        } else if (activeItem === 'arrange') {
+            menu = <div>YYY</div>;
+        }
+
         return (
             <Sidebar animation='overlay' direction="right" width='wide' visible={visible} id="right-sidebar">
-                <Button onClick={this.toggleVisibility}>Toggle Visibility</Button>
+                <Menu attached='top' tabular>
+                    <Menu.Item name='style' active={activeItem === 'style'} onClick={this.handleTabClick} />
+                    <Menu.Item name='arrange' active={activeItem === 'arrange'} onClick={this.handleTabClick} />
+                </Menu>
+                <Segment attached='bottom' visible={activeItem === 'style'}>
+                    {menu}
+                </Segment>
             </Sidebar>
         )
     }

@@ -402,3 +402,11 @@ rect {
   height:350px;
   overflow:hidden;
 }
+
+.select-outline {
+  pointer-events:none;
+  stroke: rgb(102, 102, 102);
+  stroke-width: 2px;
+  stroke-dasharray: 10 5;
+  fill:none;
+}
