@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup } from 'semantic-ui-react'
+import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form } from 'semantic-ui-react'
+import NumberPicker from 'semantic-ui-react-numberpicker';
 import Dropzone from 'react-dropzone'
 import request from 'superagent'
 import 'superagent-django-csrf'
@@ -16,8 +17,7 @@ export default class DrawMenu extends Component {
         this.state={
             contextMenuActive:false,
             contextMenuStyle:{},
-            contextUUIDs:null,
-            style:{"stroke-width":10}
+            contextUUIDs:null
         };
 
         this.contextMenuHandler = this.contextMenuHandler.bind(this);
@@ -45,14 +45,16 @@ export default class DrawMenu extends Component {
                 <ShapeContextMenu contextMenuActive={this.state.contextMenuActive}
                                   contextMenuStyle={this.state.contextMenuStyle}
                                   close={this.closeContextMenu}
-                                  moveShapes={this.props.shapeHandlers.moveShapes}
+                                  reorderShapes={this.props.shapeHandlers.reorderShapes}
                                   contextUUIDs={this.state.contextUUIDs}/>
                 <div className="draw-menu-top">
                     <TopMenu />
                 </div>
                 <div className="draw-menu-bottom">
                     <LeftSideBarMenu shapeHandlers={this.props.shapeHandlers}/>
-                    <RightSideBarMenu selectedShapes={this.props.selectedShapes} />
+                    <RightSideBarMenu selectedShapes={this.props.selectedShapes}
+                                      selectedStyle={this.props.selectedStyle}
+                                      shapeHandlers={this.props.shapeHandlers}/>
 
                     <div className="diagram-wrapper">
                         <div className="diagram-container">
@@ -61,7 +63,7 @@ export default class DrawMenu extends Component {
                                      shapeHandlers={this.props.shapeHandlers}
                                      selectedShapes={this.props.selectedShapes}
                                      contextMenuHandler={this.contextMenuHandler}
-                                     style={this.state.style}/>
+                                     shapeStyle={this.props.shapeStyle}/>
                         </div>
                     </div>
                 </div>
@@ -81,22 +83,22 @@ class ShapeContextMenu extends Component {
     }
 
     moveForwards() {
-        this.props.moveShapes(this.props.contextUUIDs, 1);
+        this.props.reorderShapes(this.props.contextUUIDs, 1);
         this.props.close()
     }
 
     moveBackwards() {
-        this.props.moveShapes(this.props.contextUUIDs, -1);
+        this.props.reorderShapes(this.props.contextUUIDs, -1);
         this.props.close()
     }
 
     moveToFront() {
-        this.props.moveShapes(this.props.contextUUIDs, "F");
+        this.props.reorderShapes(this.props.contextUUIDs, "F");
         this.props.close()
     }
 
     moveToBack() {
-        this.props.moveShapes(this.props.contextUUIDs, "B");
+        this.props.reorderShapes(this.props.contextUUIDs, "B");
         this.props.close()
     }
 
@@ -320,33 +322,47 @@ class RightSideBarMenu extends Component {
         };
 
         this.handleTabClick = this.handleTabClick.bind(this);
+        this.handleNumberPickerChange = this.handleNumberPickerChange.bind(this);
     }
 
     handleTabClick(e, {name}) {
         this.setState({activeItem: name})
     }
 
+    handleNumberPickerChange(e) {
+        this.props.shapeHandlers.setShapeStyle({strokeWidth:e.value})
+    }
+
     render() {
         const { visible } = this.state;
         const { activeItem } = this.state;
 
-        let menu;
-        if (activeItem === 'style') {
-            menu = <div>XXX</div>
-        } else if (activeItem === 'arrange') {
-            menu = <div>YYY</div>;
-        }
+        let submenu, menu;
+        if (!this.props.selectedShapes.length) {
+            submenu = null;
+            menu = <Sidebar animation='overlay' direction="right" width='wide' visible={visible} id="right-sidebar">
+            </Sidebar>
+        } else {
+            if (activeItem === 'style') {
+                submenu = <Form.Field width="1" control={NumberPicker} label="Stroke-Width"
+                                   value={this.props.selectedStyle.strokeWidth} onChange={this.handleNumberPickerChange}/>
+            } else if (activeItem === 'arrange') {
+                submenu = <div>YYY</div>;
+            }
 
-        return (
-            <Sidebar animation='overlay' direction="right" width='wide' visible={visible} id="right-sidebar">
+            menu = <Sidebar animation='overlay' direction="right" width='wide' visible={visible} id="right-sidebar">
                 <Menu attached='top' tabular>
                     <Menu.Item name='style' active={activeItem === 'style'} onClick={this.handleTabClick} />
                     <Menu.Item name='arrange' active={activeItem === 'arrange'} onClick={this.handleTabClick} />
                 </Menu>
                 <Segment attached='bottom' visible={activeItem === 'style'}>
-                    {menu}
+                    {submenu}
                 </Segment>
             </Sidebar>
+        }
+
+        return (
+            menu
         )
     }
 }

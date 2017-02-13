@@ -12,7 +12,8 @@ export default class shapeContainer extends Component {
             style: {
                 fill: "grey",
                 stroke: "black",
-                cursor: "move"
+                cursor: "move",
+                strokeWidth: 1
             },
             dims: {
                 height: this.props.bbox.h0,
@@ -57,7 +58,9 @@ export default class shapeContainer extends Component {
     handleMouseUp(e) {
         e.preventDefault();
         if (!this.isDragging) {
-            this.props.shapeHandlers.clearSelectedShapes();
+            if (!e.shiftKey) {
+                this.props.shapeHandlers.clearSelectedShapes();
+            }
             this.toggle()
         }
 
@@ -67,6 +70,7 @@ export default class shapeContainer extends Component {
 
     toggle() {
         this.props.shapeHandlers.addSelectedShape(this.props.uuid);
+        this.props.shapeHandlers.setStyleMenu(this.state.style)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -84,8 +88,8 @@ export default class shapeContainer extends Component {
                     x: x + nextProps.deltaPos.x,
                     y: y + nextProps.deltaPos.y
                 },
-                    style:updatedStyle
-                }
+                style:updatedStyle
+            }
         });
     }
 

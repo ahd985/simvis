@@ -40,15 +40,31 @@ class DrawContainer extends Component {
         this.state = {
             shapes: [],
             selectedShapes: [],
+            deltaShapePos:{x:0, y:0},
+            deltaShapeSize:{x:0, y:0},
+            shapeStyle:{},
+            selectedStyle:{},
             data: null,
             dataHeaders: null,
+            undoCache:[],
+            redoCache:[]
         };
 
         this.addShape = this.addShape.bind(this);
+        this.removeShapes = this.removeShapes.bind(this);
         this.addSelectedShape = this.addSelectedShape.bind(this);
         this.clearSelectedShapes = this.clearSelectedShapes.bind(this);
         this.addData = this.addData.bind(this);
         this.moveShapes = this.moveShapes.bind(this);
+        this.resizeShapes = this.resizeShapes.bind(this);
+        this.reorderShapes = this.reorderShapes.bind(this);
+        this.setShapeStyle = this.setShapeStyle.bind(this);
+        this.setStyleMenu = this.setStyleMenu.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.undo = this.undo.bind(this);
+        this.redo = this.redo.bind(this);
+
+        document.addEventListener("keydown", this.handleKeyDown)
     }
 
     addShape(shape) {
@@ -56,6 +72,20 @@ class DrawContainer extends Component {
         this.setState((prevState, props) => {
             return {shapes: prevState.shapes.concat({uuid:uuid, shape:shape, position:{x:400, y:400}})};
         });
+    }
+
+    removeShapes() {
+        let shapesNew = this.state.shapes;
+
+        for (var i=this.state.shapes.length-1; i >= 0; i -= 1) {
+            if (this.state.selectedShapes.indexOf(this.state.shapes[i].uuid) > -1) {
+                shapesNew.splice(i,1);
+            }
+        }
+
+        this.setState({
+            shapes:shapesNew
+        })
     }
 
     addSelectedShape(uuid, overwriteIfNotPresent) {
@@ -81,7 +111,15 @@ class DrawContainer extends Component {
         this.setState({data:data, dataHeaders:headers});
     }
 
-    moveShapes(uuids, step) {
+    moveShapes(deltaShapePos) {
+        this.setState({deltaShapePos:deltaShapePos})
+    }
+
+    resizeShapes(deltaShapeSize) {
+        this.setState({deltaShapeSize:deltaShapeSize})
+    }
+
+    reorderShapes(uuids, step) {
         let topPosition = -1;
         const movePositions = this.state.shapes.map(function(d, i) {
             let ind = uuids.indexOf(d.uuid);
@@ -120,12 +158,45 @@ class DrawContainer extends Component {
         })
     }
 
+    setStyleMenu(style) {
+        this.setState({
+            selectedStyle:style
+        })
+    }
+
+    setShapeStyle(style) {
+        this.setState({
+            shapeStyle:style
+        })
+    }
+
+    handleKeyDown(e) {
+        let key = e.keyCode || e.charCode;
+
+        if (key == 8 || key == 46) {
+            this.removeShapes()
+        }
+    }
+
+    undo() {
+
+    }
+
+    redo() {
+
+    }
+
     render() {
         const shapeHandlers = {
             addShape:this.addShape,
             addSelectedShape:this.addSelectedShape,
             clearSelectedShapes:this.clearSelectedShapes,
-            moveShapes:this.moveShapes
+            moveShapes:this.moveShapes,
+            resizeShapes:this.resizeShapes,
+            reorderShapes:this.reorderShapes,
+            removeShapes:this.removeShapes,
+            setStyleMenu:this.setStyleMenu,
+            setShapeStyle:this.setShapeStyle
         };
 
         const dataHandlers = {addData:this.addData};
@@ -134,7 +205,9 @@ class DrawContainer extends Component {
             <DrawMenu shapeHandlers={shapeHandlers}
                       dataHandlers={dataHandlers}
                       shapes={this.state.shapes}
-                      selectedShapes={this.state.selectedShapes}/>
+                      selectedShapes={this.state.selectedShapes}
+                      selectedStyle={this.state.selectedStyle}
+                      shapeStyle={this.state.shapeStyle}/>
         )
     }
 }

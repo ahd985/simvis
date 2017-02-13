@@ -84,7 +84,7 @@ export default class Diagram extends Component {
         const selectOutline = this.state.selectOutline;
         const moveShapes = this.moveShapes;
         const deltaShapePos = this.state.deltaShapePos;
-        const style = this.props.style;
+        const style = this.props.shapeStyle;
 
         const renderedShapes = this.props.shapes.map(function(shapeData, i) {
             const toggled = selectedShapes.indexOf(shapeData.uuid) > -1;
