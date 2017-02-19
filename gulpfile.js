@@ -61,13 +61,16 @@ gulp.task('styles', function() {
 });
 
 // Javascript downgrading and minification
-gulp.task('scripts', function() {
+gulp.task('build', function() {
   gulp.src(paths.js + '/src/*.jsx')
     .pipe(babel({presets: ['es2015', 'stage-0', 'react']}))
     .pipe(plumber()) // Checks for errors
-    .pipe(gulp.dest(paths.js + '/src'));
+    .pipe(gulp.dest(paths.js + '/build'));
+});
 
-  return browserify({entries: paths.js + '/src/simvis.js', debug: true})
+// Javascript downgrading and minification
+gulp.task('compile', function() {
+  return browserify({entries: paths.js + '/build/simvis.js', debug: true})
     .bundle()
     .pipe(source('simvis.min.js'))
     .pipe(buffer())
@@ -101,7 +104,7 @@ gulp.task('browserSync', function() {
 
 // Default task
 gulp.task('default', function() {
-    runSequence(['styles', 'scripts', 'imgCompression'], 'runServer', 'browserSync');
+    runSequence(['styles', 'build', 'compile', 'imgCompression'], 'runServer', 'browserSync');
 });
 
 ////////////////////////////////
@@ -111,7 +114,7 @@ gulp.task('default', function() {
 // Watch
 gulp.task('watch', ['default'], function() {
   gulp.watch(paths.sass + '/*.scss', ['styles']);
-  gulp.watch([paths.js + '/src/*.jsx'], ['scripts']);
+  gulp.watch([paths.js + '/src/*.jsx'], ['build', 'compile']);
   gulp.watch(paths.images + '/*', ['imgCompression']);
   gulp.watch('templates/*.html');
 });

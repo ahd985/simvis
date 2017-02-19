@@ -63,6 +63,7 @@ export default class Diagram extends Component {
 
     handleMouseUp(e) {
         e.preventDefault();
+        this.toggle();
         this.setState((prevState) => {
             const x = Math.min(prevState.dragX, prevState.dragX + prevState.dragWidth);
             const y = Math.min(prevState.dragY, prevState.dragY + prevState.dragHeight);
@@ -84,7 +85,7 @@ export default class Diagram extends Component {
         const selectOutline = this.state.selectOutline;
         const moveShapes = this.moveShapes;
         const deltaShapePos = this.state.deltaShapePos;
-        const style = this.props.shapeStyle;
+        const style = this.props.selectedStyle;
 
         const renderedShapes = this.props.shapes.map(function(shapeData, i) {
             const toggled = selectedShapes.indexOf(shapeData.uuid) > -1;
@@ -111,18 +112,24 @@ export default class Diagram extends Component {
         if (this.state.clicked) {
             const outlineX = Math.min(this.state.dragX, this.state.dragX + this.state.dragWidth);
             const outlineY = Math.min(this.state.dragY, this.state.dragY + this.state.dragHeight);
-            selectOutlineRect = <rect  className="select-outline" x={outlineX} y={outlineY}
-                                   height={Math.abs(this.state.dragHeight)} width={Math.abs(this.state.dragWidth)}/>
+            const rectStyle = {x:outlineX, y:outlineY,
+                height:Math.abs(this.state.dragHeight), width:Math.abs(this.state.dragWidth)};
+            selectOutlineRect = <rect className="select-outline" style={rectStyle}/>
         }
 
         return (
-            <svg className="diagram" id="draw-svg">
-                <rect className="diagram-space" onClick={this.toggle} onMouseDown={this.handleMouseDown}
-                      onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp}
-                      style={{"pointerEvents": "fill"}}/>
-                {renderedShapes}
-                {selectOutlineRect}
-            </svg>
+            <div>
+                <svg className="diagram" id="draw-svg">
+                    <rect className="diagram-space" onClick={this.toggle}
+                          onMouseDown={this.handleMouseDown}/>
+                    {renderedShapes}
+                    {selectOutlineRect}
+                </svg>
+                <div className="select-layer" style={{visibility:(this.state.clicked ? "visible" : "hidden")}}
+                     onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp}
+                     onMouseOut={this.handleMouseUp}>
+                </div>
+            </div>
         )
     }
 }

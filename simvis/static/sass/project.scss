@@ -322,6 +322,7 @@ body {
   position: absolute;
   top: 0;
   left: 0;
+  fill:none;
 }
 
 .display-block {
@@ -337,7 +338,7 @@ body {
   height:100%;
   fill: #ffffff;
   fill-opacity:0;
-  pointer-events:all;
+  pointer-events:all
 }
 
 .draw-sidebar {
@@ -360,19 +361,25 @@ rect {
   vector-effect:non-scaling-stroke
 }
 
-#draw-container {
+#simvis-container {
+  position:absolute;
+  top:40px;
+  bottom:0;
+  left:0;
+  right:0;
+}
+
+.draw-container {
   height: 100%;
   width: 100%;
 }
 
-.draw-menu {
-  height: 100%;
-  width: 100%;
-}
-
-.draw-menu-bottom {
-  height: 100%;
-  width: 100%;
+.draw-container-bottom {
+  position:absolute;
+  top:34px;
+  bottom:0;
+  left:0;
+  right:0;
 }
 
 .diagram-wrapper {
@@ -404,9 +411,28 @@ rect {
 }
 
 .select-outline {
-  pointer-events:none;
+  pointer-events:all;
   stroke: rgb(102, 102, 102);
   stroke-width: 2px;
   stroke-dasharray: 10 5;
   fill:none;
+}
+
+.select-layer {
+  position:absolute;
+  top:0;
+  left:0;
+  bottom:0;
+  right:0;
+  fill:none;
+  border:none;
+  pointer-events:visible;
+}
+
+.diagram-layer {
+  position:absolute;
+  top:0;
+  left:0;
+  bottom:0;
+  right:0;
 }

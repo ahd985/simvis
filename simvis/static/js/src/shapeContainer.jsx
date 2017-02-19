@@ -12,8 +12,8 @@ export default class shapeContainer extends Component {
             style: {
                 fill: "grey",
                 stroke: "black",
-                cursor: "move",
-                strokeWidth: 1
+                strokeWidth: 1,
+                cursor: "move"
             },
             dims: {
                 height: this.props.bbox.h0,
@@ -69,14 +69,13 @@ export default class shapeContainer extends Component {
     }
 
     toggle() {
-        this.props.shapeHandlers.addSelectedShape(this.props.uuid);
-        this.props.shapeHandlers.setStyleMenu(this.state.style)
+        this.props.shapeHandlers.addSelectedShape(this.props.uuid, this.state.style, !this.props.toggled);
     }
 
     componentWillReceiveProps(nextProps) {
         const {x, y} = this.state.controlledPosition;
         this.setState((prevState) => {
-            let updatedStyle = prevState.style;
+            let updatedStyle = Object.assign({}, prevState.style);
             if (nextProps.style) {
                 for (var p in nextProps.style) {
                     updatedStyle[p] = nextProps.style[p]

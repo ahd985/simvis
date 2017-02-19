@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form } from 'semantic-ui-react'
-import NumberPicker from 'semantic-ui-react-numberpicker';
+import NumberPicker from './numberPicker.js';
+import { SketchPicker } from 'react-color';
 import Dropzone from 'react-dropzone'
 import request from 'superagent'
 import 'superagent-django-csrf'
@@ -10,7 +11,7 @@ import Handsontable from 'handsontable/dist/handsontable.full'
 import Diagram from './diagram.js'
 import shapes from './shapes'
 
-export default class DrawMenu extends Component {
+export default class DrawContainer extends Component {
     constructor(props) {
         super(props);
 
@@ -41,16 +42,16 @@ export default class DrawMenu extends Component {
 
     render() {
         return (
-            <div className="draw-menu">
+            <div className="draw-container">
                 <ShapeContextMenu contextMenuActive={this.state.contextMenuActive}
                                   contextMenuStyle={this.state.contextMenuStyle}
                                   close={this.closeContextMenu}
                                   reorderShapes={this.props.shapeHandlers.reorderShapes}
                                   contextUUIDs={this.state.contextUUIDs}/>
-                <div className="draw-menu-top">
+                <div className="draw-container-top">
                     <TopMenu />
                 </div>
-                <div className="draw-menu-bottom">
+                <div className="draw-container-bottom">
                     <LeftSideBarMenu shapeHandlers={this.props.shapeHandlers}/>
                     <RightSideBarMenu selectedShapes={this.props.selectedShapes}
                                       selectedStyle={this.props.selectedStyle}
@@ -63,7 +64,7 @@ export default class DrawMenu extends Component {
                                      shapeHandlers={this.props.shapeHandlers}
                                      selectedShapes={this.props.selectedShapes}
                                      contextMenuHandler={this.contextMenuHandler}
-                                     shapeStyle={this.props.shapeStyle}/>
+                                     selectedStyle={this.props.selectedStyle}/>
                         </div>
                     </div>
                 </div>
@@ -288,7 +289,7 @@ class LeftSideBarMenu extends Component {
         super(props);
 
         this.state = {
-            visible: true,
+            visible: true
         };
 
         this.shapeHandlers = this.props.shapeHandlers;
@@ -330,7 +331,7 @@ class RightSideBarMenu extends Component {
     }
 
     handleNumberPickerChange(e) {
-        this.props.shapeHandlers.setShapeStyle({strokeWidth:e.value})
+        this.props.shapeHandlers.setShapeStyle({strokeWidth:e.value + ''})
     }
 
     render() {
@@ -344,10 +345,17 @@ class RightSideBarMenu extends Component {
             </Sidebar>
         } else {
             if (activeItem === 'style') {
-                submenu = <Form.Field width="1" control={NumberPicker} label="Stroke-Width"
-                                   value={this.props.selectedStyle.strokeWidth} onChange={this.handleNumberPickerChange}/>
+                submenu = <Segment attached='bottom'>
+                    <Form.Field width="1" control={NumberPicker} label="Stroke-Width"
+                                   name={"strokeWidthPicker"}
+                                   value={this.props.selectedStyle.strokeWidth}
+                                   onChange={this.handleNumberPickerChange}
+                                   min={0}/>
+                    <ColorPickerModal color={this.props.selectedStyle.fill} shapeHandlers={this.props.shapeHandlers} desc="Fill" attr="fill"/>
+                    <ColorPickerModal color={this.props.selectedStyle.stroke} shapeHandlers={this.props.shapeHandlers} desc="Stroke" attr="stroke"/>
+                </Segment>;
             } else if (activeItem === 'arrange') {
-                submenu = <div>YYY</div>;
+                submenu = <Segment attached='bottom'><div>YYY</div></Segment>;
             }
 
             menu = <Sidebar animation='overlay' direction="right" width='wide' visible={visible} id="right-sidebar">
@@ -355,14 +363,59 @@ class RightSideBarMenu extends Component {
                     <Menu.Item name='style' active={activeItem === 'style'} onClick={this.handleTabClick} />
                     <Menu.Item name='arrange' active={activeItem === 'arrange'} onClick={this.handleTabClick} />
                 </Menu>
-                <Segment attached='bottom' visible={activeItem === 'style'}>
-                    {submenu}
-                </Segment>
+                {submenu}
             </Sidebar>
         }
 
         return (
             menu
+        )
+    }
+}
+
+class ColorPickerModal extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            open:false,
+            color:this.props.color
+        };
+
+        this.handleOpen = this.handleOpen.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+        this.handleChangeComplete = this.handleChangeComplete.bind(this);
+    }
+
+    handleOpen() {
+        this.setState({open:true})
+    }
+
+    handleClose(canceled) {
+        if (!canceled) {
+            let style = {};
+            style[this.props.attr] = this.state.color.hex;
+            this.props.shapeHandlers.setShapeStyle(style)
+        }
+
+        this.setState({open:false})
+    }
+
+    handleChangeComplete(color) {
+        this.setState({color:color})
+    }
+
+    render() {
+        return (
+            <Modal trigger={<Button onClick={this.handleOpen}>{this.props.desc}</Button>} open={this.state.open}>
+                <Modal.Content>
+                    <SketchPicker color={this.state.color} onChangeComplete={this.handleChangeComplete}/>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button content='Cancel' onClick={() => this.handleClose(true)} />
+                    <Button content='Done' onClick={() => this.handleClose()} />
+                </Modal.Actions>
+            </Modal>
         )
     }
 }

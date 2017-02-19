@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom'
 import { Menu } from 'semantic-ui-react'
 import uuidV4 from 'uuid/v4'
 
-import DrawMenu from './menus.js'
+import DrawContainer from './drawContainer.js'
 
 class NavBar extends Component{
     constructor(props) {
@@ -33,7 +33,7 @@ class NavBar extends Component{
     }
 }
 
-class DrawContainer extends Component {
+class SimVis extends Component {
     constructor(props) {
         super(props);
 
@@ -42,7 +42,6 @@ class DrawContainer extends Component {
             selectedShapes: [],
             deltaShapePos:{x:0, y:0},
             deltaShapeSize:{x:0, y:0},
-            shapeStyle:{},
             selectedStyle:{},
             data: null,
             dataHeaders: null,
@@ -59,7 +58,6 @@ class DrawContainer extends Component {
         this.resizeShapes = this.resizeShapes.bind(this);
         this.reorderShapes = this.reorderShapes.bind(this);
         this.setShapeStyle = this.setShapeStyle.bind(this);
-        this.setStyleMenu = this.setStyleMenu.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.undo = this.undo.bind(this);
         this.redo = this.redo.bind(this);
@@ -88,7 +86,7 @@ class DrawContainer extends Component {
         })
     }
 
-    addSelectedShape(uuid, overwriteIfNotPresent) {
+    addSelectedShape(uuid, style, overwriteIfNotPresent) {
         this.setState((prevState, props) => {
             let selectedShapes = prevState.selectedShapes;
             if (selectedShapes.indexOf(uuid) < 0) {
@@ -99,7 +97,7 @@ class DrawContainer extends Component {
                 }
             }
 
-            return {selectedShapes:selectedShapes};
+            return {selectedShapes:selectedShapes, selectedStyle:style};
         });
     }
 
@@ -158,16 +156,17 @@ class DrawContainer extends Component {
         })
     }
 
-    setStyleMenu(style) {
-        this.setState({
-            selectedStyle:style
-        })
-    }
-
     setShapeStyle(style) {
-        this.setState({
-            shapeStyle:style
-        })
+        this.setState((prevState) => {
+            let updatedStyle = prevState.selectedStyle;
+            for (var s in style) {
+                updatedStyle[s] = style[s]
+            }
+
+            return {
+                selectedStyle:updatedStyle
+            }
+        });
     }
 
     handleKeyDown(e) {
@@ -195,19 +194,17 @@ class DrawContainer extends Component {
             resizeShapes:this.resizeShapes,
             reorderShapes:this.reorderShapes,
             removeShapes:this.removeShapes,
-            setStyleMenu:this.setStyleMenu,
             setShapeStyle:this.setShapeStyle
         };
 
         const dataHandlers = {addData:this.addData};
 
         return (
-            <DrawMenu shapeHandlers={shapeHandlers}
+            <DrawContainer shapeHandlers={shapeHandlers}
                       dataHandlers={dataHandlers}
                       shapes={this.state.shapes}
                       selectedShapes={this.state.selectedShapes}
-                      selectedStyle={this.state.selectedStyle}
-                      shapeStyle={this.state.shapeStyle}/>
+                      selectedStyle={this.state.selectedStyle}/>
         )
     }
 }
@@ -218,6 +215,6 @@ ReactDOM.render(
 );
 
 ReactDOM.render(
-  <DrawContainer />,
-  document.getElementById('draw-container')
+  <SimVis />,
+  document.getElementById('simvis-container')
 );

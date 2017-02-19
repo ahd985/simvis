@@ -56,7 +56,6 @@ class DrawMenu extends Component {
                         <div className="diagram-background"></div>
                         <Diagram element={this.state.elements}/>
                     </div>
-
                 </div>
             </div>
         )
