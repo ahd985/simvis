@@ -69,7 +69,7 @@ export default class shapeContainer extends Component {
     }
 
     toggle() {
-        this.props.shapeHandlers.addSelectedShape(this.props.uuid, this.state.style, !this.props.toggled);
+        this.props.shapeHandlers.addSelectedShape(this.props.uuid, this.state.style, true);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -93,7 +93,7 @@ export default class shapeContainer extends Component {
     }
 
     handleMove(e, ui) {
-        this.props.shapeHandlers.addSelectedShape(this.props.uuid, true);
+        this.props.shapeHandlers.addSelectedShape(this.props.uuid, this.state.style, true);
         this.props.moveShapes({x:ui.deltaX, y:ui.deltaY})
     }
 
@@ -131,7 +131,7 @@ export default class shapeContainer extends Component {
                 prevState.controlledPosition.x + prevState.dims.width + prevState.deltaDims.width <= outline.x + outline.width &&
                 prevState.controlledPosition.y + prevState.dims.height + prevState.deltaDims.height <= outline.y + outline.height) {
 
-                this.toggle()
+                this.props.shapeHandlers.addSelectedShape(this.props.uuid, this.state.style, false);
             }
         }
     }
