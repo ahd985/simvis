@@ -38,7 +38,7 @@ export class Rect extends Component {
         };
 
         return (
-            <rect {...attr} />
+            <rect {...attr} id={this.props.id}/>
         )
     }
 }
@@ -89,7 +89,7 @@ export class Circle extends Component {
         };
 
         return(
-            <circle {...attr} />
+            <circle {...attr} id={this.props.id} />
         )
     }
 }
@@ -137,7 +137,7 @@ export class Ellipse extends Component {
         };
 
         return(
-            <ellipse {...attr} />
+            <ellipse {...attr} id={this.props.id} />
         )
     }
 }
@@ -195,7 +195,7 @@ export class Path extends Component {
         const attr = {d: d};
 
         return(
-            <path {...attr} />
+            <path {...attr} id={this.props.id} />
         )
     }
 }

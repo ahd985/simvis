@@ -1,7 +1,4 @@
 import React, { Component } from 'react'
-
-import Draggable from 'react-draggable';
-
 import ShapeContainer from './shapeContainer.js'
 
 export default class Diagram extends Component {

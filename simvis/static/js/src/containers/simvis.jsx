@@ -1,39 +1,13 @@
 import React, { Component } from 'react'
-import ReactDOM from 'react-dom'
+import { createStore } from 'redux'
 
 import { Menu } from 'semantic-ui-react'
 import uuidV4 from 'uuid/v4'
+import ssv from '../../ssv.min.js'
 
 import DrawContainer from './drawContainer.js'
 
-class NavBar extends Component{
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            activeItem: 'home'
-        };
-        this.handleItemClick = this.handleItemClick.bind(this)
-    }
-
-    handleItemClick(e, {name}) {
-        this.setState({activeItem: name});
-    }
-
-    render() {
-        const { activeItem } = this.state;
-
-        return (
-            <Menu inverted>
-                <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick} />
-                <Menu.Item name='messages' active={activeItem === 'messages'} onClick={this.handleItemClick} />
-                <Menu.Item name='friends' active={activeItem === 'friends'} onClick={this.handleItemClick} />
-            </Menu>
-        )
-    }
-}
-
-class SimVis extends Component {
+export default class SimVis extends Component {
     constructor(props) {
         super(props);
 
@@ -61,12 +35,13 @@ class SimVis extends Component {
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.undo = this.undo.bind(this);
         this.redo = this.redo.bind(this);
+        this.addModelToShape = this.addModelToShape.bind(this);
 
         document.addEventListener("keydown", this.handleKeyDown)
     }
 
     addShape(shape) {
-        const uuid = uuidV4();
+        const uuid = "s" + uuidV4();
         this.setState((prevState, props) => {
             return {shapes: prevState.shapes.concat({uuid:uuid, shape:shape, position:{x:400, y:400}})};
         });
@@ -185,6 +160,30 @@ class SimVis extends Component {
 
     }
 
+    addModelToShape() {
+        const element_data = {
+            conditions: [
+                {
+                    color_levels:[372.7401979757573,408.50419817952684,444.2681983832963],
+                    color_scale:['#fdd49e','#fdbb84','#fc8d59'],
+                    data:[409],
+                    description:"Vapor Temp",
+                    id:"element_0",
+                    opacity:1,
+                    report:false,
+                    type:"background",
+                    unit:"K"
+                }
+            ],
+            description: "Quench Tank",
+            ids: ['element'],
+            type: "cell",
+            x_series:[0]
+        };
+
+        var demo = ssv.create_demo_element(this.state.selectedShapes[0], element_data).update(0,0);
+    }
+
     render() {
         const shapeHandlers = {
             addShape:this.addShape,
@@ -194,7 +193,8 @@ class SimVis extends Component {
             resizeShapes:this.resizeShapes,
             reorderShapes:this.reorderShapes,
             removeShapes:this.removeShapes,
-            setShapeStyle:this.setShapeStyle
+            setShapeStyle:this.setShapeStyle,
+            addModelToShape:this.addModelToShape
         };
 
         const dataHandlers = {addData:this.addData};
@@ -208,13 +208,3 @@ class SimVis extends Component {
         )
     }
 }
-
-ReactDOM.render(
-  <NavBar />,
-  document.getElementById('navbar-container')
-);
-
-ReactDOM.render(
-  <SimVis />,
-  document.getElementById('simvis-container')
-);

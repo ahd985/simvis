@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-
 import Draggable from 'react-draggable';
-
+import { connect } from 'react-redux'
+import { addTodo } from '../actions'
 import { Menu, Popup } from 'semantic-ui-react';
 
-export default class shapeContainer extends Component {
+class ShapeContainer extends Component {
     constructor(props) {
         super(props);
 
@@ -58,18 +58,15 @@ export default class shapeContainer extends Component {
     handleMouseUp(e) {
         e.preventDefault();
         if (!this.isDragging) {
-            if (!e.shiftKey) {
-                this.props.shapeHandlers.clearSelectedShapes();
-            }
-            this.toggle()
+            this.toggle(!e.shiftKey)
         }
 
         this.isClicked=false;
         this.isDragging=false
     }
 
-    toggle() {
-        this.props.shapeHandlers.addSelectedShape(this.props.uuid, this.state.style, true);
+    toggle(overwriteIfNotPresent) {
+        this.props.shapeHandlers.addSelectedShape(this.props.uuid, this.state.style, overwriteIfNotPresent);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -152,8 +149,8 @@ export default class shapeContainer extends Component {
             <g transform={translate}>
                 <g style={this.state.style} onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp}>
                     <Draggable grid={[5,5]} onDrag={this.handleMove} axis={"none"}>
-                        <g onContextMenu={this.handleContextMenu}>
-                            <this.props.tag dObject={dObject}/>
+                        <g onContextMenu={this.handleContextMenu} id={this.props.uuid}>
+                            <this.props.tag dObject={dObject} />
                         </g>
                     </Draggable>
                 </g>
@@ -170,3 +167,7 @@ export default class shapeContainer extends Component {
         )
     }
 }
+
+export default connect()(ShapeContainer)
+
+

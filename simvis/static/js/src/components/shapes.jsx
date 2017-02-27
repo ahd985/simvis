@@ -11,7 +11,7 @@ class Box extends Component {
     render() {
         return (
             <Shape objectBBox={defaultBBox} dObject={this.props.dObject}>
-                <Rect x={0} y={0} height={100} width={100} />
+                <Rect x={0} y={0} height={100} width={100} id={"element"} />
             </Shape>
         )
     }
@@ -25,7 +25,7 @@ class Round extends Component {
     render() {
         return (
             <Shape objectBBox={defaultBBox} dObject={this.props.dObject}>
-                <Circle cx={50} cy={50} r={50} />
+                <Circle cx={50} cy={50} r={50} id={"element"} />
             </Shape>
         )
     }
@@ -40,7 +40,7 @@ class SkewedRound extends Component {
     render() {
         return (
             <Shape objectBBox={skewedRoundBBox} dObject={this.props.dObject}>
-                <Ellipse cx={50} cy={25} rx={50} ry={25}/>
+                <Ellipse cx={50} cy={25} rx={50} ry={25} id={"element"} />
             </Shape>
         )
     }

@@ -335,3 +335,8 @@ rect {
   left: 0;
   bottom: 0;
   right: 0; }
+
+.color-set-div {
+  height: 15px;
+  width: 10px;
+  float: right; }

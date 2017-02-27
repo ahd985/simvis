@@ -61,22 +61,25 @@ gulp.task('styles', function() {
 });
 
 // Javascript downgrading and minification
-gulp.task('build', function() {
-  gulp.src(paths.js + '/src/*.jsx')
-    .pipe(babel({presets: ['es2015', 'stage-0', 'react']}))
-    .pipe(plumber()) // Checks for errors
-    .pipe(gulp.dest(paths.js + '/build'));
-});
-
-// Javascript downgrading and minification
 gulp.task('compile', function() {
-  return browserify({entries: paths.js + '/build/simvis.js', debug: true})
+  return browserify({entries: paths.js + '/build/index.js', debug: true})
     .bundle()
     .pipe(source('simvis.min.js'))
     .pipe(buffer())
     //.pipe(uglify())
     .pipe(plumber()) // Checks for errors
-    .pipe(gulp.dest(paths.js))
+    .pipe(gulp.dest(paths.js));
+});
+
+// Javascript downgrading and minification
+gulp.task('build', function() {
+  return gulp.src([paths.js + '/src/*/*.jsx', paths.js + '/src/*.jsx'])
+    .pipe(babel({presets: ['es2015', 'stage-0', 'react']}))
+    .pipe(plumber()) // Checks for errors
+    .pipe(gulp.dest(function(file) {
+      var dir = file.base.split("/");
+      return paths.js + '/build' + (dir[dir.length - 1] == 'src' ? '' : '/' + dir[dir.length - 1])
+    }));
 });
 
 // Image compression
@@ -96,7 +99,7 @@ gulp.task('runServer', function() {
 
 // Browser sync server for live reload
 gulp.task('browserSync', function() {
-    browserSync.init(
+    browserSync.init(0
       [paths.css + "/*.css", paths.js + "/*.js", paths.templates + '/*.html'], {
         proxy:  "localhost:8000"
     });
@@ -104,7 +107,7 @@ gulp.task('browserSync', function() {
 
 // Default task
 gulp.task('default', function() {
-    runSequence(['styles', 'build', 'compile', 'imgCompression'], 'runServer', 'browserSync');
+    runSequence(['styles', 'imgCompression'], 'build', 'compile', 'runServer', 'browserSync');
 });
 
 ////////////////////////////////
@@ -114,7 +117,8 @@ gulp.task('default', function() {
 // Watch
 gulp.task('watch', ['default'], function() {
   gulp.watch(paths.sass + '/*.scss', ['styles']);
-  gulp.watch([paths.js + '/src/*.jsx'], ['build', 'compile']);
+  gulp.watch([paths.js + '/src/*.jsx', paths.js + '/src/*/*.jsx'], ['build']);
+  gulp.watch([paths.js + '/build/index.js'], ['compile']);
   gulp.watch(paths.images + '/*', ['imgCompression']);
   gulp.watch('templates/*.html');
 });
