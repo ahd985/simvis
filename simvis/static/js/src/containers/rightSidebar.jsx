@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
-import { SketchPicker } from 'react-color';
 import { connect } from 'react-redux'
-import { setStrokeWidth } from '../actions'
+import { setShapeStyle, setShapeModel } from '../actions'
 
 import ssv from '../../ssv.min.js'
 
-import getForm from '../components/modelFormMap.js'
-import NumberPicker from '../components/numberPicker.js';
+import NumberPicker from '../components/numberPicker';
+import ColorPickerModal from '../components/colorPickerModal'
+import ModelPickerModal from '../components/modelPickerModal'
 
 class RightSideBarMenu extends Component {
     constructor(props) {
@@ -19,7 +19,7 @@ class RightSideBarMenu extends Component {
         };
 
         this.handleTabClick = this.handleTabClick.bind(this);
-        this.handleNumberPickerChange = this.handleNumberPickerChange.bind(this);
+        this.handleStrokeWidthChange = this.handleStrokeWidthChange.bind(this);
         this.addModelToShape = this.addModelToShape.bind(this)
     }
 
@@ -27,12 +27,12 @@ class RightSideBarMenu extends Component {
         this.setState({activeItem: name})
     }
 
-    handleNumberPickerChange(e) {
-        this.props.shapeHandlers.setShapeStyle({strokeWidth:e.value + ''})
+    handleStrokeWidthChange(e) {
+        this.props.setShapeStyle({strokeWidth:e.value + ''})
     }
 
     addModelToShape() {
-        this.props.shapeHandlers.addModelToShape()
+        this.props.setShapeModel()
     }
 
     render() {
@@ -48,17 +48,17 @@ class RightSideBarMenu extends Component {
             if (activeItem === 'model') {
                 submenu = <Segment attached='bottom'>
                     <Button onClick={this.addModelToShape}/>
-                    <ModelPickerModal/>
+                    <ModelPickerModal setShapeModel={this.props.setShapeModel}/>
                 </Segment>;
             } else if (activeItem === 'style') {
                 submenu = <Segment attached='bottom'>
                     <Form.Field width="1" control={NumberPicker} label="Stroke-Width"
                                    name={"strokeWidthPicker"}
-                                   value={1}
-                                   onChange={this.props.handleStrokeWidthChange}
+                                   value={this.props.selectedStyle.strokeWidth}
+                                   onChange={this.handleStrokeWidthChange}
                                    min={0}/>
-                    <ColorPickerModal color={this.props.selectedStyle.fill} shapeHandlers={this.props.shapeHandlers} desc="Fill" attr="fill"/>
-                    <ColorPickerModal color={this.props.selectedStyle.stroke} shapeHandlers={this.props.shapeHandlers} desc="Stroke" attr="stroke"/>
+                    <ColorPickerModal color={this.props.selectedStyle.fill} setShapeStyle={this.props.setShapeStyle} desc="Fill" attr="fill"/>
+                    <ColorPickerModal color={this.props.selectedStyle.stroke} setShapeStyle={this.props.setShapeStyle} desc="Stroke" attr="stroke"/>
                 </Segment>;
             } else if (activeItem === 'arrange') {
                 submenu = <Segment attached='bottom'><div>YYY</div></Segment>;
@@ -80,258 +80,14 @@ class RightSideBarMenu extends Component {
     }
 }
 
-class ColorPickerModal extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            open:false,
-            color:this.props.color
-        };
-
-        this.handleOpen = this.handleOpen.bind(this);
-        this.handleClose = this.handleClose.bind(this);
-        this.handleChangeComplete = this.handleChangeComplete.bind(this);
-    }
-
-    handleOpen() {
-        this.setState({open:true})
-    }
-
-    handleClose(canceled) {
-        if (!canceled) {
-            let style = {};
-            style[this.props.attr] = this.state.color.hex;
-            this.props.shapeHandlers.setShapeStyle(style)
-        }
-
-        this.setState({open:false})
-    }
-
-    handleChangeComplete(color) {
-        this.setState({color:color})
-    }
-
-    render() {
-        return (
-            <Modal trigger={<Button onClick={this.handleOpen}>{this.props.desc}</Button>} open={this.state.open}>
-                <Modal.Content>
-                    <SketchPicker color={this.state.color} onChangeComplete={this.handleChangeComplete}/>
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button content='Cancel' onClick={() => this.handleClose(true)} />
-                    <Button content='Done' onClick={() => this.handleClose()} />
-                </Modal.Actions>
-            </Modal>
-        )
-    }
-}
-
-class ModelPickerModal extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            open:false,
-            model:null,
-            modelRequirements:null,
-            selectedConditions:[]
-        };
-
-        this.requirements = ssv.get_type_requirements();
-        this.options = this.generate_options(this.requirements);
-
-        this.handleOpen = this.handleOpen.bind(this);
-        this.handleClose = this.handleClose.bind(this);
-        this.handleSelectModel = this.handleSelectModel.bind(this);
-    }
-
-    generate_options(requirements) {
-        var options = [];
-
-        const keys = Object.keys(requirements).sort();
-        keys.map(function(key) {
-           options.push({key:key, value:key, text:key})
-        });
-
-        return options
-    }
-
-    handleOpen() {
-        this.setState({open:true})
-    }
-
-    handleClose(canceled) {
-        if (!canceled) {
-
-        }
-
-        this.setState({open:false})
-    }
-
-    handleSelectModel(e, d) {
-        this.setState(
-            {
-                modelRequirements:this.requirements[d.value]
-            }
-        )
-    }
-
-    render() {
-        var modelForm=null;
-        var modelArgs=null;
-        if (this.state.modelRequirements) {
-            modelArgs = Object.keys(this.state.modelRequirements.args).map((arg) => {
-                let form = getForm(arg);
-                if (form) {
-                    return <form.tag key={arg}/>
-                } else {
-                    return false
-                }
-            }).filter((arg) => {
-                if (arg) {return true} else {return false}
-            });
-
-            const formConditions = this.state.selectedConditions.map((d) => {
-                return (
-                    <Table.Row key={d.name}>
-                        <Table.Cell>
-                            d.name
-                        </Table.Cell>
-                    </Table.Row>
-                )
-            });
-
-            modelForm = <Table compact celled definition>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell>Condition</Table.HeaderCell>
-                    </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                    {formConditions}
-                </Table.Body>
-                <Table.Footer fullWidth>
-                    <Table.Row>
-                        <Table.HeaderCell>
-                            <ConditionPickerModal conditions={this.state.modelRequirements.conditions}/>
-                        </Table.HeaderCell>
-                    </Table.Row>
-                </Table.Footer>
-            </Table>
-        }
-
-        return (
-            <Modal trigger={<Button onClick={this.handleOpen}>{"Add Model"}</Button>} open={this.state.open}>
-                <Modal.Content>
-                    <Dropdown placeholder='Model' search selection options={this.options}
-                              onChange={this.handleSelectModel} />
-                    {modelArgs}
-                    {modelForm}
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button content='Cancel' onClick={() => this.handleClose(true)} />
-                    <Button content='Done' onClick={() => this.handleClose()} />
-                </Modal.Actions>
-            </Modal>
-        )
-    }
-}
-
-class ConditionPickerModal extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            open:false,
-            options:Object.keys(this.props.conditions).map((key) => {
-                return {
-                    key:key,
-                    value:key,
-                    text:key
-                }
-            }),
-            conditionSelected:null
-        };
-
-        this.handleOpen = this.handleOpen.bind(this);
-        this.handleClose = this.handleClose.bind(this);
-        this.handleSelectCondition = this.handleSelectCondition.bind(this);
-    }
-
-    handleOpen() {
-        this.setState({open:true})
-    }
-
-    handleClose(canceled) {
-        if (!canceled) {
-
-        }
-
-        this.setState({open:false})
-    }
-
-    handleSelectCondition(e, d) {
-        this.setState(
-            {
-                conditionSelected:this.props.conditions[d.value]
-            }
-        )
-    }
-
-    render() {
-        let conditionForm = null;
-        if (this.state.conditionSelected) {
-            let conditionArgs = Object.keys(this.state.conditionSelected.args).map((arg) => {
-                let form = getForm(arg);
-                if (form) {
-                    return <form.tag key={arg}/>
-                } else {
-                    return false
-                }
-            }).filter((arg) => {
-                if (arg) {return true} else {return false}
-            });
-
-            conditionForm = <div>
-                <DataForm headers={this.props.dataHeaders}/>
-                {conditionArgs}
-            </div>
-        }
-
-        return (
-            <Modal trigger={<Button onClick={this.handleOpen} floated='right'>{"Add Condition"}</Button>} open={this.state.open}>
-                <Modal.Content>
-                    <Dropdown placeholder='Condition' search selection options={this.state.options}
-                              onChange={this.handleSelectCondition} />
-                    {conditionForm}
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button content='Cancel' onClick={() => this.handleClose(true)} />
-                    <Button content='Done' onClick={() => this.handleClose()} />
-                </Modal.Actions>
-            </Modal>
-        )
-    }
-}
-
-class DataForm extends Component {
-    constructor(props) {
-        super(props)
-    }
-
-    render() {
-        return (
-            <Dropdown placeholder='Header' search selection options={[{key:"x", value:"x", text:"x"}]}
-                              onChange={() => {}} />
-        )
-    }
-}
-
-const mapStateToProps = ({ shapeController}) => ({});
+const mapStateToProps = ({ shapeCollection }) => ({
+    selectedShapes:shapeCollection.selectedShapes,
+    selectedStyle:shapeCollection.selectedStyle
+});
 
 const mapDispatchToProps = {
-
+    setShapeStyle:setShapeStyle,
+    setShapeModel:setShapeModel
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RightSideBarMenu)

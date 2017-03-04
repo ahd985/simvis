@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Form, Modal, Button } from 'semantic-ui-react'
 import { SwatchesPicker } from 'react-color';
 
-import NumberPicker from './numberPicker.js';
+import NumberPicker from './numberPicker';
 import chroma from 'chroma-js'
 
 class DescriptionForm extends Component {
@@ -13,6 +13,114 @@ class DescriptionForm extends Component {
     render() {
         return (
             <Form.Input label='Description' name='description' placeholder='Description'/>
+        )
+    }
+}
+
+class UnitForm extends Component {
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        return (
+            <Form.Input label='Unit' name='unit' placeholder=''/>
+        )
+    }
+}
+
+class SectionLabelForm extends Component {
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        return (
+            <Form.Input label='Section Label' name='sectionLabel' placeholder='Section'/>
+        )
+    }
+}
+
+class OpacityForm extends Component {
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        return (
+            <Form.Input label='Opacity' name='opacity' placeholder='1' type="number"/>
+        )
+    }
+}
+
+class MinHeightForm extends Component {
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        return (
+            <Form.Input label='Min Height' name='minHeight' placeholder='0' type="number"/>
+        )
+    }
+}
+
+class MaxHeightForm extends Component {
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        return (
+            <Form.Input label='Max Height' name='maxHeight' placeholder='1' type={"number"}/>
+        )
+    }
+}
+
+class ReportForm extends Component {
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        return (
+            <Form.Input label='Report' name='report' placeholder=''/>
+        )
+    }
+}
+
+class OverlayForm extends Component {
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        return (
+            <Form.Input label='Overlay' name='overlay' placeholder=''/>
+        )
+    }
+}
+
+class TrueColorForm extends Component {
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        return (
+            <Form.Input label='True Color' name='trueColor' placeholder=''/>
+        )
+    }
+}
+
+class FalseColorForm extends Component {
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        return (
+            <Form.Input label='False Color' name='falseColor' placeholder=''/>
         )
     }
 }
@@ -100,7 +208,16 @@ function createColorButtonIcon(colorSet, stepCount) {
 const formMap = [
     {name:"description", tag:DescriptionForm},
     {name:"color_scale", tag:ColorScaleForm},
-    {name:"color_levels", tag:ColorLevelsForm}
+    {name:"color_levels", tag:ColorLevelsForm},
+    {name:"true_color", tag:TrueColorForm},
+    {name:"false_color", tag:FalseColorForm},
+    {name:"min_height", tag:MinHeightForm},
+    {name:"max_height", tag:MaxHeightForm},
+    {name:"unit", tag:UnitForm},
+    {name:"section_label", tag:SectionLabelForm},
+    {name:"opacity", tag:OpacityForm},
+    {name:"report", tag:ReportForm},
+    {name:"overlay", tag:OverlayForm}
 ];
 
 export default function getForm(name) {

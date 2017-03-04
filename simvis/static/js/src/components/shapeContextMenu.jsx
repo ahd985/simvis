@@ -12,22 +12,22 @@ export default class ShapeContextMenu extends Component {
     }
 
     moveForwards() {
-        this.props.reorderShapes(this.props.contextUUIDs, 1);
+        this.props.reorderShapes(1);
         this.props.close()
     }
 
     moveBackwards() {
-        this.props.reorderShapes(this.props.contextUUIDs, -1);
+        this.props.reorderShapes(-1);
         this.props.close()
     }
 
     moveToFront() {
-        this.props.reorderShapes(this.props.contextUUIDs, "F");
+        this.props.reorderShapes("F");
         this.props.close()
     }
 
     moveToBack() {
-        this.props.reorderShapes(this.props.contextUUIDs, "B");
+        this.props.reorderShapes("B");
         this.props.close()
     }
 

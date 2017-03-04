@@ -61,7 +61,7 @@ gulp.task('styles', function() {
 });
 
 // Javascript downgrading and minification
-gulp.task('compile', function() {
+gulp.task('compile', ['build'], function() {
   return browserify({entries: paths.js + '/build/index.js', debug: true})
     .bundle()
     .pipe(source('simvis.min.js'))
@@ -107,7 +107,7 @@ gulp.task('browserSync', function() {
 
 // Default task
 gulp.task('default', function() {
-    runSequence(['styles', 'imgCompression'], 'build', 'compile', 'runServer', 'browserSync');
+    runSequence(['styles', 'imgCompression'], 'compile', 'runServer', 'browserSync');
 });
 
 ////////////////////////////////
@@ -117,8 +117,7 @@ gulp.task('default', function() {
 // Watch
 gulp.task('watch', ['default'], function() {
   gulp.watch(paths.sass + '/*.scss', ['styles']);
-  gulp.watch([paths.js + '/src/*.jsx', paths.js + '/src/*/*.jsx'], ['build']);
-  gulp.watch([paths.js + '/build/index.js'], ['compile']);
+  gulp.watch([paths.js + '/src/*.jsx', paths.js + '/src/*/*.jsx'], ['compile']);
   gulp.watch(paths.images + '/*', ['imgCompression']);
   gulp.watch('templates/*.html');
 });

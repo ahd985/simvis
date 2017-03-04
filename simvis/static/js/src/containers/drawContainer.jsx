@@ -1,39 +1,38 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form } from 'semantic-ui-react'
 import { SketchPicker } from 'react-color';
+import { connect } from 'react-redux'
 
-import Diagram from './diagram.js'
-import TopMenu from './topMenu.js'
-import ShapeContextMenu from '../components/shapeContextMenu.js'
-import RightSideBarMenu from './rightSidebar.js'
-import LeftSideBarMenu from './leftSidebar.js'
+import Diagram from './diagram'
+import TopMenu from './topMenu'
+import ShapeContextMenu from '../components/shapeContextMenu'
+import RightSideBarMenu from './rightSidebar'
+import LeftSideBarMenu from './leftSidebar'
+import {reorderShapes } from '../actions'
 
-export default class DrawContainer extends Component {
+class DrawContainer extends Component {
     constructor(props) {
         super(props);
 
         this.state={
             contextMenuActive:false,
-            contextMenuStyle:{},
-            contextUUIDs:null
+            contextMenuStyle:{}
         };
 
         this.contextMenuHandler = this.contextMenuHandler.bind(this);
         this.closeContextMenu = this.closeContextMenu.bind(this)
     }
 
-    contextMenuHandler(e, uuid) {
+    contextMenuHandler(e) {
         this.setState({
             contextMenuActive:true,
-            contextMenuStyle:{position:"absolute", left:e.clientX, top:e.clientY},
-            contextUUIDs:[uuid]
+            contextMenuStyle:{position:"absolute", left:e.clientX, top:e.clientY}
         });
     }
 
     closeContextMenu() {
         this.setState({
             contextMenuActive:false,
-            contextUUIDs:null
         });
     }
 
@@ -43,25 +42,18 @@ export default class DrawContainer extends Component {
                 <ShapeContextMenu contextMenuActive={this.state.contextMenuActive}
                                   contextMenuStyle={this.state.contextMenuStyle}
                                   close={this.closeContextMenu}
-                                  reorderShapes={this.props.shapeHandlers.reorderShapes}
-                                  contextUUIDs={this.state.contextUUIDs}/>
+                                  reorderShapes={this.props.reorderShapes}/>
                 <div className="draw-container-top">
                     <TopMenu />
                 </div>
                 <div className="draw-container-bottom">
-                    <LeftSideBarMenu shapeHandlers={this.props.shapeHandlers}/>
-                    <RightSideBarMenu selectedShapes={this.props.selectedShapes}
-                                      selectedStyle={this.props.selectedStyle}
-                                      shapeHandlers={this.props.shapeHandlers}/>
+                    <LeftSideBarMenu />
+                    <RightSideBarMenu />
 
                     <div className="diagram-wrapper">
                         <div className="diagram-container">
                             <div className="diagram-background"></div>
-                            <Diagram shapes={this.props.shapes}
-                                     shapeHandlers={this.props.shapeHandlers}
-                                     selectedShapes={this.props.selectedShapes}
-                                     contextMenuHandler={this.contextMenuHandler}
-                                     selectedStyle={this.props.selectedStyle}/>
+                            <Diagram contextMenuHandler={this.contextMenuHandler}/>
                         </div>
                     </div>
                 </div>
@@ -69,3 +61,11 @@ export default class DrawContainer extends Component {
         )
     }
 }
+
+const mapStateToProps = ({ shapeCollection }) => ({});
+
+const mapDispatchToProps = {
+    reorderShapes:reorderShapes
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(DrawContainer)

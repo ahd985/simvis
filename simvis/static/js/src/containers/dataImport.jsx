@@ -1,12 +1,15 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form } from 'semantic-ui-react'
 import Dropzone from 'react-dropzone'
+import { connect } from 'react-redux'
 import request from 'superagent'
 import 'superagent-django-csrf'
 
+import { setData } from '../actions'
+
 import Handsontable from 'handsontable/dist/handsontable.full'
 
-export default class ImportDataModal extends Component {
+class ImportDataModal extends Component {
     constructor(props) {
         super(props);
 
@@ -53,7 +56,7 @@ export default class ImportDataModal extends Component {
 
     close(data) {
         if (data) {
-            this.props.dataHandlers.addData(data.slice(1), data[0])
+            this.props.setData(data.slice(1), data[0])
         }
 
         this.setState({
@@ -152,3 +155,11 @@ export default class ImportDataModal extends Component {
         )
     }
 }
+
+const mapStateToProps = ({ shapeCollection }) => ({});
+
+const mapDispatchToProps = {
+    setData:setData
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ImportDataModal)

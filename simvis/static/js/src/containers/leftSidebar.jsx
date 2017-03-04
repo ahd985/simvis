@@ -1,9 +1,12 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 
-import shapes from './../components/shapes'
+import shapes from '../components/shapes'
 
-export default class LeftSideBarMenu extends Component {
+import { addShape } from '../actions'
+
+class LeftSideBarMenu extends Component {
     constructor(props) {
         super(props);
 
@@ -11,7 +14,6 @@ export default class LeftSideBarMenu extends Component {
             visible: true
         };
 
-        this.shapeHandlers = this.props.shapeHandlers;
         this.toggleVisibility = this.toggleVisibility.bind(this)
     }
 
@@ -26,7 +28,7 @@ export default class LeftSideBarMenu extends Component {
         return (
             <Sidebar animation='overlay' direction="left" width='thin' visible={visible} id="left-sidebar">
                 <Button onClick={this.toggleVisibility}>Toggle Visibility</Button>
-                <GriddedSubMenu shapeHandlers={this.shapeHandlers}/>
+                <GriddedSubMenu addShape={this.props.addShape}/>
             </Sidebar>
         )
     }
@@ -37,11 +39,10 @@ class GriddedSubMenu extends Component {
         super(props);
 
         this.getShape = this.getShape.bind(this);
-        this.addShape = props.shapeHandlers.addShape;
     }
 
     getShape(e, shape) {
-        this.addShape(shape)
+        this.props.addShape(shape)
     }
 
     render() {
@@ -71,3 +72,11 @@ class GriddedSubMenu extends Component {
         )
     }
 }
+
+const mapStateToProps = ({ shapeCollection }) => ({});
+
+const mapDispatchToProps = {
+    addShape:addShape
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(LeftSideBarMenu)

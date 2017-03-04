@@ -32,6 +32,7 @@ def data_upload(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             data = read_file(form.cleaned_data['file'])
+            print(data)
 
             return HttpResponse(
                 json.dumps({"data": data[:MAX_DATA_ROWS]}),

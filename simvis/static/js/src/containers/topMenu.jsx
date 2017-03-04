@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 
-import ImportDataModal from '../components/dataImport.js'
+import ImportDataModal from './dataImport'
 
-export default class TopMenu extends Component {
+class TopMenu extends Component {
     constructor(props) {
         super(props);
     }
@@ -20,3 +21,11 @@ export default class TopMenu extends Component {
         )
     }
 }
+
+const mapStateToProps = ({ shapeCollection }) => ({});
+
+const mapDispatchToProps = {
+
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TopMenu)

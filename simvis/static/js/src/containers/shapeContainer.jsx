@@ -4,28 +4,11 @@ import { connect } from 'react-redux'
 import { addTodo } from '../actions'
 import { Menu, Popup } from 'semantic-ui-react';
 
+import { moveShapes, addSelectedShape, resizeShapes } from '../actions'
+
 class ShapeContainer extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            style: {
-                fill: "grey",
-                stroke: "black",
-                strokeWidth: 1,
-                cursor: "move"
-            },
-            dims: {
-                height: this.props.bbox.h0,
-                width: this.props.bbox.w0
-            },
-            controlledPosition:this.props.position,
-            deltaDims: {
-                height: 0,
-                width: 0
-            },
-            ratioLock: this.props.ratioLock
-        };
 
         this.isClicked = false;
         this.isDragging = false;
@@ -34,11 +17,9 @@ class ShapeContainer extends Component {
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
-        this.toggle = this.toggle.bind(this);
         this.handleMove = this.handleMove.bind(this);
         this.handleResize = this.handleResize.bind(this);
         this.handleContextMenu = this.handleContextMenu.bind(this);
-        this.componentDidUpdate = this.componentDidUpdate.bind(this);
     }
 
     handleMouseDown(e) {
@@ -58,61 +39,20 @@ class ShapeContainer extends Component {
     handleMouseUp(e) {
         e.preventDefault();
         if (!this.isDragging) {
-            this.toggle(!e.shiftKey)
+            this.props.addSelectedShape(this.props.uuid, !e.shiftKey)
         }
 
         this.isClicked=false;
         this.isDragging=false
     }
 
-    toggle(overwriteIfNotPresent) {
-        this.props.shapeHandlers.addSelectedShape(this.props.uuid, this.state.style, overwriteIfNotPresent);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        const {x, y} = this.state.controlledPosition;
-        this.setState((prevState) => {
-            let updatedStyle = Object.assign({}, prevState.style);
-            if (nextProps.style) {
-                for (var p in nextProps.style) {
-                    updatedStyle[p] = nextProps.style[p]
-                }
-            }
-
-            return {
-                controlledPosition: {
-                    x: x + nextProps.deltaPos.x,
-                    y: y + nextProps.deltaPos.y
-                },
-                style:updatedStyle
-            }
-        });
-    }
-
     handleMove(e, ui) {
-        this.props.shapeHandlers.addSelectedShape(this.props.uuid, this.state.style, true);
+        this.props.addSelectedShape(this.props.uuid, true);
         this.props.moveShapes({x:ui.deltaX, y:ui.deltaY})
     }
 
     handleResize(e, ui) {
-        const {height, width} = this.state.deltaDims;
-        let dX = ui.deltaX;
-        let dY = ui.deltaY;
-
-        if (this.state.ratioLock) {
-            if (Math.abs(dX) > Math.abs(dY)) {
-                dY = dX * this.state.dims.height / this.state.dims.width
-            } else {
-                dX = dY * this.state.dims.width / this.state.dims.height
-            }
-        }
-
-        this.setState({
-            deltaDims: {
-                width: width + dX,
-                height: height + dY
-            }
-        });
+        this.props.resizeShapes({width:ui.deltaX, height:ui.deltaY})
     }
 
     handleContextMenu(e) {
@@ -120,34 +60,21 @@ class ShapeContainer extends Component {
         this.props.contextMenuHandler(e, this.props.uuid)
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (prevProps.selectOutline) {
-            const outline = prevProps.selectOutline;
-            if (prevState.controlledPosition.x >= outline.x &&
-                prevState.controlledPosition.y >= outline.y &&
-                prevState.controlledPosition.x + prevState.dims.width + prevState.deltaDims.width <= outline.x + outline.width &&
-                prevState.controlledPosition.y + prevState.dims.height + prevState.deltaDims.height <= outline.y + outline.height) {
-
-                this.props.shapeHandlers.addSelectedShape(this.props.uuid, this.state.style, false);
-            }
-        }
-    }
-
     render() {
         const min_dim = 5;
-        const {height, width} = this.state.dims;
-        const dH = Math.max(this.state.deltaDims.height, -width + min_dim);
-        const dW = Math.max(this.state.deltaDims.width, -height + min_dim);
+        const {height, width} = this.props.dims;
+        const dH = Math.max(this.props.deltaDims.height, -width + min_dim);
+        const dW = Math.max(this.props.deltaDims.width, -height + min_dim);
 
         const visibility_style = {"visibility": this.props.toggled ? "visible" : "hidden"};
-        const translate = `translate(${this.state.controlledPosition.x}, ${this.state.controlledPosition.y})`;
+        const translate = `translate(${this.props.position.x}, ${this.props.position.y})`;
         const dObject = {dX:dW, dY:dH};
 
         const outline_handle_size = 5;
 
         return (
             <g transform={translate}>
-                <g style={this.state.style} onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp}>
+                <g style={this.props.style} onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp}>
                     <Draggable grid={[5,5]} onDrag={this.handleMove} axis={"none"}>
                         <g onContextMenu={this.handleContextMenu} id={this.props.uuid}>
                             <this.props.tag dObject={dObject} />
@@ -168,6 +95,14 @@ class ShapeContainer extends Component {
     }
 }
 
-export default connect()(ShapeContainer)
+const mapStateToProps = ({ shapeCollection }) => ({});
+
+const mapDispatchToProps = {
+    addSelectedShape: addSelectedShape,
+    moveShapes: moveShapes,
+    resizeShapes: resizeShapes
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ShapeContainer)
 
 

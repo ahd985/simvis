@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import Shape, {Rect, Circle, Ellipse, Path} from './shapeElements.js'
+import Shape, {Rect, Circle, Ellipse, Path} from './shapeElements'
 
 var defaultBBox = {x0:0, y0:0, w0:100, h0:100};
 
