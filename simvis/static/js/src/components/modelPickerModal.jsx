@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
-import getForm from '../components/modelFormMap'
+import getForm from '../components/modelForm'
 import ConditionPickerModal from '../components/conditionPickerModal'
 
 export default class ModelPickerModal extends Component {
@@ -11,7 +11,9 @@ export default class ModelPickerModal extends Component {
             open:false,
             model:null,
             modelRequirements:null,
-            selectedConditions:[]
+            form:{
+                selectedConditions:[]
+            }
         };
 
         this.requirements = ssv.get_type_requirements();
@@ -20,6 +22,9 @@ export default class ModelPickerModal extends Component {
         this.handleOpen = this.handleOpen.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleSelectModel = this.handleSelectModel.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleFormChange = this.handleFormChange.bind(this);
+        this.validateForm = this.validateForm.bind(this);
     }
 
     generate_options(requirements) {
@@ -39,7 +44,9 @@ export default class ModelPickerModal extends Component {
 
     handleClose(canceled) {
         if (!canceled) {
-            this.props.setShapeModel()
+            if (!this.refs.modelForm.handleSubmit()) {
+                return
+            }
         }
 
         this.setState({open:false})
@@ -53,14 +60,37 @@ export default class ModelPickerModal extends Component {
         )
     }
 
+    handleSubmit() {
+        if (!this.validateForm) {
+            return false
+        }
+        this.props.setShapeModel(this.state.form);
+        return true
+    }
+
+    handleFormChange(event, arg) {
+        this.setState((prevState) => {
+            return {
+                form: {
+                    ...prevState.form,
+                    arg: event.target.value
+                }
+            }
+        })
+    }
+
+    validateForm() {
+        return true
+    }
+
     render() {
-        var modelForm=null;
-        var modelArgs=null;
+        let modelForm=null;
+        let modelConditions=null;
         if (this.state.modelRequirements) {
-            modelArgs = Object.keys(this.state.modelRequirements.args).map((arg) => {
+            let modelFormArgs = Object.keys(this.state.modelRequirements.args).map((arg) => {
                 let form = getForm(arg);
                 if (form) {
-                    return <form.tag key={arg}/>
+                    return <form.tag key={arg} onChange={(value) => {this.handleFormChange(value, arg)}}/>
                 } else {
                     return false
                 }
@@ -68,7 +98,11 @@ export default class ModelPickerModal extends Component {
                 if (arg) {return true} else {return false}
             });
 
-            const formConditions = this.state.selectedConditions.map((d) => {
+            modelForm = <Form onSubmit={this.handleSubmit} ref="modelForm">
+                {modelFormArgs}
+            </Form>;
+
+            const formConditions = this.state.form.selectedConditions.map((d) => {
                 return (
                     <Table.Row key={d.name}>
                         <Table.Cell>
@@ -78,7 +112,7 @@ export default class ModelPickerModal extends Component {
                 )
             });
 
-            modelForm = <Table compact celled definition>
+            modelConditions = <Table compact celled definition>
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell>Condition</Table.HeaderCell>
@@ -102,8 +136,8 @@ export default class ModelPickerModal extends Component {
                 <Modal.Content>
                     <Dropdown placeholder='Model' search selection options={this.options}
                               onChange={this.handleSelectModel} />
-                    {modelArgs}
                     {modelForm}
+                    {modelConditions}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button content='Cancel' onClick={() => this.handleClose(true)} />

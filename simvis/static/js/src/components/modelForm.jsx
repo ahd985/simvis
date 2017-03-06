@@ -12,7 +12,7 @@ class DescriptionForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Description' name='description' placeholder='Description'/>
+            <Form.Input label='Description' name='description' placeholder='Description' onChange={this.props.onChange}/>
         )
     }
 }
@@ -24,7 +24,7 @@ class UnitForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Unit' name='unit' placeholder=''/>
+            <Form.Input label='Unit' name='unit' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -36,7 +36,7 @@ class SectionLabelForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Section Label' name='sectionLabel' placeholder='Section'/>
+            <Form.Input label='Section Label' name='sectionLabel' placeholder='Section' onChange={this.props.onChange}/>
         )
     }
 }
@@ -48,7 +48,7 @@ class OpacityForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Opacity' name='opacity' placeholder='1' type="number"/>
+            <Form.Input label='Opacity' name='opacity' placeholder='1' type="number" onChange={this.props.onChange}/>
         )
     }
 }
@@ -60,7 +60,7 @@ class MinHeightForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Min Height' name='minHeight' placeholder='0' type="number"/>
+            <Form.Input label='Min Height' name='minHeight' placeholder='0' type="number" onChange={this.props.onChange}/>
         )
     }
 }
@@ -72,7 +72,7 @@ class MaxHeightForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Max Height' name='maxHeight' placeholder='1' type={"number"}/>
+            <Form.Input label='Max Height' name='maxHeight' placeholder='1' type={"number"} onChange={this.props.onChange}/>
         )
     }
 }
@@ -84,7 +84,7 @@ class ReportForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Report' name='report' placeholder=''/>
+            <Form.Input label='Report' name='report' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -96,7 +96,7 @@ class OverlayForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Overlay' name='overlay' placeholder=''/>
+            <Form.Input label='Overlay' name='overlay' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -108,7 +108,7 @@ class TrueColorForm extends Component {
 
     render() {
         return (
-            <Form.Input label='True Color' name='trueColor' placeholder=''/>
+            <Form.Input label='True Color' name='trueColor' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -120,7 +120,7 @@ class FalseColorForm extends Component {
 
     render() {
         return (
-            <Form.Input label='False Color' name='falseColor' placeholder=''/>
+            <Form.Input label='False Color' name='falseColor' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -134,7 +134,7 @@ class ColorLevelsForm extends Component {
         return (
             <Form.Field width="1" control={NumberPicker} label="Color Steps"
                            value={0}
-                           onChange={() => {}}
+                           onChange={this.props.onChange}
                            min={0}/>
         )
     }
