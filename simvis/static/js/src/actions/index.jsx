@@ -18,5 +18,5 @@ export const selectShapesInOutline = (outline) => ({
     type:'SELECT_SHAPES_IN_OUTLINE', outline
 });
 export const clearSelectedShapes = () => ({type:'CLEAR_SELECTED_SHAPES'});
-export const setShapeModel = () => ({type:'SET_SHAPE_MODEL'});
+export const setShapeModel = (model) => ({type:'SET_SHAPE_MODEL', model:model});
 

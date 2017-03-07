@@ -22,7 +22,7 @@ export default class ModelPickerModal extends Component {
         this.handleOpen = this.handleOpen.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleSelectModel = this.handleSelectModel.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.addCondition = this.addCondition.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
         this.validateForm = this.validateForm.bind(this);
     }
@@ -44,9 +44,10 @@ export default class ModelPickerModal extends Component {
 
     handleClose(canceled) {
         if (!canceled) {
-            if (!this.refs.modelForm.handleSubmit()) {
+            if (!this.validateForm()) {
                 return
             }
+            this.props.setShapeModel(this.state.form)
         }
 
         this.setState({open:false})
@@ -60,20 +61,23 @@ export default class ModelPickerModal extends Component {
         )
     }
 
-    handleSubmit() {
-        if (!this.validateForm) {
-            return false
-        }
-        this.props.setShapeModel(this.state.form);
-        return true
-    }
-
-    handleFormChange(event, arg) {
+    addCondition(condition) {
         this.setState((prevState) => {
             return {
                 form: {
                     ...prevState.form,
-                    arg: event.target.value
+                    selectedConditions:prevState.form.selectedConditions.slice().concat(condition),
+                }
+            }
+        })
+    }
+
+    handleFormChange(e, arg) {
+        this.setState((prevState) => {
+            return {
+                form: {
+                    ...prevState.form,
+                    [arg]: event.target ? event.target.value : null
                 }
             }
         })
@@ -98,7 +102,7 @@ export default class ModelPickerModal extends Component {
                 if (arg) {return true} else {return false}
             });
 
-            modelForm = <Form onSubmit={this.handleSubmit} ref="modelForm">
+            modelForm = <Form onSubmit={this.handleSubmit}>
                 {modelFormArgs}
             </Form>;
 
@@ -124,7 +128,7 @@ export default class ModelPickerModal extends Component {
                 <Table.Footer fullWidth>
                     <Table.Row>
                         <Table.HeaderCell>
-                            <ConditionPickerModal conditions={this.state.modelRequirements.conditions}/>
+                            <ConditionPickerModal conditions={this.state.modelRequirements.conditions} addCondition={this.addCondition}/>
                         </Table.HeaderCell>
                     </Table.Row>
                 </Table.Footer>

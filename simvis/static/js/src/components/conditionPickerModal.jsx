@@ -15,12 +15,14 @@ export default class ConditionPickerModal extends Component {
                     text:key
                 }
             }),
-            conditionSelected:null
+            conditionSelected:null,
+            form:{}
         };
 
         this.handleOpen = this.handleOpen.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleSelectCondition = this.handleSelectCondition.bind(this);
+        this.validateForm = this.validateForm.bind(this);
     }
 
     handleOpen() {
@@ -29,7 +31,10 @@ export default class ConditionPickerModal extends Component {
 
     handleClose(canceled) {
         if (!canceled) {
-
+            if (!this.validateForm()) {
+                return
+            }
+            this.props.addCondition(this.state.form)
         }
 
         this.setState({open:false})
@@ -41,6 +46,21 @@ export default class ConditionPickerModal extends Component {
                 conditionSelected:this.props.conditions[d.value]
             }
         )
+    }
+
+    handleFormChange(event, arg) {
+        this.setState((prevState) => {
+            return {
+                form: {
+                    ...prevState.form,
+                    [arg]: event.target ? event.target.value : null
+                }
+            }
+        })
+    }
+
+    validateForm() {
+        return true
     }
 
     render() {
@@ -58,7 +78,7 @@ export default class ConditionPickerModal extends Component {
             });
 
             conditionForm = <Form>
-                <DataForm headers={this.props.dataHeaders}/>
+                <DataForm headers={this.props.dataHeaders} onChange={this.handleFormChange}/>
                 {conditionArgs}
             </Form>
         }
