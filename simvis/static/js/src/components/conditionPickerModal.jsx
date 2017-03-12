@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
-import getForm from '../components/modelFormMap'
+import getForm from '../components/modelForm'
 
 export default class ConditionPickerModal extends Component {
     constructor(props) {
@@ -22,6 +22,7 @@ export default class ConditionPickerModal extends Component {
         this.handleOpen = this.handleOpen.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleSelectCondition = this.handleSelectCondition.bind(this);
+        this.handleFormChange = this.handleFormChange.bind(this);
         this.validateForm = this.validateForm.bind(this);
     }
 
@@ -48,12 +49,24 @@ export default class ConditionPickerModal extends Component {
         )
     }
 
-    handleFormChange(event, arg) {
+    handleFormChange(e, arg) {
+        e.persist ? e.persist() : null;
         this.setState((prevState) => {
             return {
                 form: {
                     ...prevState.form,
-                    [arg]: event.target ? event.target.value : null
+                    [arg]: e.target ? e.target.value : null
+                }
+            }
+        })
+    }
+
+    handleDataHeaderSelect(e, d) {
+        this.setState((prevState) => {
+            return {
+                form: {
+                    ...prevState.form,
+                    dataIndex: d.value
                 }
             }
         })
@@ -69,7 +82,7 @@ export default class ConditionPickerModal extends Component {
             let conditionArgs = Object.keys(this.state.conditionSelected.args).map((arg) => {
                 let form = getForm(arg);
                 if (form) {
-                    return <form.tag key={arg}/>
+                    return <form.tag key={arg} onChange={(e) => {this.handleFormChange(e, arg)}}/>
                 } else {
                     return false
                 }
@@ -77,8 +90,13 @@ export default class ConditionPickerModal extends Component {
                 if (arg) {return true} else {return false}
             });
 
-            conditionForm = <Form>
-                <DataForm headers={this.props.dataHeaders} onChange={this.handleFormChange}/>
+            const dataHeaderOptions = this.props.dataHeaders.map((header, i) => {
+                return {key:i, value:i, text:header}
+            });
+
+            conditionForm = <Form onSubmit={(e) => {e.preventDefault()}}>
+                <Dropdown placeholder='Header' search selection options={dataHeaderOptions}
+                    onChange={() => {}} />
                 {conditionArgs}
             </Form>
         }
@@ -95,19 +113,6 @@ export default class ConditionPickerModal extends Component {
                     <Button content='Done' onClick={() => this.handleClose()} />
                 </Modal.Actions>
             </Modal>
-        )
-    }
-}
-
-class DataForm extends Component {
-    constructor(props) {
-        super(props)
-    }
-
-    render() {
-        return (
-            <Dropdown placeholder='Header' search selection options={[{key:"x", value:"x", text:"x"}]}
-                              onChange={() => {}} />
         )
     }
 }

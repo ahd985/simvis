@@ -48,7 +48,7 @@ class RightSideBarMenu extends Component {
             if (activeItem === 'model') {
                 submenu = <Segment attached='bottom'>
                     <Button onClick={this.addModelToShape}/>
-                    <ModelPickerModal setShapeModel={this.props.setShapeModel}/>
+                    <ModelPickerModal setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} dataHeaders={this.props.dataHeaders}/>
                 </Segment>;
             } else if (activeItem === 'style') {
                 submenu = <Segment attached='bottom'>
@@ -82,7 +82,8 @@ class RightSideBarMenu extends Component {
 
 const mapStateToProps = ({ shapeCollection }) => ({
     selectedShapes:shapeCollection.selectedShapes,
-    selectedStyle:shapeCollection.selectedStyle
+    selectedStyle:shapeCollection.selectedStyle,
+    dataHeaders:shapeCollection.dataHeaders
 });
 
 const mapDispatchToProps = {

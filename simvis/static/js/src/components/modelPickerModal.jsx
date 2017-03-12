@@ -12,7 +12,8 @@ export default class ModelPickerModal extends Component {
             model:null,
             modelRequirements:null,
             form:{
-                selectedConditions:[]
+                ids:this.props.ids,
+                conditions:[]
             }
         };
 
@@ -54,11 +55,15 @@ export default class ModelPickerModal extends Component {
     }
 
     handleSelectModel(e, d) {
-        this.setState(
-            {
-                modelRequirements:this.requirements[d.value]
+        this.setState((prevState) => {
+            return {
+                modelRequirements:this.requirements[d.value],
+                form: {
+                    type:d.value,
+                    ...prevState.form
+                }
             }
-        )
+        })
     }
 
     addCondition(condition) {
@@ -66,18 +71,19 @@ export default class ModelPickerModal extends Component {
             return {
                 form: {
                     ...prevState.form,
-                    selectedConditions:prevState.form.selectedConditions.slice().concat(condition),
+                    conditions:prevState.form.conditions.slice().concat(condition)
                 }
             }
         })
     }
 
     handleFormChange(e, arg) {
+        e.persist();
         this.setState((prevState) => {
             return {
                 form: {
                     ...prevState.form,
-                    [arg]: event.target ? event.target.value : null
+                    [arg]: e.target ? e.target.value : null
                 }
             }
         })
@@ -94,7 +100,7 @@ export default class ModelPickerModal extends Component {
             let modelFormArgs = Object.keys(this.state.modelRequirements.args).map((arg) => {
                 let form = getForm(arg);
                 if (form) {
-                    return <form.tag key={arg} onChange={(value) => {this.handleFormChange(value, arg)}}/>
+                    return <form.tag key={arg} onChange={(e) => {this.handleFormChange(e, arg)}}/>
                 } else {
                     return false
                 }
@@ -102,14 +108,14 @@ export default class ModelPickerModal extends Component {
                 if (arg) {return true} else {return false}
             });
 
-            modelForm = <Form onSubmit={this.handleSubmit}>
+            modelForm = <Form onSubmit={(e) => {e.preventDefault()}}>
                 {modelFormArgs}
             </Form>;
 
-            const formConditions = this.state.form.selectedConditions.map((d) => {
+            const formConditions = this.state.form.conditions.map((d) => {
                 return (
                     <Table.Row key={d.name}>
-                        <Table.Cell>
+                        <Table.Cell key={d.name + "-2"}>
                             d.name
                         </Table.Cell>
                     </Table.Row>
@@ -128,7 +134,7 @@ export default class ModelPickerModal extends Component {
                 <Table.Footer fullWidth>
                     <Table.Row>
                         <Table.HeaderCell>
-                            <ConditionPickerModal conditions={this.state.modelRequirements.conditions} addCondition={this.addCondition}/>
+                            <ConditionPickerModal conditions={this.state.modelRequirements.conditions} addCondition={this.addCondition} dataHeaders={this.props.dataHeaders}/>
                         </Table.HeaderCell>
                     </Table.Row>
                 </Table.Footer>
