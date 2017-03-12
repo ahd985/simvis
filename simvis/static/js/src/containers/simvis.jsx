@@ -3,8 +3,6 @@ import { createStore } from 'redux'
 import { connect } from 'react-redux'
 
 import { Menu } from 'semantic-ui-react'
-import uuidV4 from 'uuid/v4'
-import ssv from '../../ssv.min.js'
 import { removeShapes } from '../actions'
 
 import DrawContainer from './drawContainer'

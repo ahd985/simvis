@@ -3,8 +3,6 @@ import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Inpu
 import { connect } from 'react-redux'
 import { setShapeStyle, setShapeModel } from '../actions'
 
-import ssv from '../../ssv.min.js'
-
 import NumberPicker from '../components/numberPicker';
 import ColorPickerModal from '../components/colorPickerModal'
 import ModelPickerModal from '../components/modelPickerModal'
@@ -48,7 +46,7 @@ class RightSideBarMenu extends Component {
             if (activeItem === 'model') {
                 submenu = <Segment attached='bottom'>
                     <Button onClick={this.addModelToShape}/>
-                    <ModelPickerModal setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} dataHeaders={this.props.dataHeaders}/>
+                    <ModelPickerModal setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
                 </Segment>;
             } else if (activeItem === 'style') {
                 submenu = <Segment attached='bottom'>
@@ -83,7 +81,8 @@ class RightSideBarMenu extends Component {
 const mapStateToProps = ({ shapeCollection }) => ({
     selectedShapes:shapeCollection.selectedShapes,
     selectedStyle:shapeCollection.selectedStyle,
-    dataHeaders:shapeCollection.dataHeaders
+    dataHeaders:shapeCollection.dataHeaders,
+    data:shapeCollection.data
 });
 
 const mapDispatchToProps = {

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
 import getForm from '../components/modelForm'
+import uuidV4 from 'uuid/v4'
 
 export default class ConditionPickerModal extends Component {
     constructor(props) {
@@ -16,12 +17,19 @@ export default class ConditionPickerModal extends Component {
                 }
             }),
             conditionSelected:null,
-            form:{}
+            headerSelected:null,
+            dataSelected:null,
+            form:{
+                report:false,
+                opacity:1,
+                id:"s" + uuidV4().substring(0,8)
+            }
         };
 
         this.handleOpen = this.handleOpen.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleSelectCondition = this.handleSelectCondition.bind(this);
+        this.handleSelectData = this.handleSelectData.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
         this.validateForm = this.validateForm.bind(this);
     }
@@ -42,31 +50,37 @@ export default class ConditionPickerModal extends Component {
     }
 
     handleSelectCondition(e, d) {
-        this.setState(
-            {
-                conditionSelected:this.props.conditions[d.value]
-            }
-        )
-    }
-
-    handleFormChange(e, arg) {
-        e.persist ? e.persist() : null;
         this.setState((prevState) => {
             return {
+                conditionSelected: this.props.conditions[d.value],
                 form: {
                     ...prevState.form,
-                    [arg]: e.target ? e.target.value : null
+                    type: d.value.toLowerCase()
                 }
             }
         })
     }
 
-    handleDataHeaderSelect(e, d) {
+    handleSelectData(e, d) {
+        this.setState((prevState) => {
+            return {
+                dataSelected:this.props.data[d.value],
+                dataHeader:d.text,
+                form: {
+                    ...prevState.form,
+                    data: this.props.data.map((row) => {return row[d.value]})
+                }
+            }
+        })
+    }
+
+    handleFormChange(e, arg, argOverride) {
+        e.persist ? e.persist() : null;
         this.setState((prevState) => {
             return {
                 form: {
                     ...prevState.form,
-                    dataIndex: d.value
+                    [argOverride ? argOverride : arg]: e.target ? e.target.value : null
                 }
             }
         })
@@ -82,7 +96,7 @@ export default class ConditionPickerModal extends Component {
             let conditionArgs = Object.keys(this.state.conditionSelected.args).map((arg) => {
                 let form = getForm(arg);
                 if (form) {
-                    return <form.tag key={arg} onChange={(e) => {this.handleFormChange(e, arg)}}/>
+                    return <form.tag key={arg} data={this.state.dataSelected} onChange={(e, f, argOverride) => {this.handleFormChange(e, arg, argOverride)}}/>
                 } else {
                     return false
                 }
@@ -96,8 +110,8 @@ export default class ConditionPickerModal extends Component {
 
             conditionForm = <Form onSubmit={(e) => {e.preventDefault()}}>
                 <Dropdown placeholder='Header' search selection options={dataHeaderOptions}
-                    onChange={() => {}} />
-                {conditionArgs}
+                    onChange={this.handleSelectData}/>
+                {this.state.dataSelected ? conditionArgs : null}
             </Form>
         }
 

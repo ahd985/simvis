@@ -3,6 +3,8 @@ import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Inpu
 import getForm from '../components/modelForm'
 import ConditionPickerModal from '../components/conditionPickerModal'
 
+import ssv from '../../ssv.min.js'
+
 export default class ModelPickerModal extends Component {
     constructor(props) {
         super(props);
@@ -12,7 +14,7 @@ export default class ModelPickerModal extends Component {
             model:null,
             modelRequirements:null,
             form:{
-                ids:this.props.ids,
+                ids:['element'],
                 conditions:[]
             }
         };
@@ -59,7 +61,7 @@ export default class ModelPickerModal extends Component {
             return {
                 modelRequirements:this.requirements[d.value],
                 form: {
-                    type:d.value,
+                    type:d.value.toLowerCase(),
                     ...prevState.form
                 }
             }
@@ -134,7 +136,7 @@ export default class ModelPickerModal extends Component {
                 <Table.Footer fullWidth>
                     <Table.Row>
                         <Table.HeaderCell>
-                            <ConditionPickerModal conditions={this.state.modelRequirements.conditions} addCondition={this.addCondition} dataHeaders={this.props.dataHeaders}/>
+                            <ConditionPickerModal conditions={this.state.modelRequirements.conditions} addCondition={this.addCondition} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
                         </Table.HeaderCell>
                     </Table.Row>
                 </Table.Footer>

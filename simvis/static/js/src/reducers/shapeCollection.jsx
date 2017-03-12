@@ -1,4 +1,5 @@
 import uuidV4 from 'uuid/v4'
+import ssv from '../../ssv.min.js'
 
 const shapeStyle = {fill: "grey", stroke: "black", strokeWidth: 1, cursor: "move"};
 
@@ -199,6 +200,7 @@ const shapeCollection = (state = defaultState, action) => {
                 selectedShapes:[]
             };
         case 'SET_SHAPE_MODEL':
+            /*
             const element_data = {
                 conditions: [
                     {
@@ -218,8 +220,19 @@ const shapeCollection = (state = defaultState, action) => {
                 type: "cell",
                 x_series:[0]
             };
+            */
 
-            var demo = ssv.create_demo_element(state.selectedShapes[0], element_data).update(0,0);
+            // Add in x-series to model
+            const model = {
+                "x_series":state.data.map((row) => {
+                    return row[0]
+                }),
+                ...action.model
+            };
+
+            console.log(action.model.ids[0], model)
+
+            var demo = ssv.create_demo_element(state.selectedShapes[0], model).update(0,0);
             return state;
         default:
             return state

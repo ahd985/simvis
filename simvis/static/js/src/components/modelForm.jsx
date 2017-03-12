@@ -36,7 +36,7 @@ class OpacityForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Opacity' name='opacity' placeholder='1' min="0" max ="0" type="number" onChange={this.props.onChange}/>
+            <Form.Input label='Opacity' name='opacity' placeholder='1' min="0" max ="1" type="number" onChange={this.props.onChange}/>
         )
     }
 }
@@ -101,47 +101,20 @@ class FalseColorForm extends Component {
     }
 }
 
-class ColorLevelsForm extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            value:3
-        };
-
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    handleChange(e) {
-        this.setState({
-            value:e.value
-        });
-
-        // Simulate a typical form change to be consistent with other forms
-        this.props.onChange({target:{value:e.value}})
-    }
-
-    render() {
-        return (
-            <Form.Field width="3" control={NumberPicker} name="colorLevels" label="Color Steps"
-                           value={this.state.value}
-                           onChange={this.handleChange}
-                           min={1}
-                           max={10}/>
-        )
-    }
-}
-
 class ColorScaleForm extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            open:false
+            open:false,
+            colorSteps:5,
+            minColorValue:0,
+            maxColorValue:1
         };
 
         this.handleOpen = this.handleOpen.bind(this);
-        this.handleSelect = this.handleSelect.bind(this);
+        this.handleStepChange = this.handleStepChange.bind(this);
+        this.handleBoundsChange = this.handleBoundsChange.bind(this);
         this.handleClose = this.handleClose.bind(this)
     }
 
@@ -149,14 +122,29 @@ class ColorScaleForm extends Component {
         this.setState({open:true})
     }
 
-    handleSelect() {
-
+    handleStepChange(e) {
+        this.setState({
+            colorSteps:e.value
+        })
     }
 
-    handleClose(canceled) {
-        if (!canceled) {
+    handleBoundsChange(e, name) {
+        this.setState({
+            [name]:e.target.value
+        });
+    }
+
+    handleClose(colors, canceled) {
+        if (!canceled && colors) {
+            let color_levels = [];
+            const valueStep = Math.abs(this.state.minColorValue - this.state.maxColorValue) / this.state.colorSteps;
+            for (let i=1; i <= this.state.colorSteps; i++) {
+                color_levels.push(this.state.minColorValue + i * valueStep)
+            }
+
             // Simulate a typical form change to be consistent with other forms
-            this.props.onChange({target:{value:e.value}})
+            this.props.onChange({target:{value:color_levels}}, null, 'color_levels');
+            this.props.onChange({target:{value:colors}})
         }
 
         this.setState({open:false})
@@ -164,12 +152,10 @@ class ColorScaleForm extends Component {
 
     render() {
         const colorSetButtons = colorSets.map((colorSet, i) => {
-            const stepCount = 5;
-            const colors = chroma.scale(colorSet.set).colors(stepCount);
-
+            const colors = chroma.scale(colorSet.set).colors(this.state.colorSteps);
             return (
-                <Button key={i} onClick={() => {}}>
-                    {createColorButtonIcon(colors)}
+                <Button key={i} onClick={() => this.handleClose(colors, false)}>
+                    {createColorButtonIcon(colors, colorSet.name)}
                 </Button>
             )
         });
@@ -178,10 +164,16 @@ class ColorScaleForm extends Component {
             <Modal trigger={<Button onClick={this.handleOpen}>{"Color Scale"}</Button>} open={this.state.open}>
                 <Modal.Content>
                     {colorSetButtons}
+                    <Form.Input label='Lower Bound' name='minColorValue' value='0' type={"number"} onChange={(e) => this.handleBoundsChange(e, 'minColorValue')}/>
+                    <Form.Input label='Upper Bound' name='maxColorValue' value='1000' type={"number"} onChange={(e) => this.handleBoundsChange(e, 'maxColorValue')}/>
+                    <Form.Field width="3" control={NumberPicker} name="colorLevels" label="Color Steps"
+                           value={this.state.colorSteps}
+                           onChange={this.handleStepChange}
+                           min={1}
+                           max={10}/>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button content='Cancel' onClick={() => this.handleClose(true)} />
-                    <Button content='Done' onClick={() => this.handleClose()} />
+                    <Button content='Cancel' onClick={() => this.handleClose(null, true)} />
                 </Modal.Actions>
             </Modal>
         )
@@ -193,7 +185,7 @@ const colorSets = [
     {name:"rainbow", set:'RdYlBu'}
 ];
 
-function createColorButtonIcon(colors) {
+function createColorButtonIcon(colors, name) {
     let icons = [];
 
     for (let i=0; i < colors.length; i++) {
@@ -201,14 +193,13 @@ function createColorButtonIcon(colors) {
     }
 
     return (
-        <div key={-1}><span style={{clear:"right"}}>{colorSet.name}</span>{icons}</div>
+        <div key={-1}><span style={{clear:"right"}}>{name}</span>{icons}</div>
     )
 }
 
 const formMap = [
     {name:"description", tag:DescriptionForm},
     {name:"color_scale", tag:ColorScaleForm},
-    {name:"color_levels", tag:ColorLevelsForm},
     {name:"true_color", tag:TrueColorForm},
     {name:"false_color", tag:FalseColorForm},
     {name:"min_height", tag:MinHeightForm},
