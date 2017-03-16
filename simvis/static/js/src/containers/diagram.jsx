@@ -91,7 +91,7 @@ class Diagram extends Component {
         const selectedShapes = this.props.selectedShapes;
         const contextMenuHandler = this.props.contextMenuHandler;
         const selectOutline = this.state.selectOutline;
-
+        
         const renderedShapes = this.props.shapes.map(function(shapeData) {
             const toggled = selectedShapes.indexOf(shapeData.uuid) > -1;
 

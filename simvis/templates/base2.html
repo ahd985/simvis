@@ -24,6 +24,10 @@
     <!-- This file stores project-specific CSS -->
     <link href="{% static 'css/project.min.css' %}" rel="stylesheet">
 
+
+
+
+
     {% endblock %}
 
   </head>
@@ -96,10 +100,12 @@
     {% block javascript %}
       <script src="{% static 'js/jquery.min.js' %}"></script>
 
+      <!-- HOT requirement -->
+      <script src="{% static 'js/numbro.min.js' %}"></script>
+
       <!-- Your stuff: Third-party javascript libraries go here -->
       <script src="{% static 'js/d3.min.js' %}"></script>
       <script src="{% static 'js/d3-selection-multi.v1.min.js' %}"></script>
-      <script src="{% static 'js/handsontable.full.min.js' %}"></script>
 
       <!-- place project specific Javascript in this file -->
       <script src="{% static 'js/simvis.min.js' %}"></script>

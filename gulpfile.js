@@ -62,7 +62,7 @@ gulp.task('styles', function() {
 
 // Javascript downgrading and minification
 gulp.task('compile', ['build'], function() {
-  return browserify({entries: paths.js + '/build/index.js', debug: true})
+  return browserify({entries: paths.js + '/build/index.js', debug: true, requirements:['numbro']})
     .bundle()
     .pipe(source('simvis.min.js'))
     .pipe(buffer())

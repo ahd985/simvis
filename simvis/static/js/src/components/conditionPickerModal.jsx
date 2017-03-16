@@ -68,7 +68,7 @@ export default class ConditionPickerModal extends Component {
                 dataHeader:d.text,
                 form: {
                     ...prevState.form,
-                    data: this.props.data.map((row) => {return row[d.value]})
+                    dataIndex:d.value
                 }
             }
         })

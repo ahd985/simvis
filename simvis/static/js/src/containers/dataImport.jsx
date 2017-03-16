@@ -16,7 +16,9 @@ class ImportDataModal extends Component {
         this.state = {
             firstModalOpen:false,
             secondModalOpen:false,
-            data:null
+            data:null,
+            hot:null,
+            xSeriesIndex:0
         };
 
         this.onDrop = this.onDrop.bind(this);
@@ -56,7 +58,7 @@ class ImportDataModal extends Component {
 
     close(data) {
         if (data) {
-            this.props.setData(data.slice(1), data[0])
+            this.props.setData(data.slice(1), data[0], this.state.xSeriesIndex)
         }
 
         this.setState({
@@ -76,50 +78,75 @@ class ImportDataModal extends Component {
         const {firstModalOpen, secondModalOpen, data} = this.state;
 
         let secondModalContent = <div id="hot-container"></div>;
+        var self = this;
         if (this.state.data) {
-            const container = document.getElementById('hot-container');
-            var hot = new Handsontable(container, {
-                data:data,
-                rowHeaders: true,
-                stretchH: "all"
-            });
-            hot.updateSettings({
-                contextMenu: {
-                    callback: function (key, options) {
-                        if (key === 'header_add') {
-                            var selected_row = hot.getSelected()[0];
-                            var header = hot.getDataAtRow(0);
-                            var header_add = hot.getDataAtRow(selected_row);
-                            header = header.map(function(e, i) {
-                                return header_add[i] != "" ? e + ", " + header_add[i] : e
-                            });
-
-                            hot.alter('remove_row', selected_row);
-                            header.map(function(e, i) {
-                                hot.setDataAtCell(0, i, e)
-                            });
-                        }
+            if (!this.state.hot) {
+                const container = document.getElementById('hot-container');
+                this.state.hot = new Handsontable(container, {
+                    data:data,
+                    rowHeaders: true,
+                    colHeaders: (col) => {
+                        return "<button id=\"colIndex\" value=\"" + col + "\">" + col + "</button>";
                     },
-                    items: {
-                        "header_add": {
-                            name: 'Add to header',
-                            disabled: function () {
-                                // if first row, disable this option
-                                return hot.getSelected()[0] === 0;
+                    stretchH: "all",
+                    contextMenu: {
+                        callback: function (key, options) {
+                            if (key === 'header_add') {
+                                var selected_row = self.state.hot.getSelected()[0];
+                                var header = self.state.hot.getDataAtRow(0);
+                                var header_add = self.state.hot.getDataAtRow(selected_row);
+                                header = header.map(function(e, i) {
+                                    return header_add[i] != "" ? e + ", " + header_add[i] : e
+                                });
+
+                                self.state.hot.alter('remove_row', selected_row);
+                                header.map(function(e, i) {
+                                    self.state.hot.setDataAtCell(0, i, e)
+                                });
+                            }
+                        },
+                        items: {
+                            "header_add": {
+                                name: 'Add to header',
+                                disabled: function () {
+                                    // if first row, disable this option
+                                    return self.state.hot.getSelected()[0] === 0;
+                                }
                             }
                         }
-                    }
-                },
-                cells: function (row, col, prop) {
-                    var cellProperties = {};
+                    },
+                    cells: function (row, col, prop) {
+                        var cellProperties = {};
 
-                    if (row > 0) {
-                        cellProperties.readOnly = true;
-                    }
+                        if (row > 0) {
+                            cellProperties.readOnly = true;
+                        }
 
-                    return cellProperties;
-                }
-            });
+                        if (col == self.state.xSeriesIndex) {
+                            this.renderer = function(instance, td) {
+                                Handsontable.renderers.TextRenderer.apply(this, arguments);
+                                td.style.backgroundColor = 'green';
+                            }
+                        } else {
+                            this.renderer = function(instance, td) {
+                                Handsontable.renderers.TextRenderer.apply(this, arguments);
+                                td.style.backgroundColor = null;
+                            }
+                        }
+
+                        return cellProperties;
+                    }
+                });
+
+                Handsontable.Dom.addEvent(container, 'click', function (event) {
+                    if (event.target.id == 'colIndex') {
+                        self.setState({
+                            xSeriesIndex:event.target.value
+                        });
+                        self.state.hot.render();
+                    }
+                })
+            }
         }
 
         return (
@@ -147,7 +174,7 @@ class ImportDataModal extends Component {
                             {secondModalContent}
                         </Modal.Content>
                         <Modal.Actions>
-                            <Button content='All Done' onClick={() => this.close(hot.getData())} />
+                            <Button content='All Done' onClick={() => this.close(this.state.hot.getData())} />
                         </Modal.Actions>
                     </Modal>
                 </Modal.Actions>

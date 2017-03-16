@@ -8,7 +8,8 @@ const defaultState = {
     selectedShapes: [],
     selectedStyle:{},
     data: null,
-    dataHeaders: null
+    dataHeaders: null,
+    xSeriesIndex: null
 };
 
 const shapeCollection = (state = defaultState, action) => {
@@ -130,7 +131,8 @@ const shapeCollection = (state = defaultState, action) => {
             return {
                 ...state,
                 data:action.data,
-                dataHeaders:action.dataHeaders
+                dataHeaders:action.dataHeaders,
+                xSeriesIndex:action.xSeriesIndex
             };
         case 'SET_SHAPE_STYLE':
             return {
@@ -222,18 +224,30 @@ const shapeCollection = (state = defaultState, action) => {
             };
             */
 
-            // Add in x-series to model
-            const model = {
+            // Add in x-series and data to create demo model
+            const demoModel = {
                 "x_series":state.data.map((row) => {
-                    return row[0]
+                    return row[state.xSeriesIndex]
                 }),
-                ...action.model
+                ...action.model,
+                conditions: action.model.conditions.map((condition) => {
+                    return {
+                        ...condition,
+                        data:state.data.map((row) => {return row[condition.dataIndex]})
+                    }
+                })
             };
+            ssv.create_demo_element(state.selectedShapes[0], demoModel).update(0,0);
 
-            console.log(action.model.ids[0], model)
-
-            var demo = ssv.create_demo_element(state.selectedShapes[0], model).update(0,0);
-            return state;
+            return {
+                ...state,
+                shapes: state.shapes.map((shapeData) => {
+                    if (state.selectedShapes.indexOf(shapeData.uuid) > -1) {
+                        shapeData.model = action.model
+                    }
+                    return shapeData
+                })
+            };
         default:
             return state
     }

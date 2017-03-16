@@ -81,7 +81,7 @@ class ShapeContainer extends Component {
                         </g>
                     </Draggable>
                 </g>
-                <g style={visibility_style}>
+                <g style={visibility_style} className="ignore">
                     <rect x="0" y="0" height={height + dH} width={width + dW} className="shape-outline"/>
                     <Draggable onDrag={this.handleResize} axis={"none"}>
                         <g>
