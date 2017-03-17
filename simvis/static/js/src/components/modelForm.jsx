@@ -31,12 +31,25 @@ class UnitForm extends Component {
 
 class OpacityForm extends Component {
     constructor(props) {
-        super(props)
+        super(props);
+
+
+        this.default = 1;
+        this.handleChange = this.handleChange.bind(this);
+
+        // Initialize to a default of 1
+        this.handleChange({target:{value:this.default}})
+    }
+
+    handleChange(e) {
+        // Cast as int
+        e.target.value = parseFloat(e.target.value);
+        this.props.onChange(e)
     }
 
     render() {
         return (
-            <Form.Input label='Opacity' name='opacity' placeholder='1' min="0" max ="1" type="number" onChange={this.props.onChange}/>
+            <Form.Input label='Opacity' name='opacity' placeholder='1' min="0" max ="1" type="number" step="0.01" onChange={this.handleChange}/>
         )
     }
 }
@@ -67,12 +80,29 @@ class MaxHeightForm extends Component {
 
 class ReportForm extends Component {
     constructor(props) {
-        super(props)
+        super(props);
+
+        this.state = {
+            value:"f"
+        };
+
+        this.handleChange = this.handleChange.bind(this)
+    }
+
+    handleChange(e, value) {
+        this.setState({value});
+
+        e.target.value == "f" ? e.target.value = false : e.target.value = true;
+        this.props.onChange(e)
     }
 
     render() {
         return (
-            <Form.Input label='Report' name='report' placeholder='' onChange={this.props.onChange}/>
+            <Form.Group inline>
+                <label>Report</label>
+                <Form.Radio label='True' value='t' checked={this.state.value === 't'} onChange={(e) => this.handleChange(e, 't')} />
+                <Form.Radio label='False' value='f' checked={this.state.value === 'f'} onChange={(e) => this.handleChange(e, 'f')} />
+            </Form.Group>
         )
     }
 }
