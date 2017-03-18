@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
 import getForm from '../components/modelForm'
-import uuidV4 from 'uuid/v4'
 
 export default class ConditionPickerModal extends Component {
     constructor(props) {
@@ -21,8 +20,7 @@ export default class ConditionPickerModal extends Component {
             dataSelected:null,
             form:{
                 report:false,
-                opacity:1,
-                id:"s" + uuidV4().substring(0,8)
+                opacity:1
             }
         };
 
@@ -64,7 +62,7 @@ export default class ConditionPickerModal extends Component {
     handleSelectData(e, d) {
         this.setState((prevState) => {
             return {
-                dataSelected:this.props.data[d.value],
+                dataSelected:this.props.data.map((row) => {return row[d.value]}),
                 dataHeader:d.text,
                 form: {
                     ...prevState.form,

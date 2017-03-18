@@ -16,5 +16,10 @@ urlpatterns = [
         regex=r'^data-upload$',
         view=views.data_upload,
         name='data_upload'
+    ),
+    url(
+        regex=r'^ssv$',
+        view=views.ssv,
+        name='ssv'
     )
 ]

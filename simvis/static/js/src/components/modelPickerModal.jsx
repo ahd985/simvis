@@ -14,7 +14,7 @@ export default class ModelPickerModal extends Component {
             model:null,
             modelRequirements:null,
             form:{
-                ids:['element'],
+                ids:this.props.ids,
                 conditions:[]
             }
         };

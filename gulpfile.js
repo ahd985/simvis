@@ -16,6 +16,7 @@ var gulp = require('gulp'),
       pixrem = require('gulp-pixrem'),
       uglify = require('gulp-uglify'),
       imagemin = require('gulp-imagemin'),
+      spawn = require('child_process').spawn,
       exec = require('child_process').exec,
       runSequence = require('run-sequence'),
       browserSync = require('browser-sync'),
@@ -91,10 +92,9 @@ gulp.task('imgCompression', function(){
 
 // Run django server
 gulp.task('runServer', function() {
-  exec('$PYTHON_PATH manage.py runserver', function (err, stdout, stderr) {
-    console.log(stdout);
-    console.log(stderr);
-  });
+    var rs = exec('$PYTHON_PATH manage.py runserver_plus 0.0.0.0:8009');
+    rs.stdout.pipe(process.stdout);
+    rs.stderr.pipe(process.stderr)
 });
 
 // Browser sync server for live reload

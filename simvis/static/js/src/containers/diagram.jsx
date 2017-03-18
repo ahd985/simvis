@@ -91,7 +91,7 @@ class Diagram extends Component {
         const selectedShapes = this.props.selectedShapes;
         const contextMenuHandler = this.props.contextMenuHandler;
         const selectOutline = this.state.selectOutline;
-        
+
         const renderedShapes = this.props.shapes.map(function(shapeData) {
             const toggled = selectedShapes.indexOf(shapeData.uuid) > -1;
 
@@ -119,10 +119,12 @@ class Diagram extends Component {
 
         return (
             <div>
-                <svg className="diagram" id="draw-svg">
-                    <rect className="diagram-space" onClick={this.toggle}
+                <svg className="diagram" id="draw-svg" xmlns="http://www.w3.org/2000/svg">
+                    <rect className="diagram-space ignore" onClick={this.toggle}
                           onMouseDown={this.handleMouseDown}/>
-                    {renderedShapes}
+                    <g>
+                        {renderedShapes}
+                    </g>
                     {selectOutlineRect}
                 </svg>
                 <div className="select-layer" style={{visibility:(this.state.clicked ? "visible" : "hidden")}}

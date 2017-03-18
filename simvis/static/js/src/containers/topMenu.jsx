@@ -12,26 +12,30 @@ class TopMenu extends Component {
         this.handleSubmitClick = this.handleSubmitClick.bind(this)
     }
 
-    scrub_svg_children(el) {
-        // Remove unwanted classes
-        el.removeAttribute('class');
-
+    getCleanedSVG(el) {
         if (el.children.length > 0) {
-            for (var child of el.children) {
+            for (var i=el.children.length-1; i >= 0; i--) {
+                let child = el.children[i];
                 if (child.classList.contains("ignore")) {
-                    el.removeChild(child)
+                    child.remove()
                 } else {
-                    this.scrub_svg_children(child)
+                    this.getCleanedSVG(child)
                 }
             }
         }
+
+        // Remove unwanted classes
+        el.removeAttribute('class');
+
         return el
     }
 
     handleSubmitClick() {
         // Grab and clean svg layout
         var svg = document.getElementById("draw-svg");
-        svg = this.scrub_svg_children(svg).cloneNode(true);
+        var svgClone = svg.cloneNode(true);
+        svgClone = this.getCleanedSVG(svgClone);
+        svgClone.setAttribute("viewBox", `0 0 1000 666`);
 
         // Grab model details
         const compiledModels = this.props.shapes.filter((shapeData) => {
@@ -46,8 +50,20 @@ class TopMenu extends Component {
 
         const output = {
             elements:compiledModels,
-            tree:svg.outerHTML
-        }
+            tree:svgClone.outerHTML,
+            xSeriesIndex:this.props.xSeriesIndex,
+            //TODO - Implement these Options
+            "x_series_unit": "",
+            "title":"",
+            "font_size":12
+        };
+
+        var form = document.getElementById("ssv-submit");
+        var field = document.createElement("input");
+        field.setAttribute("name", "model");
+        field.setAttribute("value", JSON.stringify(output));
+        form.appendChild(field);
+        form.submit();
     }
 
     render() {
@@ -67,7 +83,8 @@ class TopMenu extends Component {
 }
 
 const mapStateToProps = ({ shapeCollection }) => ({
-    shapes:shapeCollection.shapes
+    shapes:shapeCollection.shapes,
+    xSeriesIndex:shapeCollection.xSeriesIndex
 });
 
 const mapDispatchToProps = {

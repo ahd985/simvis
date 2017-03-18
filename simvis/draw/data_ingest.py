@@ -70,9 +70,14 @@ def read_file(f):
                                       df_headers)
 
     df = df.fillna(0)
-    # Get column headers and min/max
-    data = [list(df.columns), list(df.min()), list(df.max())]
 
-    return data
+    return df
+
+
+def summarize(data):
+    # Get column headers and min/max
+    summary = [list(data.columns), list(data.min()), list(data.max())]
+
+    return summary
 
 

@@ -233,9 +233,11 @@ const shapeCollection = (state = defaultState, action) => {
                 conditions: action.model.conditions.map((condition) => {
                     return {
                         ...condition,
+                        id: "s" + uuidV4().substring(0,8),
                         data:state.data.map((row) => {return row[condition.dataIndex]})
                     }
-                })
+                }),
+                ids:["element"]
             };
             ssv.create_demo_element(state.selectedShapes[0], demoModel).update(0,0);
 

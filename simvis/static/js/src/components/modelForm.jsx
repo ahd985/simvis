@@ -42,9 +42,8 @@ class OpacityForm extends Component {
     }
 
     handleChange(e) {
-        // Cast as int
-        e.target.value = parseFloat(e.target.value);
-        this.props.onChange(e)
+        // Cast as float
+        this.props.onChange({target:{value:parseFloat(e.target.value)}})
     }
 
     render() {
@@ -138,8 +137,8 @@ class ColorScaleForm extends Component {
         this.state = {
             open:false,
             colorSteps:5,
-            minColorValue:0,
-            maxColorValue:1
+            minColorValue:this.props.data[0],
+            maxColorValue:this.props.data[this.props.data.length-1]
         };
 
         this.handleOpen = this.handleOpen.bind(this);
@@ -194,8 +193,8 @@ class ColorScaleForm extends Component {
             <Modal trigger={<Button onClick={this.handleOpen}>{"Color Scale"}</Button>} open={this.state.open}>
                 <Modal.Content>
                     {colorSetButtons}
-                    <Form.Input label='Lower Bound' name='minColorValue' value='0' type={"number"} onChange={(e) => this.handleBoundsChange(e, 'minColorValue')}/>
-                    <Form.Input label='Upper Bound' name='maxColorValue' value='1000' type={"number"} onChange={(e) => this.handleBoundsChange(e, 'maxColorValue')}/>
+                    <Form.Input label='Lower Bound' name='minColorValue' value={this.state.minColorValue} type={"number"} onChange={(e) => this.handleBoundsChange(e, 'minColorValue')}/>
+                    <Form.Input label='Upper Bound' name='maxColorValue' value={this.state.maxColorValue} type={"number"} onChange={(e) => this.handleBoundsChange(e, 'maxColorValue')}/>
                     <Form.Field width="3" control={NumberPicker} name="colorLevels" label="Color Steps"
                            value={this.state.colorSteps}
                            onChange={this.handleStepChange}
