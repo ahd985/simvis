@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
+import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table, Label } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { setShapeStyle, setShapeModel } from '../actions'
+import { setShapeStyle, setShapeModel, setOverview, setLayout } from '../actions'
 
 import NumberPicker from '../components/numberPicker';
 import ColorPickerModal from '../components/colorPickerModal'
@@ -18,6 +18,7 @@ class RightSideBarMenu extends Component {
 
         this.handleTabClick = this.handleTabClick.bind(this);
         this.handleStrokeWidthChange = this.handleStrokeWidthChange.bind(this);
+        this.handleOverviewChange = this.handleOverviewChange.bind(this);
         this.addModelToShape = this.addModelToShape.bind(this)
     }
 
@@ -29,6 +30,14 @@ class RightSideBarMenu extends Component {
         this.props.setShapeStyle({strokeWidth:e.value + ''})
     }
 
+    handleOverviewChange(e, arg) {
+        e.persist ? e.persist() : null;
+        this.props.setOverview({
+            ...this.props.overview,
+            [arg]:e.value ? e.value : e.target.value
+        })
+    }
+
     addModelToShape() {
         this.props.setShapeModel()
     }
@@ -37,11 +46,33 @@ class RightSideBarMenu extends Component {
         const { visible } = this.state;
         const { activeItem } = this.state;
 
+        const style = {width:this.props.rightSideBarWidth, right:0};
+
         let submenu, menu;
         if (!this.props.selectedShapes.length) {
             submenu = null;
-            menu = <Sidebar animation='overlay' direction="right" width='wide' visible={visible} id="right-sidebar">
-            </Sidebar>
+            menu = <div id="right-sidebar" style={style}>
+                <Segment size="mini" attached>Overview</Segment>
+                <Form size="small" style={{padding:5}}>
+                    <Form.Input label='Title' name='title' type='text' placeholder='My Simulation' value={this.props.overview.title} onChange={(e) => this.handleOverviewChange(e, "title")}/>
+                    <Form.Group widths='equal'>
+                        <Form.Input label='X Series Unit' name='x_series_unit' type='text' placeholder='e.g., Hrs' value={this.props.overview.x_series_unit} onChange={(e) => this.handleOverviewChange(e, "x_series_unit")}/>
+                        <Form.Input label='Font Size' name='font_size' type='number' value={this.props.overview.font_size} onChange={(e) => this.handleOverviewChange(e, "font_size")} min={1} max={72}/>
+                    </Form.Group>
+                </Form>
+                <Segment size="mini" attached>Layout</Segment>
+                <Form size="small" style={{padding:5}}>
+                    <Label attached="top">Height x Width</Label>
+                    <Form.Group widths='equal'>
+                        <Form.Field>
+                            <Input labelPosition='right' label='px' name='diagram_width' type='number'  value={this.props.diagramWidth} onChange={(e) => this.props.setLayout("diagramWidth", parseInt(e.target.value))} min={1} max={10000}/>
+                        </Form.Field>
+                        <Form.Field>
+                            <Input labelPosition='right' label='px' name='diagram_height' type='number'  value={this.props.diagramHeight} onChange={(e) => this.props.setLayout("diagramHeight", parseInt(e.target.value))} min={1} max={10000}/>
+                        </Form.Field>
+                    </Form.Group>
+                </Form>
+            </div>
         } else {
             if (activeItem === 'model') {
                 submenu = <Segment attached='bottom'>
@@ -62,18 +93,18 @@ class RightSideBarMenu extends Component {
                 submenu = <Segment attached='bottom'><div>YYY</div></Segment>;
             }
 
-            menu = <Sidebar animation='overlay' direction="right" width='wide' visible={visible} id="right-sidebar">
+            menu = <div id="right-sidebar" style={style}>
                 <Menu attached='top' tabular>
                     <Menu.Item name='model' active={activeItem === 'model'} onClick={this.handleTabClick} />
                     <Menu.Item name='style' active={activeItem === 'style'} onClick={this.handleTabClick} />
                     <Menu.Item name='arrange' active={activeItem === 'arrange'} onClick={this.handleTabClick} />
                 </Menu>
                 {submenu}
-            </Sidebar>
+            </div>
         }
 
         return (
-            menu
+            this.props.rightSideBarPresent ? menu : null
         )
     }
 }
@@ -82,12 +113,19 @@ const mapStateToProps = ({ shapeCollection }) => ({
     selectedShapes:shapeCollection.selectedShapes,
     selectedStyle:shapeCollection.selectedStyle,
     dataHeaders:shapeCollection.dataHeaders,
-    data:shapeCollection.data
+    data:shapeCollection.data,
+    rightSideBarWidth:shapeCollection.layout.rightSideBarWidth,
+    rightSideBarPresent:shapeCollection.layout.rightSideBarPresent,
+    overview:shapeCollection.overview,
+    diagramWidth:shapeCollection.layout.diagramWidth,
+    diagramHeight:shapeCollection.layout.diagramHeight
 });
 
 const mapDispatchToProps = {
     setShapeStyle:setShapeStyle,
-    setShapeModel:setShapeModel
+    setShapeModel:setShapeModel,
+    setOverview:setOverview,
+    setLayout:setLayout
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RightSideBarMenu)

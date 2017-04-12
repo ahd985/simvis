@@ -8,11 +8,11 @@ export class Rect extends Component {
 
     render() {
         const {x0, y0, h0, w0} = this.props.objectBBox;
-        const {dX, dY} = this.props.dObject;
-        let height = this.props.height;
-        let width = this.props.width;
-        let x = this.props.x;
-        let y = this.props.y;
+        const {dX, dY, scale} = this.props.dObject;
+        let height = this.props.height * scale;
+        let width = this.props.width * scale;
+        let x = this.props.x * scale;
+        let y = this.props.y * scale;
 
         const x1 = x + width;
         const y1 = y + height;
@@ -62,10 +62,10 @@ export class Circle extends Component {
 
     render() {
         const {x0, y0, h0, w0} = this.props.objectBBox;
-        const {dX, dY} = this.props.dObject;
-        let r = this.props.r;
-        let cx = this.props.cx;
-        let cy = this.props.cy;
+        const {dX, dY, scale} = this.props.dObject;
+        let r = this.props.r * scale;
+        let cx = this.props.cx * scale;
+        let cy = this.props.cy * scale;
 
         let x1 = cx + r;
         let y1 = cy + r;
@@ -107,11 +107,11 @@ export class Ellipse extends Component {
 
     render() {
         const {x0, y0, h0, w0} = this.props.objectBBox;
-        const {dX, dY} = this.props.dObject;
-        let rx = this.props.rx;
-        let ry = this.props.ry;
-        let cx = this.props.cx;
-        let cy = this.props.cy;
+        const {dX, dY, scale} = this.props.dObject;
+        let rx = this.props.rx * scale;
+        let ry = this.props.ry * scale;
+        let cx = this.props.cx * scale;
+        let cy = this.props.cy * scale;
 
         const x1 = cx + rx;
         const y1 = cy + ry;
@@ -156,7 +156,7 @@ export class Path extends Component {
 
     render() {
         const {x0, y0, h0, w0} = this.props.objectBBox;
-        const {dX, dY} = this.props.dObject;
+        const {dX, dY, scale} = this.props.dObject;
         let d = this.props.d;
 
         d = svgpath(d).rel();
@@ -188,7 +188,7 @@ export class Path extends Component {
         const xFrac = (x1 - x0) / (x1 + width - x0);
         const yFrac = (y1 - y0) / (y1 + height - y0);
 
-        d = d.scale(1 + (1-xFrac) * dX / w0, 1 + (1-yFrac) * dY / h0)
+        d = d.scale((1 + (1-xFrac) * dX / w0)*scale, (1 + (1-yFrac) * dY / h0)*scale)
             .translate(xFrac * dX, yFrac * dY)
             .toString();
 
@@ -240,5 +240,5 @@ Shape.propTypes = {
 };
 
 Shape.defaultProps = {
-    dObject: {dX:0, dY:0}
+    dObject: {dX:0, dY:0, scale:1}
 };

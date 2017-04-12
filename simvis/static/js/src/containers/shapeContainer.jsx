@@ -47,12 +47,14 @@ class ShapeContainer extends Component {
     }
 
     handleMove(e, ui) {
+        const scale = this.props.scale;
         this.props.addSelectedShape(this.props.uuid, true);
-        this.props.moveShapes({x:ui.deltaX, y:ui.deltaY})
+        this.props.moveShapes({x:ui.deltaX/scale, y:ui.deltaY/scale})
     }
 
     handleResize(e, ui) {
-        this.props.resizeShapes({width:ui.deltaX, height:ui.deltaY})
+        const scale = this.props.scale;
+        this.props.resizeShapes({width:ui.deltaX/scale, height:ui.deltaY/scale})
     }
 
     handleContextMenu(e) {
@@ -62,13 +64,15 @@ class ShapeContainer extends Component {
 
     render() {
         const min_dim = 5;
-        const {height, width} = this.props.dims;
+        const scale = this.props.scale;
+        const height = this.props.dims.height;
+        const width = this.props.dims.width;
         const dH = Math.max(this.props.deltaDims.height, -width + min_dim);
         const dW = Math.max(this.props.deltaDims.width, -height + min_dim);
 
         const visibility_style = {"visibility": this.props.toggled ? "visible" : "hidden"};
-        const translate = `translate(${this.props.position.x}, ${this.props.position.y})`;
-        const dObject = {dX:dW, dY:dH};
+        const translate = `translate(${this.props.position.x*scale}, ${this.props.position.y*scale})`;
+        const dObject = {dX:dW, dY:dH, scale:scale};
 
         const outline_handle_size = 5;
 
@@ -77,15 +81,15 @@ class ShapeContainer extends Component {
                 <g style={this.props.style} onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp}>
                     <Draggable grid={[5,5]} onDrag={this.handleMove} axis={"none"}>
                         <g onContextMenu={this.handleContextMenu} id={this.props.uuid}>
-                            <this.props.tag dObject={dObject} />
+                            <this.props.tag dObject={dObject}/>
                         </g>
                     </Draggable>
                 </g>
                 <g style={visibility_style} className="ignore">
-                    <rect x="0" y="0" height={height + dH} width={width + dW} className="shape-outline"/>
+                    <rect x="0" y="0" height={(height + dH)*scale} width={(width + dW)*scale} className="shape-outline"/>
                     <Draggable onDrag={this.handleResize} axis={"none"}>
                         <g>
-                            <circle cx={width + dW} cy={height + dH} r={outline_handle_size}
+                            <circle cx={(width + dW)*scale} cy={(height + dH)*scale} r={outline_handle_size}
                                     className="resizer-circle" onDrag={this.handleResize}/>
                         </g>
                     </Draggable>

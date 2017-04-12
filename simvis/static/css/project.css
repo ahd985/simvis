@@ -111,17 +111,11 @@ body {
   right: 0;
   background: #EEEEEE; }
 
-.left-sidebar-menu {
-  position: absolute;
-  left: 0;
-  top: 100px;
-  bottom: 0;
-  width: 200px;
-  background: #EEEEEE; }
-
 #left-sidebar, #right-sidebar {
   background: #EEEEEE;
-  top: auto; }
+  top: auto;
+  position: absolute;
+  height: 100%; }
 
 #top-sidebar {
   margin: 0; }
@@ -156,7 +150,9 @@ body {
   top: 0;
   bottom: 0;
   right: 0;
-  overflow: auto; }
+  overflow: scroll;
+  height: 100%;
+  width: 100%; }
 
 .shape-select-container {
   display: block;
@@ -218,8 +214,14 @@ body {
   stroke: #000000;
   stroke-width: 2; }
 
+.diagram-mat {
+  background-color: darkgrey;
+  z-index: -5;
+  min-height: 100%;
+  min-width: 100%; }
+
 .diagram-background {
-  position: relative;
+  position: absolute;
   border-width: 1px;
   overflow: hidden;
   left: 0px;
@@ -229,16 +231,11 @@ body {
   border-color: #cacaca;
   border-style: solid;
   background-color: white;
-  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2UwZTBlMCIgb3BhY2l0eT0iMC4yIiBzdHJva2Utd2lkdGg9IjEiLz48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=");
   background-position: -1px -1px;
   z-index: -1; }
 
 .diagram {
-  width: 100%;
-  height: 100%;
   position: absolute;
-  top: 0;
-  left: 0;
   fill: none; }
 
 .display-block {
@@ -289,9 +286,8 @@ rect {
   right: 0; }
 
 .diagram-wrapper {
-  position: relative;
-  height: 100%;
-  width: 100%; }
+  position: absolute;
+  height: 100%; }
 
 .dropzone {
   width: 100%;
@@ -340,3 +336,14 @@ rect {
   height: 15px;
   width: 10px;
   float: right; }
+
+.left-sidebar-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  cursor: col-resize;
+  background-color: #EEEEEE; }
+
+.left-sidebar-resizer:hover {
+  background-color: black; }

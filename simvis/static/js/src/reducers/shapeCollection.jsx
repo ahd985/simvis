@@ -9,7 +9,21 @@ const defaultState = {
     selectedStyle:{},
     data: null,
     dataHeaders: null,
-    xSeriesIndex: null
+    xSeriesIndex: null,
+    addPosition: {x:10, y:10},
+    layout:{
+        leftSideBarWidth:200,
+        rightSideBarPresent:true,
+        rightSideBarWidth:300,
+        diagramWidth:1000,
+        diagramHeight:1000,
+        scale:100
+    },
+    overview:{
+        title:"",
+        x_series_unit:"",
+        font_size:12
+    }
 };
 
 const shapeCollection = (state = defaultState, action) => {
@@ -23,12 +37,13 @@ const shapeCollection = (state = defaultState, action) => {
                     {
                         uuid:"s" + uuidV4(),
                         shape:action.shape,
-                        position:{x:400, y:400},
+                        position:state.addPosition,
                         dims:{width:action.shape.bbox.w0, height:action.shape.bbox.h0},
                         deltaDims:{width:0, height:0},
-                        style:shapeStyle
+                        style:shapeStyle,
                     }
-                ]
+                ],
+                addPosition:{x:state.addPosition.x + 10, y:state.addPosition.y + 10}
             };
         case 'REMOVE_SHAPES':
             return {
@@ -39,7 +54,8 @@ const shapeCollection = (state = defaultState, action) => {
                     } else {
                         return true
                     }
-                })
+                }),
+                selectedShapes:[]
             };
         case 'MOVE_SHAPES':
             return {
@@ -249,6 +265,19 @@ const shapeCollection = (state = defaultState, action) => {
                     }
                     return shapeData
                 })
+            };
+        case 'SET_OVERVIEW':
+            return {
+                ...state,
+                overview:action.overview
+            };
+        case 'SET_LAYOUT':
+            return {
+                ...state,
+                layout:{
+                    ...state.layout,
+                    [action.arg]:action.value
+                }
             };
         default:
             return state

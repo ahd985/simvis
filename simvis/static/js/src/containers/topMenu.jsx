@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form } from 'semantic-ui-react'
+import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { compileModel } from '../actions'
+import { compileModel, setLayout } from '../actions'
 
 import ImportDataModal from './dataImport'
 
@@ -9,7 +9,13 @@ class TopMenu extends Component {
     constructor(props) {
         super(props);
 
-        this.handleSubmitClick = this.handleSubmitClick.bind(this)
+        this.zoomLevels = [25, 50, 75, 100, 200, 300];
+        this.zoomLevelOptions = this.zoomLevels.map((e, i) => {
+            return {key:i, value:e, text:e.toString() + "%"}
+        });
+
+        this.handleSubmitClick = this.handleSubmitClick.bind(this);
+        this.handleZoom = this.handleZoom.bind(this)
     }
 
     getCleanedSVG(el) {
@@ -52,10 +58,7 @@ class TopMenu extends Component {
             elements:compiledModels,
             tree:svgClone.outerHTML,
             xSeriesIndex:this.props.xSeriesIndex,
-            //TODO - Implement these Options
-            "x_series_unit": "",
-            "title":"",
-            "font_size":12
+            ...this.props.overview
         };
 
         var form = document.getElementById("ssv-submit");
@@ -66,11 +69,25 @@ class TopMenu extends Component {
         form.submit();
     }
 
+    handleZoom(type, value) {
+        const scale = this.props.layout.scale;
+        if (type === "delta") {
+            let i = this.zoomLevels.indexOf(scale);
+            i = Math.max(Math.min(i+value, this.zoomLevels.length-1), 0);
+            this.props.setLayout("scale", this.zoomLevels[i])
+        } else {
+            this.props.setLayout("scale", value)
+        }
+    }
+
     render() {
         return (
             <Menu id="top-sidebar" size="mini">
-                <Menu.Item name="moveForward"><Icon name='move' /></Menu.Item>
-                <Menu.Item name="moveBackwards"><Icon name='move' /></Menu.Item>
+                <Menu.Item name="zoomLevel"><Dropdown text={this.props.layout.scale.toString() + "%"}
+                                                      options={this.zoomLevelOptions}
+                                                      onChange={(e, d) => this.handleZoom("select", d.value)} /></Menu.Item>
+                <Menu.Item name="zoomIn" onClick={() => this.handleZoom("delta", +1)}><Icon name='zoom' /></Menu.Item>
+                <Menu.Item name="zoomOut" onClick={() => this.handleZoom("delta", -1)}><Icon name='zoom out' /></Menu.Item>
                 <Menu.Menu position='right'>
                     <ImportDataModal/>
                 </Menu.Menu>
@@ -84,11 +101,13 @@ class TopMenu extends Component {
 
 const mapStateToProps = ({ shapeCollection }) => ({
     shapes:shapeCollection.shapes,
-    xSeriesIndex:shapeCollection.xSeriesIndex
+    xSeriesIndex:shapeCollection.xSeriesIndex,
+    overview:shapeCollection.overview,
+    layout:shapeCollection.layout
 });
 
 const mapDispatchToProps = {
-
+    setLayout:setLayout
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(TopMenu)

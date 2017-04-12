@@ -92,10 +92,14 @@ class pathInBox extends Component {
 }
 
 export default [
-    {name:"box", tag:Box, bbox:defaultBBox, ratioLock:false},
-    {name:"round", tag:Round, bbox:defaultBBox, ratioLock:true},
-    {name:"skewedRound", tag:SkewedRound, bbox:skewedRoundBBox, ratioLock:false},
-    {name:"line", tag:Line, bbox:lineBBox, ratioLock:false},
-    {name:"circleInBox", tag:circleInBox, bbox:defaultBBox, ratioLock:false},
-    {name:"pathInBox", tag:pathInBox, bbox:defaultBBox, ratioLock:false}
+    {name:"General", shapes:[
+        {name:"box", tag:Box, bbox:defaultBBox, ratioLock:false},
+        {name:"round", tag:Round, bbox:defaultBBox, ratioLock:true}     
+    ]},
+    {name:"Special", shapes:[
+        {name:"skewedRound", tag:SkewedRound, bbox:skewedRoundBBox, ratioLock:false},
+        {name:"line", tag:Line, bbox:lineBBox, ratioLock:false},
+        {name:"circleInBox", tag:circleInBox, bbox:defaultBBox, ratioLock:false},
+        {name:"pathInBox", tag:pathInBox, bbox:defaultBBox, ratioLock:false} 
+    ]}
 ]
