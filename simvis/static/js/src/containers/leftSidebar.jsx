@@ -11,7 +11,7 @@ class LeftSideBarMenu extends Component {
     constructor(props) {
         super(props);
 
-        this.resizerWidth = 8;
+        this.resizerWidth = 2;
 
         this.handleMove = this.handleMove.bind(this)
     }
@@ -30,14 +30,18 @@ class LeftSideBarMenu extends Component {
             }
         });
 
+        /* TODO - consider re-enabling resizer
+        <Draggable onDrag={this.handleMove} axis={"none"}>
+            <div className={"left-sidebar-resizer"} style={{width:this.resizerWidth, right:-this.resizerWidth}}></div>
+        </Draggable>
+        */
+
         return (
             <div style={{width:this.props.leftSideBarWidth - this.resizerWidth}} id="left-sidebar">
-                <div style={{width:this.props.leftSideBarWidth}}>
+                <div style={{width:this.props.leftSideBarWidth - this.resizerWidth}}>
                     { numCols > 0 ? <Accordion styled panels={panels} exclusive={false} defaultActiveIndex={0}/> : null}
                 </div>
-                <Draggable onDrag={this.handleMove} axis={"none"}>
-                    <div className={"left-sidebar-resizer"} style={{width:this.resizerWidth, right:-this.resizerWidth}}></div>
-                </Draggable>
+                <div className={"left-sidebar-resizer"} style={{width:this.resizerWidth, right:-this.resizerWidth}}></div>
             </div>
         )
     }
@@ -56,23 +60,31 @@ class GriddedSubMenu extends Component {
 
     render() {
         var getShape = this.getShape;
+        const leftSideBarWidth = this.props.leftSideBarWidth;
 
         return (
             <Grid stackable padded textAlign={"center"} columns={this.props.cols}>
                 {this.props.shapes.map(function(shape, i) {
                     const viewbox = `${shape.bbox.x0-5} ${shape.bbox.y0-5} ${shape.bbox.w0+10} ${shape.bbox.h0+10}`;
 
+                    const a = <a id={shape.id} className="menu-item" name={shape.name} onClick={(e) => getShape(e, shape)}>
+                        <svg className="menu-icon" width="40" height="40" viewBox={viewbox} preserveAspectRatio="xMidYMid">
+                            <g className="shape-svg-container">
+                                <g className="shape-svg">
+                                    <shape.tag />
+                                </g>
+                            </g>
+                        </svg>
+                    </a>;
+
                     return (
                         <Grid.Column key={i} style={{"paddingLeft":4, "paddingRight":4}}>
-                            <a id={shape.id} className="menu-item" name={shape.name} onClick={(e) => getShape(e, shape)}>
-                                <svg className="menu-icon" width="40" height="40" viewBox={viewbox} preserveAspectRatio="xMidYMid">
-                                    <g className="shape-svg-container">
-                                        <g className="shape-svg">
-                                            <shape.tag />
-                                        </g>
-                                    </g>
-                                </svg>
-                            </a>
+                            <Popup
+                                trigger={a}
+                                content={shape.description ? shape.name + ": " + shape.description : shape.name}
+                                position='right center'
+                                style={{left:leftSideBarWidth}}
+                            />
                         </Grid.Column>
                     );
                 })}
@@ -82,7 +94,7 @@ class GriddedSubMenu extends Component {
 }
 
 const mapStateToProps = ({ shapeCollection }) => ({
-    leftSideBarWidth:shapeCollection.layout.leftSideBarWidth
+    leftSideBarWidth:shapeCollection.present.layout.leftSideBarWidth
 });
 
 const mapDispatchToProps = {

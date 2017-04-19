@@ -110,15 +110,15 @@ class RightSideBarMenu extends Component {
 }
 
 const mapStateToProps = ({ shapeCollection }) => ({
-    selectedShapes:shapeCollection.selectedShapes,
-    selectedStyle:shapeCollection.selectedStyle,
-    dataHeaders:shapeCollection.dataHeaders,
-    data:shapeCollection.data,
-    rightSideBarWidth:shapeCollection.layout.rightSideBarWidth,
-    rightSideBarPresent:shapeCollection.layout.rightSideBarPresent,
-    overview:shapeCollection.overview,
-    diagramWidth:shapeCollection.layout.diagramWidth,
-    diagramHeight:shapeCollection.layout.diagramHeight
+    selectedShapes:shapeCollection.present.selectedShapes,
+    selectedStyle:shapeCollection.present.selectedStyle,
+    dataHeaders:shapeCollection.present.dataHeaders,
+    data:shapeCollection.present.data,
+    rightSideBarWidth:shapeCollection.present.layout.rightSideBarWidth,
+    rightSideBarPresent:shapeCollection.present.layout.rightSideBarPresent,
+    overview:shapeCollection.present.overview,
+    diagramWidth:shapeCollection.present.layout.diagramWidth,
+    diagramHeight:shapeCollection.present.layout.diagramHeight
 });
 
 const mapDispatchToProps = {

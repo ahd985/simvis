@@ -3,7 +3,7 @@ import ssv from '../../ssv.min.js'
 
 const shapeStyle = {fill: "grey", stroke: "black", strokeWidth: 1, cursor: "move"};
 
-const defaultState = {
+const defaultPresent = {
     shapes: [],
     selectedShapes: [],
     selectedStyle:{},
@@ -12,11 +12,11 @@ const defaultState = {
     xSeriesIndex: null,
     addPosition: {x:10, y:10},
     layout:{
-        leftSideBarWidth:200,
+        leftSideBarWidth:250,
         rightSideBarPresent:true,
         rightSideBarWidth:300,
-        diagramWidth:1000,
-        diagramHeight:1000,
+        diagramWidth:500,
+        diagramHeight:500,
         scale:100
     },
     overview:{
@@ -26,8 +26,50 @@ const defaultState = {
     }
 };
 
-const shapeCollection = (state = defaultState, action) => {
+const historyTracker = (reducer) => {
+    const initialState = {
+        past: [],
+        present: reducer(undefined, {}),
+        future: []
+    };
+
+    return function (state = initialState, action) {
+        const { past, present, future } = state;
+
+        switch (action.type) {
+            case 'UNDO':
+                const previous = past[past.length - 1];
+                const newPast = past.slice(0, past.length - 1);
+                return {
+                    past: newPast,
+                    present: previous,
+                    future: [ present, ...future ]
+                };
+            case 'REDO':
+                const next = future[0];
+                const newFuture = future.slice(1);
+                return {
+                    past: [ ...past, present ],
+                    present: next,
+                    future: newFuture
+                };
+            default:
+                const newPresent = reducer(present, action);
+                if (present === newPresent) {
+                    return state
+                }
+                return {
+                    past: [ ...past, present ],
+                    present: newPresent,
+                    future: []
+                }
+        }
+    }
+};
+
+const shapeCollection = (state = defaultPresent, action) => {
     console.log(state, action);
+
     switch (action.type) {
         case 'ADD_SHAPE':
             return {
@@ -284,4 +326,4 @@ const shapeCollection = (state = defaultState, action) => {
     }
 };
 
-export default shapeCollection
+export default historyTracker(shapeCollection)

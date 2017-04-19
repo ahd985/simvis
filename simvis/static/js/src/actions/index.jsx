@@ -21,3 +21,5 @@ export const clearSelectedShapes = () => ({type:'CLEAR_SELECTED_SHAPES'});
 export const setShapeModel = (model) => ({type:'SET_SHAPE_MODEL', model:model});
 export const setOverview = (overview) => ({type:'SET_OVERVIEW', overview:overview});
 export const setLayout = (arg, value) => ({type:'SET_LAYOUT', arg, value});
+export const undo = () => ({type:'UNDO'});
+export const redo = () => ({type:'REDO'});

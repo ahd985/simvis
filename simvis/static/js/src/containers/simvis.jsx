@@ -35,9 +35,9 @@ class SimVis extends Component {
 }
 
 const mapStateToProps = ({ shapeCollection }) => ({
-    shapes:shapeCollection.shapes,
-    selectedShapes:shapeCollection.selectedShapes,
-    selectedStyle:shapeCollection.selectedStyle
+    shapes:shapeCollection.present.shapes,
+    selectedShapes:shapeCollection.present.selectedShapes,
+    selectedStyle:shapeCollection.present.selectedStyle
 });
 
 const mapDispatchToProps = {

@@ -112,10 +112,21 @@ body {
   background: #EEEEEE; }
 
 #left-sidebar, #right-sidebar {
-  background: #EEEEEE;
+  background: #373737;
   top: auto;
   position: absolute;
   height: 100%; }
+
+#right-sidebar {
+  border-left: 2px solid #BDBDBD;
+  color: #fff; }
+
+#right-sidebar label {
+  color: #fff; }
+
+#right-sidebar .ui.label {
+  color: #fff;
+  background-color: transparent; }
 
 #top-sidebar {
   margin: 0; }
@@ -215,7 +226,7 @@ body {
   stroke-width: 2; }
 
 .diagram-mat {
-  background-color: darkgrey;
+  background-color: #EFEBE9;
   z-index: -5;
   min-height: 100%;
   min-width: 100%; }
@@ -342,8 +353,32 @@ rect {
   top: 0;
   right: 0;
   bottom: 0;
-  cursor: col-resize;
-  background-color: #EEEEEE; }
+  background-color: #BDBDBD; }
 
+/*
 .left-sidebar-resizer:hover {
-  background-color: black; }
+  background-color:$colorF
+}
+*/
+.ui.styled.accordion {
+  border-radius: 0;
+  background: #F4F4F4; }
+
+#navbar-container .ui.menu {
+  border-radius: 0;
+  background: #373737; }
+
+.draw-container-top .ui.menu {
+  border-radius: 0;
+  background: #F4F4F4;
+  border-bottom: 2px solid #373737; }
+
+#right-sidebar .ui.segment {
+  background: #BDBDBD; }
+
+#top-sidebar .ui.menu {
+  border-radius: 0;
+  background: #F4F4F4; }
+
+.item.no-border:before {
+  display: none; }

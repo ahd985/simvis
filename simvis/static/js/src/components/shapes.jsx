@@ -3,7 +3,7 @@ import Shape, {Rect, Circle, Ellipse, Path} from './shapeElements'
 
 var defaultBBox = {x0:0, y0:0, w0:100, h0:100};
 
-class Box extends Component {
+class Rectangle extends Component {
     constructor(props) {
         super(props);
     }
@@ -17,7 +17,7 @@ class Box extends Component {
     }
 }
 
-class Round extends Component {
+class CircleSimple extends Component {
     constructor(props) {
         super(props);
     }
@@ -93,13 +93,13 @@ class pathInBox extends Component {
 
 export default [
     {name:"General", shapes:[
-        {name:"box", tag:Box, bbox:defaultBBox, ratioLock:false},
-        {name:"round", tag:Round, bbox:defaultBBox, ratioLock:true}     
+        {name:"Rectangle", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple rectangle."},
+        {name:"Circle", tag:CircleSimple, bbox:defaultBBox, ratioLock:true, description:"A simple circle."}
     ]},
     {name:"Special", shapes:[
         {name:"skewedRound", tag:SkewedRound, bbox:skewedRoundBBox, ratioLock:false},
         {name:"line", tag:Line, bbox:lineBBox, ratioLock:false},
         {name:"circleInBox", tag:circleInBox, bbox:defaultBBox, ratioLock:false},
-        {name:"pathInBox", tag:pathInBox, bbox:defaultBBox, ratioLock:false} 
+        {name:"pathInBox", tag:pathInBox, bbox:defaultBBox, ratioLock:false}
     ]}
 ]

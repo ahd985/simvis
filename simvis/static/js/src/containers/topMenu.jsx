@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { compileModel, setLayout } from '../actions'
+import { compileModel, setLayout, reorderShapes, removeShapes, undo, redo } from '../actions'
 
 import ImportDataModal from './dataImport'
 
@@ -15,7 +15,10 @@ class TopMenu extends Component {
         });
 
         this.handleSubmitClick = this.handleSubmitClick.bind(this);
-        this.handleZoom = this.handleZoom.bind(this)
+        this.handleZoom = this.handleZoom.bind(this);
+        this.handleHistoryChange = this.handleHistoryChange.bind(this);
+        this.handleLayerChange = this.handleLayerChange.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     getCleanedSVG(el) {
@@ -80,14 +83,39 @@ class TopMenu extends Component {
         }
     }
 
+    handleHistoryChange(type) {
+        if (type == 'undo') {
+            this.props.undo()
+        } else {
+            this.props.redo()
+        }
+    }
+
+    handleLayerChange(type) {
+        if (type == 'up') {
+            this.props.reorderShapes(1);
+        } else {
+            this.props.reorderShapes(-1);
+        }
+    }
+
+    handleDelete() {
+        this.props.removeShapes()
+    }
+
     render() {
         return (
             <Menu id="top-sidebar" size="mini">
                 <Menu.Item name="zoomLevel"><Dropdown text={this.props.layout.scale.toString() + "%"}
                                                       options={this.zoomLevelOptions}
                                                       onChange={(e, d) => this.handleZoom("select", d.value)} /></Menu.Item>
-                <Menu.Item name="zoomIn" onClick={() => this.handleZoom("delta", +1)}><Icon name='zoom' /></Menu.Item>
+                <Menu.Item className="no-border" name="zoomIn" onClick={() => this.handleZoom("delta", +1)}><Icon name='zoom' /></Menu.Item>
                 <Menu.Item name="zoomOut" onClick={() => this.handleZoom("delta", -1)}><Icon name='zoom out' /></Menu.Item>
+                <Menu.Item className="no-border" name="undo" onClick={() => this.handleHistoryChange("undo")}><Icon name='undo' /></Menu.Item>
+                <Menu.Item name="redo" onClick={() => this.handleHistoryChange("redo")}><Icon name='flipped undo' /></Menu.Item>
+                <Menu.Item className="no-border" name="layerUp" onClick={() => this.handleLayerChange("up")}><Icon name='level up' /></Menu.Item>
+                <Menu.Item name="layerDown" onClick={() => this.handleLayerChange("down")}><Icon name='level down' /></Menu.Item>
+                <Menu.Item name="delete" onClick={() => this.handleDelete()}><Icon name='trash' /></Menu.Item>
                 <Menu.Menu position='right'>
                     <ImportDataModal/>
                 </Menu.Menu>
@@ -100,14 +128,18 @@ class TopMenu extends Component {
 }
 
 const mapStateToProps = ({ shapeCollection }) => ({
-    shapes:shapeCollection.shapes,
-    xSeriesIndex:shapeCollection.xSeriesIndex,
-    overview:shapeCollection.overview,
-    layout:shapeCollection.layout
+    shapes:shapeCollection.present.shapes,
+    xSeriesIndex:shapeCollection.present.xSeriesIndex,
+    overview:shapeCollection.present.overview,
+    layout:shapeCollection.present.layout
 });
 
 const mapDispatchToProps = {
-    setLayout:setLayout
+    setLayout:setLayout,
+    reorderShapes:reorderShapes,
+    removeShapes:removeShapes,
+    undo:undo,
+    redo:redo
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(TopMenu)

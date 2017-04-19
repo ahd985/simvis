@@ -139,8 +139,8 @@ class Diagram extends Component {
 }
 
 const mapStateToProps = ({ shapeCollection }) => ({
-    shapes:shapeCollection.shapes,
-    selectedShapes:shapeCollection.selectedShapes
+    shapes:shapeCollection.present.shapes,
+    selectedShapes:shapeCollection.present.selectedShapes
 });
 
 const mapDispatchToProps = {

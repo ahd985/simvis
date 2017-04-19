@@ -25,9 +25,15 @@ class DrawContainer extends Component {
     }
 
     componentDidMount() {
-        window.addEventListener("resize", this.updateDimensions);
+        const scrollWidth = Math.max(0, (document.getElementById("diagram-mat").offsetWidth - document.getElementById("diagram-container").offsetWidth) / 2);
+        let container = document.getElementById("diagram-container");
+        container.scrollLeft = scrollWidth;
+        window.addEventListener('resize', () => this.forceUpdate())
     }
 
+    componentWillUnmount() {
+        window.removeEventListener('resize', () => this.forceUpdate())
+    }
     contextMenuHandler(e) {
         this.setState({
             contextMenuActive:true,
@@ -42,16 +48,27 @@ class DrawContainer extends Component {
     }
 
     render() {
-        const padding = 50;
+        const padding = 100;
         const scale = this.props.layout.scale / 100;
         const dims = {width:this.props.layout.diagramWidth*scale, height:this.props.layout.diagramHeight*scale};
-        const xOffset = dims.width / 2;
+        const containerWidth = document.getElementById('simvis-container').offsetWidth
+            - this.props.layout.leftSideBarWidth
+            - (this.props.layout.rightSideBarPresent ? this.props.layout.rightSideBarWidth : 0);
+        const xOffset = Math.max(padding, (containerWidth - dims.width) / 2);
 
-        const childStyle = {
+        const diagramStyle = {
             top:padding,
-            left:padding,
+            left:xOffset,
             width:dims.width,
             height:dims.height
+        };
+
+        const matStyle = {
+            position:"absolute",
+            top:0,
+            left:0,
+            width:dims.width + 2*padding,
+            height:dims.height + 2*padding
         };
 
         const b64Grid = generateB64Grid(10, scale);
@@ -72,9 +89,9 @@ class DrawContainer extends Component {
                     <div className="diagram-wrapper" style={{left:this.props.layout.leftSideBarWidth,
                             right:(this.props.layout.rightSideBarPresent ? this.props.layout.rightSideBarWidth : 0)}}>
                         <div className="diagram-container" id="diagram-container">
-                            <div className="diagram-mat" style={{position:"absolute", top:0, left:0, width:dims.width + 2*padding, height:dims.height + 2*padding}}></div>
-                            <div className="diagram-background" style={{...childStyle, "backgroundImage":b64Grid}}></div>
-                            <Diagram contextMenuHandler={this.contextMenuHandler} svgStyle={childStyle} scale={scale}/>
+                            <div className="diagram-mat" id="diagram-mat" style={matStyle}></div>
+                            <div className="diagram-background" style={{...diagramStyle, "backgroundImage":b64Grid}}></div>
+                            <Diagram contextMenuHandler={this.contextMenuHandler} svgStyle={diagramStyle} scale={scale}/>
                         </div>
                     </div>
                 </div>
@@ -84,7 +101,7 @@ class DrawContainer extends Component {
 }
 
 const mapStateToProps = ({ shapeCollection }) => ({
-    layout:shapeCollection.layout
+    layout:shapeCollection.present.layout
 });
 
 const mapDispatchToProps = {
