@@ -355,6 +355,18 @@ rect {
   bottom: 0;
   background-color: #BDBDBD; }
 
+.color-picker-btn {
+  width: 100%;
+  background: #373737; }
+
+.color-picker-icon {
+  border: 1px solid black;
+  border-radius: 2px;
+  margin-left: 10px;
+  width: 15px;
+  height: 0.75em;
+  display: inline-block; }
+
 /*
 .left-sidebar-resizer:hover {
   background-color:$colorF
@@ -382,3 +394,19 @@ rect {
 
 .item.no-border:before {
   display: none; }
+
+#right-sidebar .tabular.menu {
+  background: #F4F4F4; }
+
+#right-sidebar .bottom.segment {
+  background: #F4F4F4; }
+
+#right-sidebar .shapes-selected-menu label {
+  color: #373737; }
+
+#right-sidebar .shapes-selected-menu button {
+  color: #EFEBE9;
+  background: #BDBDBD; }
+
+#right-sidebar .shapes-selected-menu button:hover {
+  background: #373737; }

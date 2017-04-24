@@ -5,6 +5,7 @@ export const setStrokeWidth = (strokeWidth) => ({
 
 export const addShape = (shape) => ({type:'ADD_SHAPE', shape});
 export const removeShapes = () => ({type:'REMOVE_SHAPES'});
+export const startMoveShapes = () => ({type:'START_MOVE_SHAPES'});
 export const moveShapes = (deltaShapePos) => ({type:'MOVE_SHAPES', deltaShapePos});
 export const resizeShapes = (deltaShapeSize) => ({type:'RESIZE_SHAPES', deltaShapeSize});
 export const reorderShapes = (step) => ({type:'REORDER_SHAPES', step});

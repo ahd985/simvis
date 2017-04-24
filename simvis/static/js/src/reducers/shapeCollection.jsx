@@ -34,32 +34,46 @@ const historyTracker = (reducer) => {
     };
 
     return function (state = initialState, action) {
+        console.log(state, action);
+
         const { past, present, future } = state;
 
         switch (action.type) {
             case 'UNDO':
-                const previous = past[past.length - 1];
-                const newPast = past.slice(0, past.length - 1);
-                return {
-                    past: newPast,
-                    present: previous,
-                    future: [ present, ...future ]
-                };
-            case 'REDO':
-                const next = future[0];
-                const newFuture = future.slice(1);
-                return {
-                    past: [ ...past, present ],
-                    present: next,
-                    future: newFuture
-                };
-            default:
-                const newPresent = reducer(present, action);
-                if (present === newPresent) {
+                if (past.length > 0) {
+                    const previous = past[past.length - 1];
+                    const newPast = past.slice(0, past.length - 1);
+                    return {
+                        past: newPast,
+                        present: previous,
+                        future: [present, ...future]
+                    }
+                } else {
                     return state
                 }
+            case 'REDO':
+                if (future.length > 0) {
+                    const next = future[0];
+                    const newFuture = future.slice(1);
+                    return {
+                        past: [ ...past, present ],
+                        present: next,
+                        future: newFuture
+                    };
+                } else {
+                    return state
+                }
+
+            default:
+                const noHistoryActions = ['MOVE_SHAPES', 'ADD_SELECTED_SHAPE'];
+
+                const newPresent = reducer(present, action);
+                if (present === newPresent && action.type != 'START_MOVE_SHAPES') {
+                    return state
+                }
+
                 return {
-                    past: [ ...past, present ],
+                    past: (noHistoryActions.indexOf(action.type) >= 0 ? [...past] : [...past, present]),
                     present: newPresent,
                     future: []
                 }
@@ -68,8 +82,6 @@ const historyTracker = (reducer) => {
 };
 
 const shapeCollection = (state = defaultPresent, action) => {
-    console.log(state, action);
-
     switch (action.type) {
         case 'ADD_SHAPE':
             return {
@@ -116,6 +128,8 @@ const shapeCollection = (state = defaultPresent, action) => {
                     }
                 })
             };
+        case 'START_MOVE_SHAPES':
+            return state;
         case 'RESIZE_SHAPES':
             return {
                 ...state,

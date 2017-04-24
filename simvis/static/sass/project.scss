@@ -473,6 +473,20 @@ rect {
   //background-position: center center;
 }
 
+.color-picker-btn {
+  width:100%;
+  background:$colorB;
+}
+
+.color-picker-icon {
+  border: 1px solid black;
+  border-radius: 2px;
+  margin-left: 10px;
+  width: 15px;
+  height: 0.75em;
+  display: inline-block;
+}
+
 /*
 .left-sidebar-resizer:hover {
   background-color:$colorF
@@ -507,4 +521,25 @@ rect {
 
 .item.no-border:before {
   display:none;
+}
+
+#right-sidebar .tabular.menu {
+  background:$colorD
+}
+
+#right-sidebar .bottom.segment {
+  background:$colorD
+}
+
+#right-sidebar .shapes-selected-menu label  {
+  color:$colorB;
+}
+
+#right-sidebar .shapes-selected-menu button  {
+  color:$colorA;
+  background:$colorC;
+}
+
+#right-sidebar .shapes-selected-menu button:hover  {
+  background:$colorB;
 }

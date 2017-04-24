@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { addTodo } from '../actions'
 import { Menu, Popup } from 'semantic-ui-react';
 
-import { moveShapes, addSelectedShape, resizeShapes } from '../actions'
+import { moveShapes, addSelectedShape, resizeShapes, startMoveShapes } from '../actions'
 
 class ShapeContainer extends Component {
     constructor(props) {
@@ -17,6 +17,8 @@ class ShapeContainer extends Component {
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseUp = this.handleMouseUp.bind(this);
+        this.handleDragStart = this.handleDragStart.bind(this);
+        this.handleDragStop = this.handleDragStop.bind(this);
         this.handleMove = this.handleMove.bind(this);
         this.handleResize = this.handleResize.bind(this);
         this.handleContextMenu = this.handleContextMenu.bind(this);
@@ -46,10 +48,20 @@ class ShapeContainer extends Component {
         this.isDragging=false
     }
 
+    handleDragStart(e, ui) {
+        this.props.startMoveShapes()
+    }
+
     handleMove(e, ui) {
         const scale = this.props.scale;
-        this.props.addSelectedShape(this.props.uuid, true);
+        if (this.props.selectedShapes.indexOf(this.props.uuid) == -1) {
+            this.props.addSelectedShape(this.props.uuid, true);
+        }
         this.props.moveShapes({x:ui.deltaX/scale, y:ui.deltaY/scale})
+    }
+
+    handleDragStop(e, ui) {
+        
     }
 
     handleResize(e, ui) {
@@ -79,7 +91,7 @@ class ShapeContainer extends Component {
         return (
             <g transform={translate}>
                 <g style={this.props.style} onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp}>
-                    <Draggable grid={[5,5]} onDrag={this.handleMove} axis={"none"}>
+                    <Draggable grid={[5,5]} onStart={this.handleDragStart} onDrag={this.handleMove} onStop={this.handleDragStop} axis={"none"}>
                         <g onContextMenu={this.handleContextMenu} id={this.props.uuid}>
                             <this.props.tag dObject={dObject}/>
                         </g>
@@ -99,11 +111,14 @@ class ShapeContainer extends Component {
     }
 }
 
-const mapStateToProps = ({ shapeCollection }) => ({});
+const mapStateToProps = ({ shapeCollection }) => ({
+    selectedShapes:shapeCollection.present.selectedShapes
+});
 
 const mapDispatchToProps = {
     addSelectedShape: addSelectedShape,
     moveShapes: moveShapes,
+    startMoveShapes: startMoveShapes,
     resizeShapes: resizeShapes
 };
 

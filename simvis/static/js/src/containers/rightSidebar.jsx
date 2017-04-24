@@ -19,7 +19,6 @@ class RightSideBarMenu extends Component {
         this.handleTabClick = this.handleTabClick.bind(this);
         this.handleStrokeWidthChange = this.handleStrokeWidthChange.bind(this);
         this.handleOverviewChange = this.handleOverviewChange.bind(this);
-        this.addModelToShape = this.addModelToShape.bind(this)
     }
 
     handleTabClick(e, {name}) {
@@ -36,10 +35,6 @@ class RightSideBarMenu extends Component {
             ...this.props.overview,
             [arg]:e.value ? e.value : e.target.value
         })
-    }
-
-    addModelToShape() {
-        this.props.setShapeModel()
     }
 
     render() {
@@ -75,29 +70,35 @@ class RightSideBarMenu extends Component {
             </div>
         } else {
             if (activeItem === 'model') {
-                submenu = <Segment attached='bottom'>
-                    <Button onClick={this.addModelToShape}/>
+                submenu = <Segment attached='bottom' className="shapes-selected-menu">
                     <ModelPickerModal setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
                 </Segment>;
             } else if (activeItem === 'style') {
-                submenu = <Segment attached='bottom'>
-                    <Form.Field width="1" control={NumberPicker} label="Stroke-Width"
+                submenu = <Segment attached='bottom' className="shapes-selected-menu">
+                    <Form size="small" style={{padding:5}} as="none">
+                        <Form.Group widths='equal'>
+                            <Form.Field>
+                                <ColorPickerModal color={this.props.selectedStyle.fill} setShapeStyle={this.props.setShapeStyle} desc="Fill" attr="fill"/>
+                            </Form.Field>
+                            <Form.Field>
+                               <ColorPickerModal color={this.props.selectedStyle.stroke} setShapeStyle={this.props.setShapeStyle} desc="Stroke" attr="stroke"/>
+                            </Form.Field>
+                        </Form.Group>
+                        <Form.Group widths='10'>
+                            <Form.Field width="10" control={NumberPicker} label="Stroke-Width"
                                    name={"strokeWidthPicker"}
                                    value={this.props.selectedStyle.strokeWidth}
                                    onChange={this.handleStrokeWidthChange}
                                    min={0}/>
-                    <ColorPickerModal color={this.props.selectedStyle.fill} setShapeStyle={this.props.setShapeStyle} desc="Fill" attr="fill"/>
-                    <ColorPickerModal color={this.props.selectedStyle.stroke} setShapeStyle={this.props.setShapeStyle} desc="Stroke" attr="stroke"/>
+                        </Form.Group>
+                    </Form>
                 </Segment>;
-            } else if (activeItem === 'arrange') {
-                submenu = <Segment attached='bottom'><div>YYY</div></Segment>;
             }
 
             menu = <div id="right-sidebar" style={style}>
                 <Menu attached='top' tabular>
                     <Menu.Item name='model' active={activeItem === 'model'} onClick={this.handleTabClick} />
                     <Menu.Item name='style' active={activeItem === 'style'} onClick={this.handleTabClick} />
-                    <Menu.Item name='arrange' active={activeItem === 'arrange'} onClick={this.handleTabClick} />
                 </Menu>
                 {submenu}
             </div>

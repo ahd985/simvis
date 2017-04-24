@@ -36,7 +36,7 @@ export default class ColorPickerModal extends Component {
 
     render() {
         return (
-            <Modal trigger={<Button onClick={this.handleOpen}>{this.props.desc}</Button>} open={this.state.open}>
+            <Modal trigger={<Button className="color-picker-btn" onClick={this.handleOpen}>{this.props.desc}<span className="color-picker-icon" style={{background:this.props.color}}></span></Button>} open={this.state.open}>
                 <Modal.Content>
                     <SketchPicker color={this.state.color} onChangeComplete={this.handleChangeComplete}/>
                 </Modal.Content>
