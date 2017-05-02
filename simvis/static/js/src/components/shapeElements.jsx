@@ -55,6 +55,33 @@ Rect.defaultProps = {
     ry: 0
 };
 
+export class Text extends Component {
+    constructor(props) {
+        super(props)
+    }
+
+    render() {
+        const attr = {
+        };
+
+        return (
+            <text {...attr} id={this.props.id}/>
+        )
+    }
+}
+
+Rect.propTypes = {
+    x: React.PropTypes.any.isRequired,
+    y: React.PropTypes.any.isRequired,
+    height: React.PropTypes.any.isRequired,
+    width: React.PropTypes.any.isRequired
+};
+
+Rect.defaultProps = {
+    rx: 0,
+    ry: 0
+};
+
 export class Circle extends Component {
     constructor(props) {
         super(props)

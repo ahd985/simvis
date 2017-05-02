@@ -267,12 +267,14 @@ body {
 
 .shape-outline {
   fill: none;
-  stroke: black;
-  stroke-width: 1px;
+  stroke: #FFE082;
+  stroke-width: 2px;
   stroke-dasharray: 5,5; }
 
 .resizer-circle {
-  fill: red;
+  fill: #FFE082;
+  stroke: #373737;
+  stroke-width: 1px;
   cursor: se-resize; }
 
 rect {

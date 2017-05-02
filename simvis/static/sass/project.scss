@@ -21,6 +21,7 @@ $colorC: #BDBDBD;
 $colorD: #F4F4F4;
 $colorE: #e3dec0;
 $colorF: #7F5217;
+$colorG: #FFE082;
 
 ////////////////////////////////
 		//Alerts//
@@ -366,13 +367,15 @@ body {
 
 .shape-outline {
   fill: none;
-  stroke: black;
-  stroke-width: 1px;
+  stroke: $colorG;
+  stroke-width: 2px;
   stroke-dasharray: 5,5
 }
 
 .resizer-circle {
-  fill: red;
+  fill: $colorG;
+  stroke: $colorB;
+  stroke-width: 1px;
   cursor: se-resize;
 }
 

@@ -1,7 +1,7 @@
 import uuidV4 from 'uuid/v4'
 import ssv from '../../ssv.min.js'
 
-const shapeStyle = {fill: "grey", stroke: "black", strokeWidth: 1, cursor: "move"};
+const shapeStyle = {fill: "#F4F4F4", stroke: "black", strokeWidth: 1, cursor: "move"};
 
 const defaultPresent = {
     shapes: [],

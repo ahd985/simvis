@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import Shape, {Rect, Circle, Ellipse, Path} from './shapeElements'
+import Shape, {Rect, Circle, Ellipse, Path, Text} from './shapeElements'
 
 var defaultBBox = {x0:0, y0:0, w0:100, h0:100};
 
@@ -26,6 +26,20 @@ class CircleSimple extends Component {
         return (
             <Shape objectBBox={defaultBBox} dObject={this.props.dObject}>
                 <Circle cx={50} cy={50} r={50} id={"element"} />
+            </Shape>
+        )
+    }
+}
+
+class TextBox extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <Shape objectBBox={defaultBBox} dObject={this.props.dObject}>
+                <Text x={0} y={0} id={"element"}>We did it</Text>
             </Shape>
         )
     }
@@ -94,11 +108,12 @@ class pathInBox extends Component {
 export default [
     {name:"General", shapes:[
         {name:"Rectangle", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple rectangle."},
-        {name:"Circle", tag:CircleSimple, bbox:defaultBBox, ratioLock:true, description:"A simple circle."}
+        {name:"Circle", tag:CircleSimple, bbox:defaultBBox, ratioLock:true, description:"A simple circle."},
+        {name:"Text", tag:Text, bbox:defaultBBox, ratioLock:true, description:"A simple circle."}
     ]},
     {name:"Special", shapes:[
         {name:"skewedRound", tag:SkewedRound, bbox:skewedRoundBBox, ratioLock:false},
-        {name:"line", tag:Line, bbox:lineBBox, ratioLock:false},
+        //{name:"line", tag:Line, bbox:lineBBox, ratioLock:false},
         {name:"circleInBox", tag:circleInBox, bbox:defaultBBox, ratioLock:false},
         {name:"pathInBox", tag:pathInBox, bbox:defaultBBox, ratioLock:false}
     ]}

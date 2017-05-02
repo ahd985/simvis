@@ -3,6 +3,7 @@ import Draggable from 'react-draggable';
 import { connect } from 'react-redux'
 import { addTodo } from '../actions'
 import { Menu, Popup } from 'semantic-ui-react';
+import { debounce } from 'underscore';
 
 import { moveShapes, addSelectedShape, resizeShapes, startMoveShapes } from '../actions'
 
@@ -13,6 +14,7 @@ class ShapeContainer extends Component {
         this.isClicked = false;
         this.isDragging = false;
         this.dragPos = {x:0, y:0};
+        this.lastPos = null;
 
         this.handleMouseDown = this.handleMouseDown.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -20,7 +22,11 @@ class ShapeContainer extends Component {
         this.handleDragStart = this.handleDragStart.bind(this);
         this.handleDragStop = this.handleDragStop.bind(this);
         this.handleMove = this.handleMove.bind(this);
+        this.handleMove = debounce(this.handleMove, 5);
+        this.handleResizeStart = this.handleResizeStart.bind(this);
         this.handleResize = this.handleResize.bind(this);
+        this.handleResize = debounce(this.handleResize, 5);
+        this.handleResizeStop = this.handleResizeStop.bind(this);
         this.handleContextMenu = this.handleContextMenu.bind(this);
     }
 
@@ -49,24 +55,48 @@ class ShapeContainer extends Component {
     }
 
     handleDragStart(e, ui) {
+        this.lastPos = {x:0, y:0};
         this.props.startMoveShapes()
     }
 
     handleMove(e, ui) {
         const scale = this.props.scale;
+        const deltaX = ui.x - this.lastPos.x;
+        const deltaY = ui.y - this.lastPos.y;
         if (this.props.selectedShapes.indexOf(this.props.uuid) == -1) {
             this.props.addSelectedShape(this.props.uuid, true);
         }
-        this.props.moveShapes({x:ui.deltaX/scale, y:ui.deltaY/scale})
+        this.props.moveShapes({x: deltaX / scale, y: deltaY / scale});
+        this.lastPos = {x:ui.x, y:ui.y};
     }
 
     handleDragStop(e, ui) {
-        
+        const scale = this.props.scale;
+        const deltaX = ui.x - this.lastPos.x;
+        const deltaY = ui.y - this.lastPos.y;
+        this.props.moveShapes({x: deltaX / scale, y: deltaY / scale});
+        this.lastPos = null;
+    }
+
+    handleResizeStart(e, ui) {
+        this.lastPos = {x:0, y:0};
+        //this.props.startResizeShapes()
     }
 
     handleResize(e, ui) {
         const scale = this.props.scale;
-        this.props.resizeShapes({width:ui.deltaX/scale, height:ui.deltaY/scale})
+        const deltaX = ui.x - this.lastPos.x;
+        const deltaY = ui.y - this.lastPos.y;
+        this.props.resizeShapes({width:deltaX/scale, height:deltaY/scale});
+        this.lastPos = {x:ui.x, y:ui.y};
+    }
+
+    handleResizeStop(e, ui) {
+        const scale = this.props.scale;
+        const deltaX = ui.x - this.lastPos.x;
+        const deltaY = ui.y - this.lastPos.y;
+        this.props.resizeShapes({width: deltaX / scale, height: deltaY / scale});
+        this.lastPos = null;
     }
 
     handleContextMenu(e) {
@@ -87,11 +117,13 @@ class ShapeContainer extends Component {
         const dObject = {dX:dW, dY:dH, scale:scale};
 
         const outline_handle_size = 5;
+        const position = {x:0, y:0};
 
+        // TODO - fix crappy implementation of drag
         return (
             <g transform={translate}>
                 <g style={this.props.style} onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp}>
-                    <Draggable grid={[5,5]} onStart={this.handleDragStart} onDrag={this.handleMove} onStop={this.handleDragStop} axis={"none"}>
+                    <Draggable onStart={this.handleDragStart} onDrag={this.handleMove} onStop={this.handleDragStop} position={position} axis={"none"}>
                         <g onContextMenu={this.handleContextMenu} id={this.props.uuid}>
                             <this.props.tag dObject={dObject}/>
                         </g>
@@ -99,10 +131,10 @@ class ShapeContainer extends Component {
                 </g>
                 <g style={visibility_style} className="ignore">
                     <rect x="0" y="0" height={(height + dH)*scale} width={(width + dW)*scale} className="shape-outline"/>
-                    <Draggable onDrag={this.handleResize} axis={"none"}>
+                    <Draggable onStart={this.handleResizeStart} onDrag={this.handleResize} onStop={this.handleResizeStop} position={{x:0, y:0}} axis={"none"}>
                         <g>
                             <circle cx={(width + dW)*scale} cy={(height + dH)*scale} r={outline_handle_size}
-                                    className="resizer-circle" onDrag={this.handleResize}/>
+                                    className="resizer-circle"/>
                         </g>
                     </Draggable>
                 </g>
