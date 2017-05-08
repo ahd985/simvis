@@ -70,7 +70,7 @@ class GriddedSubMenu extends Component {
                     const a = <a id={shape.id} className="menu-item" name={shape.name} onClick={(e) => getShape(e, shape)}>
                         <svg className="menu-icon" width="40" height="40" viewBox={viewbox} preserveAspectRatio="xMidYMid">
                             <g className="shape-svg-container">
-                                <g className="shape-svg">
+                                <g className="shape-svg" style={shape.style ? shape.style : null}>
                                     <shape.tag />
                                 </g>
                             </g>

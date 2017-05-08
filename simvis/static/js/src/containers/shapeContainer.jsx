@@ -5,20 +5,22 @@ import { addTodo } from '../actions'
 import { Menu, Popup } from 'semantic-ui-react';
 import { debounce } from 'underscore';
 
-import { moveShapes, addSelectedShape, resizeShapes, startMoveShapes } from '../actions'
+import { moveShapes, addSelectedShape, resizeShapes, startMoveShapes, clearSelectedShapes } from '../actions'
 
 class ShapeContainer extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            editActive:false
+        };
+
         this.isClicked = false;
         this.isDragging = false;
         this.dragPos = {x:0, y:0};
         this.lastPos = null;
+        this.doubleClickWIndow = false;
 
-        this.handleMouseDown = this.handleMouseDown.bind(this);
-        this.handleMouseMove = this.handleMouseMove.bind(this);
-        this.handleMouseUp = this.handleMouseUp.bind(this);
         this.handleDragStart = this.handleDragStart.bind(this);
         this.handleDragStop = this.handleDragStop.bind(this);
         this.handleMove = this.handleMove.bind(this);
@@ -28,54 +30,49 @@ class ShapeContainer extends Component {
         this.handleResize = debounce(this.handleResize, 5);
         this.handleResizeStop = this.handleResizeStop.bind(this);
         this.handleContextMenu = this.handleContextMenu.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+        this.handleDoubleClick = this.handleDoubleClick.bind(this);
     }
 
-    handleMouseDown(e) {
-        e.preventDefault();
+    handleDragStart(e, ui) {
         this.isClicked = true;
         this.dragPos = {x:e.pageX, y:e.pageY};
+        this.lastPos = {x:0, y:0};
     }
 
-    handleMouseMove(e) {
-        e.preventDefault();
-        e.persist();
-        if (this.isClicked && !(e.pageX === this.dragPos.x && e.pageY === this.dragPos.y)) {
-            this.isDragging = true;
+    handleMove(e, ui) {
+        if (this.isClicked && !(Math.abs(e.pageX - this.dragPos.x) < 4 && Math.abs(e.pageY - this.dragPos.y) < 4)) {
+            if (!this.isDragging) {
+                this.props.startMoveShapes();
+                this.isDragging = true;
+            }
+        }
+
+        if (this.isDragging) {
+            const scale = this.props.scale;
+            const deltaX = ui.x - this.lastPos.x;
+            const deltaY = ui.y - this.lastPos.y;
+            if (this.props.selectedShapes.indexOf(this.props.uuid) == -1) {
+                this.props.addSelectedShape(this.props.uuid, true);
+            }
+            this.props.moveShapes({x: deltaX / scale, y: deltaY / scale});
+            this.lastPos = {x:ui.x, y:ui.y};
         }
     }
 
-    handleMouseUp(e) {
-        e.preventDefault();
-        if (!this.isDragging) {
+    handleDragStop(e, ui) {
+        if (this.isDragging) {
+            const scale = this.props.scale;
+            const deltaX = ui.x - this.lastPos.x;
+            const deltaY = ui.y - this.lastPos.y;
+            this.props.moveShapes({x: deltaX / scale, y: deltaY / scale});
+            this.lastPos = null;
+        } else {
             this.props.addSelectedShape(this.props.uuid, !e.shiftKey)
         }
 
         this.isClicked=false;
         this.isDragging=false
-    }
-
-    handleDragStart(e, ui) {
-        this.lastPos = {x:0, y:0};
-        this.props.startMoveShapes()
-    }
-
-    handleMove(e, ui) {
-        const scale = this.props.scale;
-        const deltaX = ui.x - this.lastPos.x;
-        const deltaY = ui.y - this.lastPos.y;
-        if (this.props.selectedShapes.indexOf(this.props.uuid) == -1) {
-            this.props.addSelectedShape(this.props.uuid, true);
-        }
-        this.props.moveShapes({x: deltaX / scale, y: deltaY / scale});
-        this.lastPos = {x:ui.x, y:ui.y};
-    }
-
-    handleDragStop(e, ui) {
-        const scale = this.props.scale;
-        const deltaX = ui.x - this.lastPos.x;
-        const deltaY = ui.y - this.lastPos.y;
-        this.props.moveShapes({x: deltaX / scale, y: deltaY / scale});
-        this.lastPos = null;
     }
 
     handleResizeStart(e, ui) {
@@ -104,6 +101,29 @@ class ShapeContainer extends Component {
         this.props.contextMenuHandler(e, this.props.uuid)
     }
 
+    handleClick(e) {
+        this.doubleClickWindow = true;
+        setTimeout(() => {
+            this.doubleClickWindow = false
+        }, 100)
+    }
+
+    handleDoubleClick(e) {
+        if (this.doubleClickWindow) {
+            this.props.clearSelectedShapes();
+            this.props.addSelectedShape(this.props.uuid, false);
+            this.setState({editActive:true});
+        }
+    }
+
+    componentDidMount() {
+        if (this.state.editActive && !this.props.toggled) {
+            this.setState({
+                editActive:false
+            })
+        }
+    }
+
     render() {
         const min_dim = 5;
         const scale = this.props.scale;
@@ -119,16 +139,16 @@ class ShapeContainer extends Component {
         const outline_handle_size = 5;
         const position = {x:0, y:0};
 
+        const editActive = (this.state.editActive && this.props.toggled);
+
         // TODO - fix crappy implementation of drag
         return (
             <g transform={translate}>
-                <g style={this.props.style} onMouseDown={this.handleMouseDown} onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp}>
-                    <Draggable onStart={this.handleDragStart} onDrag={this.handleMove} onStop={this.handleDragStop} position={position} axis={"none"}>
-                        <g onContextMenu={this.handleContextMenu} id={this.props.uuid}>
-                            <this.props.tag dObject={dObject}/>
-                        </g>
-                    </Draggable>
-                </g>
+                <Draggable onStart={this.handleDragStart} onDrag={this.handleMove} onStop={this.handleDragStop} position={position} axis={"none"}>
+                    <g onContextMenu={this.handleContextMenu} id={this.props.uuid} style={this.props.style} onClick={this.handleClick} onDoubleClick={this.handleDoubleClick}>
+                        <this.props.tag dObject={dObject} editActive={editActive}/>
+                    </g>
+                </Draggable>
                 <g style={visibility_style} className="ignore">
                     <rect x="0" y="0" height={(height + dH)*scale} width={(width + dW)*scale} className="shape-outline"/>
                     <Draggable onStart={this.handleResizeStart} onDrag={this.handleResize} onStop={this.handleResizeStop} position={{x:0, y:0}} axis={"none"}>
@@ -149,6 +169,7 @@ const mapStateToProps = ({ shapeCollection }) => ({
 
 const mapDispatchToProps = {
     addSelectedShape: addSelectedShape,
+    clearSelectedShapes: clearSelectedShapes,
     moveShapes: moveShapes,
     startMoveShapes: startMoveShapes,
     resizeShapes: resizeShapes

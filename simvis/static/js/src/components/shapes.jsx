@@ -31,6 +31,7 @@ class CircleSimple extends Component {
     }
 }
 
+const defaultTextBBox = {x0:0, y0:0, w0:40, h0:40};
 class TextBox extends Component {
     constructor(props) {
         super(props);
@@ -38,8 +39,8 @@ class TextBox extends Component {
 
     render() {
         return (
-            <Shape objectBBox={defaultBBox} dObject={this.props.dObject}>
-                <Text x={0} y={0} id={"element"}>We did it</Text>
+            <Shape objectBBox={defaultTextBBox} dObject={this.props.dObject}>
+                <Text x={0} y={0} height={40} width={40} id={"element"} editActive={this.props.editActive}/>
             </Shape>
         )
     }
@@ -97,7 +98,7 @@ class pathInBox extends Component {
 
     render() {
         return (
-            <Shape objectBBox={defaultBBox} dObject={this.props.dObject}>
+            <Shape objectBBox={defaultBBox} dObject={this.props.dObject} editActive={this.props.editActive}>
                 <Rect x={0} y={0} height={100} width={100} />
                 <Path d="M0,50 l25,0 25,25 50,-75"/>
             </Shape>
@@ -109,7 +110,7 @@ export default [
     {name:"General", shapes:[
         {name:"Rectangle", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple rectangle."},
         {name:"Circle", tag:CircleSimple, bbox:defaultBBox, ratioLock:true, description:"A simple circle."},
-        {name:"Text", tag:Text, bbox:defaultBBox, ratioLock:true, description:"A simple circle."}
+        {name:"Text", tag:TextBox, bbox:defaultTextBBox, ratioLock:false, description:"A text box.", style:{stroke:"none", fill:"none", fontSize:12}, textEditable:{true}}
     ]},
     {name:"Special", shapes:[
         {name:"skewedRound", tag:SkewedRound, bbox:skewedRoundBBox, ratioLock:false},

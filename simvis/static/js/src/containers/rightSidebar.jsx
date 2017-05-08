@@ -18,6 +18,7 @@ class RightSideBarMenu extends Component {
 
         this.handleTabClick = this.handleTabClick.bind(this);
         this.handleStrokeWidthChange = this.handleStrokeWidthChange.bind(this);
+        this.handleFontSizeChange = this.handleFontSizeChange.bind(this);
         this.handleOverviewChange = this.handleOverviewChange.bind(this);
     }
 
@@ -27,6 +28,10 @@ class RightSideBarMenu extends Component {
 
     handleStrokeWidthChange(e) {
         this.props.setShapeStyle({strokeWidth:e.value + ''})
+    }
+
+    handleFontSizeChange(e) {
+        this.props.setShapeStyle({fontSize:e.value + ''})
     }
 
     handleOverviewChange(e, arg) {
@@ -40,6 +45,7 @@ class RightSideBarMenu extends Component {
     render() {
         const { visible } = this.state;
         const { activeItem } = this.state;
+        const textEditorAvailable = true;
 
         const style = {width:this.props.rightSideBarWidth, right:0};
 
@@ -87,8 +93,25 @@ class RightSideBarMenu extends Component {
                         <Form.Group widths='10'>
                             <Form.Field width="10" control={NumberPicker} label="Stroke-Width"
                                    name={"strokeWidthPicker"}
-                                   value={this.props.selectedStyle.strokeWidth}
+                                   value={this.props.selectedStyle.strokeWidth ? this.props.selectedStyle.strokeWidth : 0}
                                    onChange={this.handleStrokeWidthChange}
+                                   min={0}/>
+                        </Form.Group>
+                    </Form>
+                </Segment>;
+            } else if (activeItem === 'text') {
+                submenu = <Segment attached='bottom' className="shapes-selected-menu">
+                    <Form size="small" style={{padding:5}} as="none">
+                        <Form.Group widths='equal'>
+                            <Form.Field>
+                                <ColorPickerModal color={this.props.selectedStyle.color} setShapeStyle={this.props.setShapeStyle} desc="Color" attr="color"/>
+                            </Form.Field>
+                        </Form.Group>
+                        <Form.Group widths='10'>
+                            <Form.Field width="10" control={NumberPicker} label="Font-Size"
+                                   name={"fontSizePicker"}
+                                   value={this.props.selectedStyle.fontSize ? this.props.selectedStyle.fontSize : 0}
+                                   onChange={this.handleFontSizeChange}
                                    min={0}/>
                         </Form.Group>
                     </Form>
@@ -99,6 +122,7 @@ class RightSideBarMenu extends Component {
                 <Menu attached='top' tabular>
                     <Menu.Item name='model' active={activeItem === 'model'} onClick={this.handleTabClick} />
                     <Menu.Item name='style' active={activeItem === 'style'} onClick={this.handleTabClick} />
+                    {textEditorAvailable ? <Menu.Item name='text' active={activeItem === 'text'} onClick={this.handleTabClick} /> : null}
                 </Menu>
                 {submenu}
             </div>
@@ -112,6 +136,7 @@ class RightSideBarMenu extends Component {
 
 const mapStateToProps = ({ shapeCollection }) => ({
     selectedShapes:shapeCollection.present.selectedShapes,
+    shapes:shapeCollection.present.shapes,
     selectedStyle:shapeCollection.present.selectedStyle,
     dataHeaders:shapeCollection.present.dataHeaders,
     data:shapeCollection.present.data,

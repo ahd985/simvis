@@ -281,6 +281,7 @@ body {
   border-radius: 2px;
   background-repeat: no-repeat;
   background-position: 50% 50%;
+  color:black;
 }
 
 .menu-item:hover {
@@ -495,6 +496,24 @@ rect {
   background-color:$colorF
 }
 */
+
+.text-container {
+  display: inline-block;
+  line-height: 1.2;
+  vertical-align: top;
+  width: 100%;
+  height: 100%;
+  white-space: normal;
+  word-wrap: normal;
+  text-align: center;
+}
+
+.text {
+  text-align: inherit;
+  text-decoration: inherit;
+  vertical-align: text-top;
+  outline: 0px solid transparent;
+}
 
 // Theme overriding
 .ui.styled.accordion {

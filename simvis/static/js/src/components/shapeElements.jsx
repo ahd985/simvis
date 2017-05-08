@@ -57,15 +57,43 @@ Rect.defaultProps = {
 
 export class Text extends Component {
     constructor(props) {
-        super(props)
+        super(props);
     }
 
     render() {
-        const attr = {
-        };
+        const {x0, y0, h0, w0} = this.props.objectBBox;
+        const {dX, dY, scale} = this.props.dObject;
+        let height = this.props.height * scale;
+        let width = this.props.width * scale;
+        let x = this.props.x * scale;
+        let y = this.props.y * scale;
+
+        const x1 = x + width;
+        const y1 = y + height;
+        const dDX = dX * (x1 - x0) / w0;
+        const dDY = dY * (y1 - y0) / h0;
+
+        // Calculate split fraction to adjust x / width and y / height
+        const xFrac = (x - x0) / (x1 - x0);
+        const yFrac = (y - y0) / (y1 - y0);
+
+        x = x + xFrac * dDX;
+        y = y + yFrac * dDY;
+        width = width + (1 - xFrac) * dDX;
+        height = height + (1 - yFrac) * dDY;
+
+        let text;
+        this.props.text ? text = this.props.text : text = "Text";
 
         return (
-            <text {...attr} id={this.props.id}/>
+            <g transform={`translate(${x}, ${y})`}>
+                <rect x={0} y={0} height={height} width={width}></rect>
+                <foreignObject style={{overflow:"visible"}} width={width}>
+                    <div className="text-container">
+                        <div className="text" xmlns="http://www.w3.org/1999/xhtml" style={{lineHeight:height + "px"}} contentEditable={this.props.editActive} suppressContentEditableWarning={true}>{text}</div>
+                    </div>
+                </foreignObject>
+            </g>
         )
     }
 }

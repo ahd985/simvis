@@ -1,7 +1,7 @@
 import uuidV4 from 'uuid/v4'
 import ssv from '../../ssv.min.js'
 
-const shapeStyle = {fill: "#F4F4F4", stroke: "black", strokeWidth: 1, cursor: "move"};
+const defaultShapeStyle = {fill: "#F4F4F4", stroke: "black", strokeWidth: 1, cursor: "move", color:"black", fontSize:12};
 
 const defaultPresent = {
     shapes: [],
@@ -94,7 +94,7 @@ const shapeCollection = (state = defaultPresent, action) => {
                         position:state.addPosition,
                         dims:{width:action.shape.bbox.w0, height:action.shape.bbox.h0},
                         deltaDims:{width:0, height:0},
-                        style:shapeStyle,
+                        style:(action.shape.style ? action.shape.style : defaultShapeStyle),
                     }
                 ],
                 addPosition:{x:state.addPosition.x + 10, y:state.addPosition.y + 10}
