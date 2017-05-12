@@ -129,7 +129,8 @@ body {
   background-color: transparent; }
 
 #top-sidebar {
-  margin: 0; }
+  margin: 0;
+  border-bottom: 1px solid #BDBDBD; }
 
 #left-sidebar-menu {
   position: absolute;
@@ -283,7 +284,7 @@ rect {
 
 #simvis-container {
   position: absolute;
-  top: 40px;
+  top: 0;
   bottom: 0;
   left: 0;
   right: 0; }
@@ -294,7 +295,7 @@ rect {
 
 .draw-container-bottom {
   position: absolute;
-  top: 34px;
+  top: 74px;
   bottom: 0;
   left: 0;
   right: 0; }
@@ -391,11 +392,16 @@ rect {
   vertical-align: text-top;
   outline: 0px solid transparent; }
 
+#header-container {
+  margin-bottom: 0;
+  border-bottom: none;
+  background: #373737; }
+
 .ui.styled.accordion {
   border-radius: 0;
   background: #F4F4F4; }
 
-#navbar-container .ui.menu {
+#header-container .ui.menu {
   border-radius: 0;
   background: #373737; }
 

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
 import getForm from '../components/modelForm'
 import ConditionPickerModal from '../components/conditionPickerModal'
+import {cellButtonIcon} from '../components/modelButtons'
 
 import ssv from '../../ssv.min.js'
 
@@ -148,6 +149,11 @@ export default class ModelPickerModal extends Component {
                 <Modal.Content>
                     <Dropdown placeholder='Model' search selection options={this.options}
                               onChange={this.handleSelectModel} />
+                    <Button>
+                        <a>
+                            {cellButtonIcon}
+                        </a>
+                    </Button>
                     {modelForm}
                     {modelConditions}
                 </Modal.Content>

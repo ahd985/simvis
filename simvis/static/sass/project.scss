@@ -209,6 +209,7 @@ body {
 
 #top-sidebar {
   margin: 0;
+  border-bottom: 1px solid $colorC
 }
 
 #left-sidebar-menu {
@@ -386,7 +387,7 @@ rect {
 
 #simvis-container {
   position:absolute;
-  top:40px;
+  top:0;
   bottom:0;
   left:0;
   right:0;
@@ -399,7 +400,7 @@ rect {
 
 .draw-container-bottom {
   position:absolute;
-  top:34px;
+  top:74px;
   bottom:0;
   left:0;
   right:0;
@@ -515,13 +516,19 @@ rect {
   outline: 0px solid transparent;
 }
 
+#header-container {
+  margin-bottom:0;
+  border-bottom:none;
+  background:$colorB;
+}
+
 // Theme overriding
 .ui.styled.accordion {
   border-radius:0;
   background:$colorD;
 }
 
-#navbar-container .ui.menu {
+#header-container .ui.menu {
   border-radius:0;
   background:$colorB;
 }

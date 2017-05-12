@@ -5,21 +5,20 @@ import { addTodo } from '../actions'
 import { Menu, Popup } from 'semantic-ui-react';
 import { debounce } from 'underscore';
 
-import { moveShapes, addSelectedShape, resizeShapes, startMoveShapes, clearSelectedShapes } from '../actions'
+import { moveShapes, addSelectedShape, resizeShapes, startMoveShapes, clearSelectedShapes, toggleEdit } from '../actions'
 
 class ShapeContainer extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            editActive:false
-        };
 
         this.isClicked = false;
         this.isDragging = false;
         this.dragPos = {x:0, y:0};
         this.lastPos = null;
         this.doubleClickWIndow = false;
+
+        this.outlineHandleSize = 5;
+        this.minBound = Math.ceil(this.outlineHandleSize / 2.0);
 
         this.handleDragStart = this.handleDragStart.bind(this);
         this.handleDragStop = this.handleDragStop.bind(this);
@@ -112,15 +111,7 @@ class ShapeContainer extends Component {
         if (this.doubleClickWindow) {
             this.props.clearSelectedShapes();
             this.props.addSelectedShape(this.props.uuid, false);
-            this.setState({editActive:true});
-        }
-    }
-
-    componentDidMount() {
-        if (this.state.editActive && !this.props.toggled) {
-            this.setState({
-                editActive:false
-            })
+            this.props.toggleEdit(true)
         }
     }
 
@@ -136,10 +127,9 @@ class ShapeContainer extends Component {
         const translate = `translate(${this.props.position.x*scale}, ${this.props.position.y*scale})`;
         const dObject = {dX:dW, dY:dH, scale:scale};
 
-        const outline_handle_size = 5;
         const position = {x:0, y:0};
 
-        const editActive = (this.state.editActive && this.props.toggled);
+        const editActive = (this.props.editActive && this.props.toggled);
 
         // TODO - fix crappy implementation of drag
         return (
@@ -153,7 +143,7 @@ class ShapeContainer extends Component {
                     <rect x="0" y="0" height={(height + dH)*scale} width={(width + dW)*scale} className="shape-outline"/>
                     <Draggable onStart={this.handleResizeStart} onDrag={this.handleResize} onStop={this.handleResizeStop} position={{x:0, y:0}} axis={"none"}>
                         <g>
-                            <circle cx={(width + dW)*scale} cy={(height + dH)*scale} r={outline_handle_size}
+                            <circle cx={(width + dW)*scale} cy={(height + dH)*scale} r={this.outlineHandleSize}
                                     className="resizer-circle"/>
                         </g>
                     </Draggable>
@@ -164,7 +154,9 @@ class ShapeContainer extends Component {
 }
 
 const mapStateToProps = ({ shapeCollection }) => ({
-    selectedShapes:shapeCollection.present.selectedShapes
+    selectedShapes:shapeCollection.present.selectedShapes,
+    editActive:shapeCollection.present.editActive,
+    layout:shapeCollection.present.layout
 });
 
 const mapDispatchToProps = {
@@ -172,7 +164,8 @@ const mapDispatchToProps = {
     clearSelectedShapes: clearSelectedShapes,
     moveShapes: moveShapes,
     startMoveShapes: startMoveShapes,
-    resizeShapes: resizeShapes
+    resizeShapes: resizeShapes,
+    toggleEdit: toggleEdit
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ShapeContainer)

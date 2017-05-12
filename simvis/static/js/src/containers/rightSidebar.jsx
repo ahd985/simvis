@@ -6,6 +6,7 @@ import { setShapeStyle, setShapeModel, setOverview, setLayout } from '../actions
 import NumberPicker from '../components/numberPicker';
 import ColorPickerModal from '../components/colorPickerModal'
 import ModelPickerModal from '../components/modelPickerModal'
+import ImportDataModal from './dataImport'
 
 class RightSideBarMenu extends Component {
     constructor(props) {
@@ -76,9 +77,21 @@ class RightSideBarMenu extends Component {
             </div>
         } else {
             if (activeItem === 'model') {
-                submenu = <Segment attached='bottom' className="shapes-selected-menu">
-                    <ModelPickerModal setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
-                </Segment>;
+                if (!this.props.data) {
+                    submenu = <Segment attached='bottom' className="shapes-selected-menu">
+                        <Form size="small" style={{padding:5}} as="none">
+                            <Form.Field>
+                                <ImportDataModal asForm={true}/>
+                            </Form.Field>
+                        </Form>
+                    </Segment>;
+                } else {
+                    submenu = <Segment attached='bottom' className="shapes-selected-menu">
+                        <Form size="small" style={{padding:5}} as="none">
+                            <ModelPickerModal setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
+                        </Form>
+                    </Segment>;
+                }
             } else if (activeItem === 'style') {
                 submenu = <Segment attached='bottom' className="shapes-selected-menu">
                     <Form size="small" style={{padding:5}} as="none">

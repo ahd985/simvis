@@ -24,3 +24,4 @@ export const setOverview = (overview) => ({type:'SET_OVERVIEW', overview:overvie
 export const setLayout = (arg, value) => ({type:'SET_LAYOUT', arg, value});
 export const undo = () => ({type:'UNDO'});
 export const redo = () => ({type:'REDO'});
+export const toggleEdit = (value) => ({type:'TOGGLE_EDIT', value});

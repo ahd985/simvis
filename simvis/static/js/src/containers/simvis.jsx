@@ -19,8 +19,11 @@ class SimVis extends Component {
     handleKeyDown(e) {
         let key = e.keyCode || e.charCode;
 
-        if (key == 8 || key == 46) {
-            this.props.removeShapes()
+        if (!this.props.editActive) {
+            // Allow shape deleting if delete or backspace is pressed
+            if (key == 8 || key == 46) {
+                this.props.removeShapes()
+            }
         }
     }
 
@@ -37,7 +40,8 @@ class SimVis extends Component {
 const mapStateToProps = ({ shapeCollection }) => ({
     shapes:shapeCollection.present.shapes,
     selectedShapes:shapeCollection.present.selectedShapes,
-    selectedStyle:shapeCollection.present.selectedStyle
+    selectedStyle:shapeCollection.present.selectedStyle,
+    editActive:shapeCollection.present.editActive
 });
 
 const mapDispatchToProps = {

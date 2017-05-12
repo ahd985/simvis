@@ -149,8 +149,15 @@ class ImportDataModal extends Component {
             }
         }
 
+        let trigger;
+        if (this.props.asForm) {
+            trigger = <Button onClick={this.openFirstModal}>Import Data</Button>
+        } else {
+            trigger = <Menu.Item onClick={this.openFirstModal}>Import or Edit Data</Menu.Item>
+        }
+
         return (
-            <Modal trigger={<Menu.Item onClick={this.openFirstModal}>Import Data</Menu.Item>} size='small' open={firstModalOpen} onClose={() => this.close(null)}>
+            <Modal trigger={trigger} size='small' open={firstModalOpen} onClose={() => this.close(null)}>
                 <Modal.Header>Import Data</Modal.Header>
                 <Modal.Content image>
                     <Modal.Description>

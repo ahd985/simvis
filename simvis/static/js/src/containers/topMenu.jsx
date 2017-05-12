@@ -105,24 +105,28 @@ class TopMenu extends Component {
 
     render() {
         return (
-            <Menu id="top-sidebar" size="mini">
-                <Menu.Item name="zoomLevel"><Dropdown text={this.props.layout.scale.toString() + "%"}
-                                                      options={this.zoomLevelOptions}
-                                                      onChange={(e, d) => this.handleZoom("select", d.value)} /></Menu.Item>
-                <Menu.Item className="no-border" name="zoomIn" onClick={() => this.handleZoom("delta", +1)}><Icon name='zoom' /></Menu.Item>
-                <Menu.Item name="zoomOut" onClick={() => this.handleZoom("delta", -1)}><Icon name='zoom out' /></Menu.Item>
-                <Menu.Item className="no-border" name="undo" onClick={() => this.handleHistoryChange("undo")}><Icon name='undo' /></Menu.Item>
-                <Menu.Item name="redo" onClick={() => this.handleHistoryChange("redo")}><Icon name='flipped undo' /></Menu.Item>
-                <Menu.Item className="no-border" name="layerUp" onClick={() => this.handleLayerChange("up")}><Icon name='level up' /></Menu.Item>
-                <Menu.Item name="layerDown" onClick={() => this.handleLayerChange("down")}><Icon name='level down' /></Menu.Item>
-                <Menu.Item name="delete" onClick={() => this.handleDelete()}><Icon name='trash' /></Menu.Item>
-                <Menu.Menu position='right'>
-                    <ImportDataModal/>
-                </Menu.Menu>
-                <Menu.Menu position='right'>
-                    <Menu.Item content='Submit' onClick={this.handleSubmitClick} />
-                </Menu.Menu>
-            </Menu>
+            <div>
+                <Menu inverted id="header-container">
+                    <Menu.Menu name='importOrEditData'>
+                        <ImportDataModal/>
+                    </Menu.Menu>
+                    <Menu.Menu position='right'>
+                        <Menu.Item name='submitData' onClick={this.handleSubmitClick} />
+                    </Menu.Menu>
+                </Menu>
+                <Menu id="top-sidebar" size="mini">
+                    <Menu.Item name="zoomLevel"><Dropdown text={this.props.layout.scale.toString() + "%"}
+                                                          options={this.zoomLevelOptions}
+                                                          onChange={(e, d) => this.handleZoom("select", d.value)} /></Menu.Item>
+                    <Menu.Item className="no-border" name="zoomIn" onClick={() => this.handleZoom("delta", +1)}><Icon name='zoom' /></Menu.Item>
+                    <Menu.Item name="zoomOut" onClick={() => this.handleZoom("delta", -1)}><Icon name='zoom out' /></Menu.Item>
+                    <Menu.Item className="no-border" name="undo" onClick={() => this.handleHistoryChange("undo")}><Icon name='undo' /></Menu.Item>
+                    <Menu.Item name="redo" onClick={() => this.handleHistoryChange("redo")}><Icon name='flipped undo' /></Menu.Item>
+                    <Menu.Item className="no-border" name="layerUp" onClick={() => this.handleLayerChange("up")}><Icon name='level up' /></Menu.Item>
+                    <Menu.Item name="layerDown" onClick={() => this.handleLayerChange("down")}><Icon name='level down' /></Menu.Item>
+                    <Menu.Item name="delete" onClick={() => this.handleDelete()}><Icon name='trash' /></Menu.Item>
+                </Menu>
+            </div>
         )
     }
 }

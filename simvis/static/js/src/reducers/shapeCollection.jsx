@@ -10,6 +10,7 @@ const defaultPresent = {
     data: null,
     dataHeaders: null,
     xSeriesIndex: null,
+    editActive: false,
     addPosition: {x:10, y:10},
     layout:{
         leftSideBarWidth:250,
@@ -109,7 +110,8 @@ const shapeCollection = (state = defaultPresent, action) => {
                         return true
                     }
                 }),
-                selectedShapes:[]
+                selectedShapes:[],
+                editActive: false
             };
         case 'MOVE_SHAPES':
             return {
@@ -126,7 +128,8 @@ const shapeCollection = (state = defaultPresent, action) => {
                     } else {
                         return shape
                     }
-                })
+                }),
+                editActive:false
             };
         case 'START_MOVE_SHAPES':
             return state;
@@ -266,12 +269,14 @@ const shapeCollection = (state = defaultPresent, action) => {
 
             return {
                 ...state,
-                selectedShapes:outlinedShapes
+                selectedShapes:outlinedShapes,
+                editActive:false
             };
         case 'CLEAR_SELECTED_SHAPES':
             return {
                 ...state,
-                selectedShapes:[]
+                selectedShapes:[],
+                editActive:false
             };
         case 'SET_SHAPE_MODEL':
             /*
@@ -334,6 +339,11 @@ const shapeCollection = (state = defaultPresent, action) => {
                     ...state.layout,
                     [action.arg]:action.value
                 }
+            };
+        case 'TOGGLE_EDIT':
+            return {
+                ...state,
+                editActive:action.value ? action.value : !state.editActive
             };
         default:
             return state
