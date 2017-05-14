@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
 import getForm from '../components/modelForm'
 import ConditionPickerModal from '../components/conditionPickerModal'
-import {cellButtonIcon} from '../components/modelButtons'
+import { cellButtonIcon, heatmapButtonIcon, lineButtonIcon, toggleButtonIcon, legendButtonIcon, reportButtonIcon, tableButtonIcon } from '../components/modelButtons'
 
 import ssv from '../../ssv.min.js'
 
@@ -25,7 +25,7 @@ export default class ModelPickerModal extends Component {
 
         this.handleOpen = this.handleOpen.bind(this);
         this.handleClose = this.handleClose.bind(this);
-        this.handleSelectModel = this.handleSelectModel.bind(this);
+        this.handleClick = this.handleClick.bind(this);
         this.addCondition = this.addCondition.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
         this.validateForm = this.validateForm.bind(this);
@@ -57,12 +57,12 @@ export default class ModelPickerModal extends Component {
         this.setState({open:false})
     }
 
-    handleSelectModel(e, d) {
+    handleClick(type) {
         this.setState((prevState) => {
             return {
-                modelRequirements:this.requirements[d.value],
+                modelRequirements:this.requirements[type],
                 form: {
-                    type:d.value.toLowerCase(),
+                    type,
                     ...prevState.form
                 }
             }
@@ -147,19 +147,73 @@ export default class ModelPickerModal extends Component {
         return (
             <Modal trigger={<Button onClick={this.handleOpen}>{"Add Model"}</Button>} open={this.state.open}>
                 <Modal.Content>
-                    <Dropdown placeholder='Model' search selection options={this.options}
-                              onChange={this.handleSelectModel} />
-                    <Button>
-                        <a>
-                            {cellButtonIcon}
-                        </a>
-                    </Button>
+                    <Grid container>
+                        <Grid.Row>
+                            <Grid.Column width={4}>
+                                <Button onClick={() => this.handleClick("Cell")}>
+                                    <a>
+                                        {cellButtonIcon}
+                                    </a>
+                                    <div>Cell</div>
+                                </Button>
+                            </Grid.Column>
+                            <Grid.Column width={4}>
+                                <Button onClick={() => this.handleClick("Heatmap")}>
+                                    <a>
+                                        {heatmapButtonIcon}
+                                    </a>
+                                    <div>Heatmap</div>
+                                </Button>
+                            </Grid.Column>
+                            <Grid.Column width={4}>
+                                <Button onClick={() => this.handleClick("Line")}>
+                                    <a>
+                                        {lineButtonIcon}
+                                    </a>
+                                    <div>Line</div>
+                                </Button>
+                            </Grid.Column>
+                            <Grid.Column width={4}>
+                                <Button onClick={() => this.handleClick("Toggle")}>
+                                    <a>
+                                        {toggleButtonIcon}
+                                    </a>
+                                    <div>Toggle</div>
+                                </Button>
+                            </Grid.Column>
+                        </Grid.Row>
+                        <Grid.Row>
+                            <Grid.Column width={4}>
+                                <Button onClick={() => this.handleClick("Legend")}>
+                                    <a>
+                                        {legendButtonIcon}
+                                    </a>
+                                    <div>Legend</div>
+                                </Button>
+                            </Grid.Column>
+                            <Grid.Column width={4}>
+                                <Button onClick={() => this.handleClick("Report")}>
+                                    <a>
+                                        {reportButtonIcon}
+                                    </a>
+                                    <div>Report</div>
+                                </Button>
+                            </Grid.Column>
+                            <Grid.Column width={4}>
+                                <Button onClick={() => this.handleClick("Table")}>
+                                    <a>
+                                        {tableButtonIcon}
+                                    </a>
+                                    <div>Table</div>
+                                </Button>
+                            </Grid.Column>
+                        </Grid.Row>
+                    </Grid>
                     {modelForm}
                     {modelConditions}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button content='Cancel' onClick={() => this.handleClose(true)} />
-                    <Button content='Done' onClick={() => this.handleClose()} />
                 </Modal.Actions>
             </Modal>
         )
