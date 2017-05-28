@@ -209,6 +209,13 @@ const shapeCollection = (state = defaultPresent, action) => {
                 dataHeaders:action.dataHeaders,
                 xSeriesIndex:action.xSeriesIndex
             };
+        case 'CLEAR_DATA':
+            return {
+                ...state,
+                data: null,
+                dataHeaders: null,
+                xSeriesIndex: null
+            }
         case 'SET_SHAPE_STYLE':
             return {
                 ...state,
@@ -279,28 +286,6 @@ const shapeCollection = (state = defaultPresent, action) => {
                 editActive:false
             };
         case 'SET_SHAPE_MODEL':
-            /*
-            const element_data = {
-                conditions: [
-                    {
-                        color_levels:[372.7401979757573,408.50419817952684,444.2681983832963],
-                        color_scale:['#fdd49e','#fdbb84','#fc8d59'],
-                        data:[450],
-                        description:"Vapor Temp",
-                        id:"element_0",
-                        opacity:1,
-                        report:false,
-                        type:"background",
-                        unit:"K"
-                    }
-                ],
-                description: "Quench Tank",
-                ids: ['element'],
-                type: "cell",
-                x_series:[0]
-            };
-            */
-
             // Add in x-series and data to create demo model
             const demoModel = {
                 "x_series":state.data.map((row) => {

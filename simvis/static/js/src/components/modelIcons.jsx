@@ -1,9 +1,6 @@
 import React from 'react'
 
-export const cellButtonIcon = <svg viewBox="0 0 100 100" width="100" height="100">
-        <rect height="100"
-              style={{opacity:1, fill:"url(#cell-btn-pattern)", fillOpacity:1, stroke:"#000000"}}
-              width="100" x="0" y="0" />
+const cellIcon = <svg viewBox="0 0 100 100" width="100" height="100">
         <defs>
             <pattern id="cell-btn-pattern" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
                 <rect x="0" width="100%" height="100%" y="0" style={{fill: "#EEEEEE", opacity: 1}} />
@@ -17,18 +14,12 @@ export const cellButtonIcon = <svg viewBox="0 0 100 100" width="100" height="100
                 </rect>
             </pattern>
         </defs>
+        <rect height="100"
+          style={{opacity:1, fill:"url(#cell-btn-pattern)", fillOpacity:1, stroke:"#000000"}}
+          width="100" x="0" y="0" />
     </svg>;
 
-export const heatmapButtonIcon = <svg viewBox="0 0 100 100" width="100" height="100">
-        <rect height="33" width="33" x="0" y="0" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
-        <rect height="33" width="33" x="33" y="0" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
-        <rect height="34" width="33" x="66" y="0" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
-        <rect height="33" width="33" x="0" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
-        <rect height="33" width="33" x="33" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
-        <rect height="33" width="33" x="66" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
-        <rect height="33" width="33" x="0" y="66" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
-        <rect height="33" width="33" x="33" y="66" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
-        <rect height="34" width="33" x="66" y="66" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
+const heatmapIcon = <svg viewBox="0 0 100 100" width="100" height="100">
         <defs>
             <pattern id="heatmap-btn-pattern-1" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
                 <rect x="0" width="100%" height="100%" y="0">
@@ -41,10 +32,18 @@ export const heatmapButtonIcon = <svg viewBox="0 0 100 100" width="100" height="
                 </rect>
             </pattern>
         </defs>
+        <rect height="33" width="33" x="0" y="0" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
+        <rect height="33" width="33" x="33" y="0" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="34" width="33" x="66" y="0" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
+        <rect height="33" width="33" x="0" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="33" width="33" x="33" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="33" width="33" x="66" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="33" width="33" x="0" y="66" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
+        <rect height="33" width="33" x="33" y="66" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="34" width="33" x="66" y="66" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
     </svg>;
 
-export const lineButtonIcon = <svg viewBox="0 0 100 100" width="100" height="100">
-        <line x1="0" y1="50" x2="100" y2="50.01" stroke="url(#line-btn-pattern)" strokeWidth={3}/>
+const lineIcon = <svg viewBox="0 0 100 100" width="100" height="100">
         <defs>
             <pattern id="line-btn-pattern" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
                 <rect x="0" width="25" height="100%" y="0">
@@ -60,15 +59,16 @@ export const lineButtonIcon = <svg viewBox="0 0 100 100" width="100" height="100
                 </rect>
             </pattern>
         </defs>
+        <line x1="0" y1="50" x2="100" y2="50.01" stroke="url(#line-btn-pattern)" strokeWidth={3}/>
     </svg>;
 
-export const toggleButtonIcon = <svg viewBox="0 0 100 100" width="100" height="100">
+const toggleIcon = <svg viewBox="0 0 100 100" width="100" height="100">
         <circle cx="50" cy="50" r="45" stroke="#000000" strokeWidth="5">
             <animate attributeName="fill" values="#4CAF50;#F44336" dur="4s" repeatCount="indefinite" calcMode="discrete" />
         </circle>
     </svg>;
 
-export const legendButtonIcon = <svg viewBox="0 0 100 100" width="100" height="100">
+const legendIcon = <svg viewBox="0 0 100 100" width="100" height="100">
         <rect height="15" width="25" x="0" y="35" fill="#ffffb2" stroke="#000000" />
         <rect height="15" width="25" x="25" y="35" fill="#fecc5c" stroke="#000000" />
         <rect height="15" width="25" x="50" y="35" fill="#fd8d3c" stroke="#000000" />
@@ -79,7 +79,7 @@ export const legendButtonIcon = <svg viewBox="0 0 100 100" width="100" height="1
         <text x="78" y="62">4</text>
     </svg>;
 
-export const reportButtonIcon = <svg width="100" height="100" viewBox="0 0 100 100">
+const reportIcon = <svg width="100" height="100" viewBox="0 0 100 100">
     <rect width="100" alignmentBaseline="after-edge" height="24" x="0" y="0" fill="#616161" />
     <text width="100" textAnchor="middle" x="50" y="21" fontSize="13" fill="#ffc107">Quench Tank</text>
     <rect width="100" alignmentBaseline="after-edge" height="24" x="0" y="25" fill="#616161" />
@@ -96,7 +96,7 @@ export const reportButtonIcon = <svg width="100" height="100" viewBox="0 0 100 1
     <text width="100" textAnchor="middle" x="93" y="90" fontSize="10" fill="#ffffff">T</text>
 </svg>;
 
-export const tableButtonIcon = <svg width="100" height="100" viewBox="0 0 100 100">
+const tableIcon = <svg width="100" height="100" viewBox="0 0 100 100">
         <foreignObject width="100" height="100">
             <table width="100" height="100">
                 <thead style={{fontSize:18}}>
@@ -131,3 +131,13 @@ export const tableButtonIcon = <svg width="100" height="100" viewBox="0 0 100 10
             </table>
         </foreignObject>
     </svg>;
+
+export default {
+    cell:cellIcon,
+    heatmap:heatmapIcon,
+    line:lineIcon,
+    toggle:toggleIcon,
+    legend:legendIcon,
+    report:reportIcon,
+    table:tableIcon
+}

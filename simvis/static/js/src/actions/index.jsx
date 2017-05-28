@@ -10,6 +10,7 @@ export const moveShapes = (deltaShapePos) => ({type:'MOVE_SHAPES', deltaShapePos
 export const resizeShapes = (deltaShapeSize) => ({type:'RESIZE_SHAPES', deltaShapeSize});
 export const reorderShapes = (step) => ({type:'REORDER_SHAPES', step});
 export const setData = (data, dataHeaders, xSeriesIndex) => ({type:'SET_DATA', data, dataHeaders, xSeriesIndex});
+export const clearData = () => ({type:'CLEAR_DATA'});
 export const setSelectedStyle = (style) => ({type:'SET_SELECTED_STYLE', style});
 export const setShapeStyle = (style) => ({type:'SET_SHAPE_STYLE', style});
 export const addSelectedShape = (uuid, overwriteIfNotPresent) => ({

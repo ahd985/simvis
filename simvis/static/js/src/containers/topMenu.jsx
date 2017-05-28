@@ -108,7 +108,7 @@ class TopMenu extends Component {
             <div>
                 <Menu inverted id="header-container">
                     <Menu.Menu name='importOrEditData'>
-                        <ImportDataModal/>
+                        <ImportDataModal />
                     </Menu.Menu>
                     <Menu.Menu position='right'>
                         <Menu.Item name='submitData' onClick={this.handleSubmitClick} />

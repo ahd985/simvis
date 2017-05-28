@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
-import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form } from 'semantic-ui-react'
+import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Table, Header } from 'semantic-ui-react'
 import Dropzone from 'react-dropzone'
 import { connect } from 'react-redux'
 import request from 'superagent'
 import 'superagent-django-csrf'
 
-import { setData } from '../actions'
+import { setData, clearData } from '../actions'
 
-import Handsontable from 'handsontable/dist/handsontable.full'
+//import Handsontable from 'handsontable/dist/handsontable.full'
 
 class ImportDataModal extends Component {
     constructor(props) {
@@ -17,8 +17,8 @@ class ImportDataModal extends Component {
             firstModalOpen:false,
             secondModalOpen:false,
             data:null,
-            hot:null,
-            xSeriesIndex:0
+            //hot:null,
+            xSeriesIndex:this.props.xSeriesIndex ? this.props.xSeriesIndex : 0
         };
 
         this.onDrop = this.onDrop.bind(this);
@@ -26,6 +26,8 @@ class ImportDataModal extends Component {
         this.openSecondModal = this.openSecondModal.bind(this);
         this.close = this.close.bind(this);
         this.addData = this.addData.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+        this.handleErase = this.handleErase.bind(this);
     }
 
     onDrop(files) {
@@ -45,9 +47,16 @@ class ImportDataModal extends Component {
     }
 
     openFirstModal() {
-        this.setState({
-            firstModalOpen:true
-        })
+        if (this.state.data) {
+            this.setState({
+                firstModalOpen:true,
+                secondModalOpen:true
+            })
+        } else {
+            this.setState({
+                firstModalOpen:true
+            })
+        }
     }
 
     openSecondModal() {
@@ -64,7 +73,6 @@ class ImportDataModal extends Component {
         this.setState({
             secondModalOpen:false,
             firstModalOpen:false,
-            data:null
         });
     }
 
@@ -74,12 +82,78 @@ class ImportDataModal extends Component {
         })
     }
 
+    handleClick(index) {
+        this.setState({xSeriesIndex:index})
+    }
+
+    handleErase() {
+        this.props.clearData();
+        this.setState({
+            data:null,
+            xSeriesIndex:0,
+            secondModalOpen:false,
+            firstModalOpen:false
+        })
+    }
+
     render() {
         const {firstModalOpen, secondModalOpen, data} = this.state;
 
-        let secondModalContent = <div id="hot-container"></div>;
-        var self = this;
+        //let secondModalContent = <div id="hot-container"></div>;
+        let secondModalContent = null;
+        //var self = this;
         if (this.state.data) {
+            const selectedHeader = "XAxis";
+            const nonSelectedHeader = "YData";
+            const selectedCellClass = "selected-cell";
+            const nonSelectedCellClass = "non-selected-cell";
+            const rowLen = this.state.data[0].length;
+
+            secondModalContent = (
+                <div id="data-table">
+                    <Table celled>
+                        <Table.Header>
+                            <Table.Row textAlign="center">
+                                <Table.HeaderCell></Table.HeaderCell>
+                                {
+                                    this.state.data[0].map((e, i) => {
+                                        return <Table.HeaderCell key={i}><Button className="xaxis-btn" onClick={() => this.handleClick(i)}>{i == this.state.xSeriesIndex ? selectedHeader : nonSelectedHeader}</Button></Table.HeaderCell>
+                                    })
+                                }
+                            </Table.Row>
+                        </Table.Header>
+                        <Table.Body>
+                            {
+                                this.state.data.map((row, i) => {
+                                    let rowDescription;
+                                    if (i == 0) {
+                                        rowDescription = "Data";
+                                    } else if (i == 1) {
+                                        rowDescription = "Min Val";
+                                    } else if (i == 2) {
+                                        rowDescription = "Max Val";
+                                    }
+
+                                    return (
+                                        <Table.Row key={i}>
+                                            <Table.Cell><Header>{rowDescription}</Header></Table.Cell>
+                                            {row.map((e, j) => {
+                                                return (
+                                                    <Table.Cell key={j} active={j == this.state.xSeriesIndex}>{e}</Table.Cell>
+                                                )
+                                            })}
+                                        </Table.Row>
+                                    )
+                                })
+                            }
+                        </Table.Body>
+                    </Table>
+                </div>
+            )
+
+
+
+            /*
             if (!this.state.hot) {
                 const container = document.getElementById('hot-container');
                 this.state.hot = new Handsontable(container, {
@@ -147,6 +221,7 @@ class ImportDataModal extends Component {
                     }
                 })
             }
+            */
         }
 
         let trigger;
@@ -159,7 +234,7 @@ class ImportDataModal extends Component {
         return (
             <Modal trigger={trigger} size='small' open={firstModalOpen} onClose={() => this.close(null)}>
                 <Modal.Header>Import Data</Modal.Header>
-                <Modal.Content image>
+                <Modal.Content>
                     <Modal.Description>
                         <Dropzone onDrop={this.onDrop} multiple={false} className="dropzone">
                             <div className="dropzone-area">Try dropping some files here, or click to select files to upload.</div>
@@ -168,20 +243,17 @@ class ImportDataModal extends Component {
                 </Modal.Content>
                 <Modal.Actions>
                     <Modal dimmer={false} open={secondModalOpen} onOpen={this.openSecondModal} size='small'>
-                        <Modal.Header>Data Manipulation</Modal.Header>
+                        <Modal.Header>Data Manipulation<Button icon floated="right" onClick={this.handleErase}><Icon name='erase' /></Button></Modal.Header>
                         <Modal.Content>
                             <Message>
                                 <Message.Header>
-                                    We did our best to import your data as intended.  Adjust the column names of your data if desired.
+                                    We did our best to import your data as intended.  Select the column that represents your X-Series Data.
                                 </Message.Header>
-                                <p>
-                                    Hint: right-click a row to add it to the header columns as text
-                                </p>
                             </Message>
                             {secondModalContent}
                         </Modal.Content>
                         <Modal.Actions>
-                            <Button content='All Done' onClick={() => this.close(this.state.hot.getData())} />
+                            <Button content='All Done' onClick={() => this.close(this.state.data)} />
                         </Modal.Actions>
                     </Modal>
                 </Modal.Actions>
@@ -190,10 +262,13 @@ class ImportDataModal extends Component {
     }
 }
 
-const mapStateToProps = ({ shapeCollection }) => ({});
+const mapStateToProps = ({ shapeCollection }) => ({
+    xSeriesIndex:shapeCollection.present.xSeriesIndex,
+});
 
 const mapDispatchToProps = {
-    setData:setData
+    setData:setData,
+    clearData:clearData
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ImportDataModal)

@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
-import getForm from '../components/modelForm'
-import ConditionPickerModal from '../components/conditionPickerModal'
-import { cellButtonIcon, heatmapButtonIcon, lineButtonIcon, toggleButtonIcon, legendButtonIcon, reportButtonIcon, tableButtonIcon } from '../components/modelButtons'
+import getForm from './modelForm'
+import ConditionPickerModal from './conditionPickerModal'
+import modelIconMap from './modelIcons'
 
 import ssv from '../../ssv.min.js'
 
@@ -10,15 +10,20 @@ export default class ModelPickerModal extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
+        this.defaultState = {
             open:false,
-            model:null,
             modelRequirements:null,
             form:{
                 ids:this.props.ids,
                 conditions:[]
             }
         };
+
+        this.state = {
+            ...this.defaultState
+        };
+
+        this.iconOrder = ["cell", "heatmap", "line", "toggle", "legend", "report", "table"];
 
         this.requirements = ssv.get_type_requirements();
         this.options = this.generate_options(this.requirements);
@@ -29,6 +34,7 @@ export default class ModelPickerModal extends Component {
         this.addCondition = this.addCondition.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
         this.validateForm = this.validateForm.bind(this);
+        this.handleRemoveModel = this.handleRemoveModel.bind(this);
     }
 
     generate_options(requirements) {
@@ -43,7 +49,15 @@ export default class ModelPickerModal extends Component {
     }
 
     handleOpen() {
-        this.setState({open:true})
+        if (this.props.model) {
+            this.setState({
+                open:true,
+                form:this.props.model,
+                modelRequirements:this.requirements[this.props.model.type]
+            })
+        } else {
+            this.setState({open:true});
+        }
     }
 
     handleClose(canceled) {
@@ -54,7 +68,14 @@ export default class ModelPickerModal extends Component {
             this.props.setShapeModel(this.state.form)
         }
 
-        this.setState({open:false})
+        this.setState({...this.defaultState})
+    }
+
+    handleRemoveModel() {
+        this.setState({
+            ...this.defaultState,
+            open:true
+        })
     }
 
     handleClick(type) {
@@ -62,7 +83,7 @@ export default class ModelPickerModal extends Component {
             return {
                 modelRequirements:this.requirements[type],
                 form: {
-                    type,
+                    type:type,
                     ...prevState.form
                 }
             }
@@ -97,9 +118,22 @@ export default class ModelPickerModal extends Component {
     }
 
     render() {
+        let modelSelection=null;
         let modelForm=null;
         let modelConditions=null;
         if (this.state.modelRequirements) {
+            const name = this.state.form.type[0].toUpperCase() + this.state.form.type.substring(1);
+            
+            modelSelection = (
+                <div>
+                    <div><h3>{name}</h3></div>
+                    {modelIconMap[this.state.form.type]}
+                    <div style={{position:"absolute", top:"5px", right:"5px"}}>
+                        <Button onClick={this.handleRemoveModel}>Remove</Button>
+                    </div>
+                </div>
+            );
+
             let modelFormArgs = Object.keys(this.state.modelRequirements.args).map((arg) => {
                 let form = getForm(arg);
                 if (form) {
@@ -142,78 +176,32 @@ export default class ModelPickerModal extends Component {
                     </Table.Row>
                 </Table.Footer>
             </Table>
+        } else {
+            modelSelection = <Grid container columns={4}>
+                {this.iconOrder.map((e,i) => {
+                    const name = e[0].toUpperCase() + e.substring(1);
+                    return <Grid.Column key={i}>
+                            <Button onClick={() => this.handleClick(e)}>
+                                    <a>
+                                        {modelIconMap[e]}
+                                    </a>
+                                <div>{name}</div>
+                            </Button>
+                        </Grid.Column>
+                })}
+            </Grid>
         }
 
         return (
             <Modal trigger={<Button onClick={this.handleOpen}>{"Add Model"}</Button>} open={this.state.open}>
                 <Modal.Content>
-                    <Grid container>
-                        <Grid.Row>
-                            <Grid.Column width={4}>
-                                <Button onClick={() => this.handleClick("Cell")}>
-                                    <a>
-                                        {cellButtonIcon}
-                                    </a>
-                                    <div>Cell</div>
-                                </Button>
-                            </Grid.Column>
-                            <Grid.Column width={4}>
-                                <Button onClick={() => this.handleClick("Heatmap")}>
-                                    <a>
-                                        {heatmapButtonIcon}
-                                    </a>
-                                    <div>Heatmap</div>
-                                </Button>
-                            </Grid.Column>
-                            <Grid.Column width={4}>
-                                <Button onClick={() => this.handleClick("Line")}>
-                                    <a>
-                                        {lineButtonIcon}
-                                    </a>
-                                    <div>Line</div>
-                                </Button>
-                            </Grid.Column>
-                            <Grid.Column width={4}>
-                                <Button onClick={() => this.handleClick("Toggle")}>
-                                    <a>
-                                        {toggleButtonIcon}
-                                    </a>
-                                    <div>Toggle</div>
-                                </Button>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Grid.Column width={4}>
-                                <Button onClick={() => this.handleClick("Legend")}>
-                                    <a>
-                                        {legendButtonIcon}
-                                    </a>
-                                    <div>Legend</div>
-                                </Button>
-                            </Grid.Column>
-                            <Grid.Column width={4}>
-                                <Button onClick={() => this.handleClick("Report")}>
-                                    <a>
-                                        {reportButtonIcon}
-                                    </a>
-                                    <div>Report</div>
-                                </Button>
-                            </Grid.Column>
-                            <Grid.Column width={4}>
-                                <Button onClick={() => this.handleClick("Table")}>
-                                    <a>
-                                        {tableButtonIcon}
-                                    </a>
-                                    <div>Table</div>
-                                </Button>
-                            </Grid.Column>
-                        </Grid.Row>
-                    </Grid>
+                    {modelSelection}
                     {modelForm}
                     {modelConditions}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button content='Cancel' onClick={() => this.handleClose(true)} />
+                    <Button content='Done' onClick={() => this.handleClose(false)} />
                 </Modal.Actions>
             </Modal>
         )

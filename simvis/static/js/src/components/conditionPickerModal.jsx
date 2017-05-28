@@ -1,34 +1,35 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
 import getForm from '../components/modelForm'
+import conditionIconMap from './conditionIcons'
 
 export default class ConditionPickerModal extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
+        this.defaultState = {
             open:false,
-            options:Object.keys(this.props.conditions).map((key) => {
-                return {
-                    key:key,
-                    value:key,
-                    text:key
-                }
-            }),
             conditionSelected:null,
-            headerSelected:null,
             dataSelected:null,
             form:{
                 report:false,
                 opacity:1
             }
+        }
+
+        this.state = {
+            ...this.defaultState
         };
+
+        this.iconOrder = ["staticLevel", "dynamicLevel", "background", "zonalY", "rect",
+            "equalY", "colorScale", "logical", "showHide"];
 
         this.handleOpen = this.handleOpen.bind(this);
         this.handleClose = this.handleClose.bind(this);
-        this.handleSelectCondition = this.handleSelectCondition.bind(this);
+        this.handleClick = this.handleClick.bind(this);
         this.handleSelectData = this.handleSelectData.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
+        this.handleRemoveCondition = this.handleRemoveCondition.bind(this);
         this.validateForm = this.validateForm.bind(this);
     }
 
@@ -47,13 +48,13 @@ export default class ConditionPickerModal extends Component {
         this.setState({open:false})
     }
 
-    handleSelectCondition(e, d) {
+    handleClick(type) {
         this.setState((prevState) => {
             return {
-                conditionSelected: this.props.conditions[d.value],
+                conditionSelected: this.props.conditions[type],
                 form: {
                     ...prevState.form,
-                    type: d.value.toLowerCase()
+                    type:type,
                 }
             }
         })
@@ -84,13 +85,33 @@ export default class ConditionPickerModal extends Component {
         })
     }
 
+    handleRemoveCondition() {
+        this.setState({
+            ...this.defaultState,
+            open:true
+        })
+    }
+
     validateForm() {
         return true
     }
 
     render() {
-        let conditionForm = null;
+        let conditionSelection=null;
+        let conditionForm=null;
         if (this.state.conditionSelected) {
+            const name = this.state.form.type[0].toUpperCase() + this.state.form.type.substring(1);
+
+            conditionSelection = (
+                <div>
+                    <div><h3>{name}</h3></div>
+                    {conditionIconMap[this.state.form.type]}
+                    <div style={{position:"absolute", top:"5px", right:"5px"}}>
+                        <Button onClick={this.handleRemoveCondition}>Remove</Button>
+                    </div>
+                </div>
+            );
+
             let conditionArgs = Object.keys(this.state.conditionSelected.args).map((arg) => {
                 let form = getForm(arg);
                 if (form) {
@@ -111,13 +132,34 @@ export default class ConditionPickerModal extends Component {
                     onChange={this.handleSelectData}/>
                 {this.state.dataSelected ? conditionArgs : null}
             </Form>
+        } else {
+            const allowedConditions = this.props.conditions;
+
+            conditionSelection = <Grid container columns={4}>
+                {this.iconOrder.filter((e) => {
+                    if (allowedConditions.hasOwnProperty(e.toLowerCase())) {
+                        return true
+                    }
+
+                    return false
+                }).map((e,i) => {
+                    const name = e[0].toUpperCase() + e.substring(1);
+                    return <Grid.Column key={i}>
+                            <Button onClick={() => this.handleClick(e.toLowerCase())}>
+                                    <a>
+                                        {conditionIconMap[e]}
+                                    </a>
+                                <div>{name}</div>
+                            </Button>
+                        </Grid.Column>
+                })}
+            </Grid>
         }
 
         return (
             <Modal trigger={<Button onClick={this.handleOpen} floated='right'>{"Add Condition"}</Button>} open={this.state.open}>
                 <Modal.Content>
-                    <Dropdown placeholder='Condition' search selection options={this.state.options}
-                              onChange={this.handleSelectCondition} />
+                    {conditionSelection}
                     {conditionForm}
                 </Modal.Content>
                 <Modal.Actions>

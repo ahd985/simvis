@@ -427,10 +427,11 @@ rect {
   text-align:center;
 }
 
-#hot-container {
+#data-table {
   width:100%;
-  height:350px;
-  overflow:hidden;
+  height:100%;
+  overflow-x:scroll;
+  border-right:3px solid $colorC
 }
 
 .select-outline {
@@ -571,4 +572,10 @@ rect {
 
 #right-sidebar .shapes-selected-menu button:hover  {
   background:$colorB;
+}
+
+
+// Data table stuff
+.xaxis-btn {
+  width:110px;
 }

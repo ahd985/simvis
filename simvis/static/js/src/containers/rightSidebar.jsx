@@ -48,7 +48,7 @@ class RightSideBarMenu extends Component {
         const { activeItem } = this.state;
         const textEditorAvailable = true;
 
-        const style = {width:this.props.rightSideBarWidth, right:0};
+        const style = {width:this.props.rightSideBarWidth, right:0, textAlign:"center"};
 
         let submenu, menu;
         if (!this.props.selectedShapes.length) {
@@ -80,15 +80,28 @@ class RightSideBarMenu extends Component {
                 if (!this.props.data) {
                     submenu = <Segment attached='bottom' className="shapes-selected-menu">
                         <Form size="small" style={{padding:5}} as="none">
-                            <Form.Field>
-                                <ImportDataModal asForm={true}/>
-                            </Form.Field>
+                            <Form.Group widths='equal'>
+                                <Form.Field>
+                                    <ImportDataModal asForm={true}/>
+                                </Form.Field>
+                            </Form.Group>
                         </Form>
                     </Segment>;
                 } else {
+                    // TODO - check for conflicting models
+                    const selectedShapes = this.props.shapes.filter((shape) => {
+                        if (this.props.selectedShapes.includes(shape.uuid)) {
+                            return true
+                        }
+
+                        return false
+                    });
+
+                    const selectedModel = selectedShapes[0].model;
+
                     submenu = <Segment attached='bottom' className="shapes-selected-menu">
                         <Form size="small" style={{padding:5}} as="none">
-                            <ModelPickerModal setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
+                            <ModelPickerModal model={selectedModel} setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
                         </Form>
                     </Segment>;
                 }

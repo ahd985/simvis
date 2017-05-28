@@ -23,10 +23,10 @@ class ShapeContainer extends Component {
         this.handleDragStart = this.handleDragStart.bind(this);
         this.handleDragStop = this.handleDragStop.bind(this);
         this.handleMove = this.handleMove.bind(this);
-        this.handleMove = debounce(this.handleMove, 5);
+        this.handleMove = debounce(this.handleMove, 3);
         this.handleResizeStart = this.handleResizeStart.bind(this);
         this.handleResize = this.handleResize.bind(this);
-        this.handleResize = debounce(this.handleResize, 5);
+        this.handleResize = debounce(this.handleResize, 3);
         this.handleResizeStop = this.handleResizeStop.bind(this);
         this.handleContextMenu = this.handleContextMenu.bind(this);
         this.handleClick = this.handleClick.bind(this);
