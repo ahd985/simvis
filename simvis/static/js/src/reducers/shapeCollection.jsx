@@ -66,6 +66,7 @@ const historyTracker = (reducer) => {
                 }
 
             default:
+                // TODO - Set limit on history size
                 const noHistoryActions = ['MOVE_SHAPES', 'ADD_SELECTED_SHAPE'];
 
                 const newPresent = reducer(present, action);
@@ -210,6 +211,10 @@ const shapeCollection = (state = defaultPresent, action) => {
                 xSeriesIndex:action.xSeriesIndex
             };
         case 'CLEAR_DATA':
+            state.shapes.map((shapeData) => {
+                ssv.remove_demo_element(shapeData.uuid)
+            })
+
             return {
                 ...state,
                 data: null,

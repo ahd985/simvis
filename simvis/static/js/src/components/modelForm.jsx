@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Form, Modal, Button } from 'semantic-ui-react'
+import { Form, Modal, Button, Radio, Segment } from 'semantic-ui-react'
 import { SwatchesPicker } from 'react-color';
 
 import NumberPicker from './numberPicker';
@@ -82,26 +82,29 @@ class ReportForm extends Component {
         super(props);
 
         this.state = {
-            value:"f"
+            value:false
         };
 
         this.handleChange = this.handleChange.bind(this)
     }
 
-    handleChange(e, value) {
+    handleChange(e) {
+        const value = !this.state.value;
         this.setState({value});
 
-        e.target.value == "f" ? e.target.value = false : e.target.value = true;
+        console.log(e)
+
+        e.target.value ? e.target.value = true : e.target.value = false;
         this.props.onChange(e)
     }
 
     render() {
         return (
-            <Form.Group inline>
-                <label>Report</label>
-                <Form.Radio label='True' value='t' checked={this.state.value === 't'} onChange={(e) => this.handleChange(e, 't')} />
-                <Form.Radio label='False' value='f' checked={this.state.value === 'f'} onChange={(e) => this.handleChange(e, 'f')} />
-            </Form.Group>
+            <Form.Field>
+                <div style={{position:"relative", top:"50%", left:"30%"}}>
+                    <Radio label="Report Values" toggle onChange={(e) => this.handleChange(e)} />
+                </div>
+            </Form.Field>
         )
     }
 }
@@ -138,7 +141,8 @@ class ColorScaleForm extends Component {
             open:false,
             colorSteps:5,
             minColorValue:this.props.data[0],
-            maxColorValue:this.props.data[this.props.data.length-1]
+            maxColorValue:this.props.data[this.props.data.length-1],
+            selectedColors:null
         };
 
         this.handleOpen = this.handleOpen.bind(this);
@@ -176,7 +180,7 @@ class ColorScaleForm extends Component {
             this.props.onChange({target:{value:colors}})
         }
 
-        this.setState({open:false})
+        this.setState({open:false, selectedColors:colors})
     }
 
     render() {
@@ -190,16 +194,20 @@ class ColorScaleForm extends Component {
         });
 
         return (
-            <Modal trigger={<Button onClick={this.handleOpen}>{"Color Scale"}</Button>} open={this.state.open}>
+            <Modal trigger={<Form.Button style={{height:70, width:175, textAlign:"center"}} className="color-scale-btn" onClick={this.handleOpen}>{this.state.selectedColors ? createColorButtonIcon(this.state.selectedColors, "Color Scale") : <div>{"Color Scale"}</div>}</Form.Button>} open={this.state.open}>
                 <Modal.Content>
+                    <Form onSubmit={(e) => {e.preventDefault()}}>
+                        <Form.Group widths="equal">
+                            <Form.Input label='Lower Bound' name='minColorValue' value={this.state.minColorValue} type={"number"} onChange={(e) => this.handleBoundsChange(e, 'minColorValue')}/>
+                            <Form.Input label='Upper Bound' name='maxColorValue' value={this.state.maxColorValue} type={"number"} onChange={(e) => this.handleBoundsChange(e, 'maxColorValue')}/>
+                            <Form.Field control={NumberPicker} name="colorLevels" label="Color Steps"
+                                   value={this.state.colorSteps}
+                                   onChange={this.handleStepChange}
+                                   min={2}
+                                   max={10}/>
+                        </Form.Group>
+                    </Form>
                     {colorSetButtons}
-                    <Form.Input label='Lower Bound' name='minColorValue' value={this.state.minColorValue} type={"number"} onChange={(e) => this.handleBoundsChange(e, 'minColorValue')}/>
-                    <Form.Input label='Upper Bound' name='maxColorValue' value={this.state.maxColorValue} type={"number"} onChange={(e) => this.handleBoundsChange(e, 'maxColorValue')}/>
-                    <Form.Field width="3" control={NumberPicker} name="colorLevels" label="Color Steps"
-                           value={this.state.colorSteps}
-                           onChange={this.handleStepChange}
-                           min={1}
-                           max={10}/>
                 </Modal.Content>
                 <Modal.Actions>
                     <Button content='Cancel' onClick={() => this.handleClose(null, true)} />
@@ -222,28 +230,51 @@ function createColorButtonIcon(colors, name) {
     }
 
     return (
-        <div key={-1}><span style={{clear:"right"}}>{name}</span>{icons}</div>
+        <div style={{display:"inline-block"}} key={-1}>{name ? <div>{name}</div>: null}{icons}</div>
     )
 }
 
-const formMap = [
-    {name:"description", tag:DescriptionForm},
-    {name:"color_scale", tag:ColorScaleForm},
-    {name:"true_color", tag:TrueColorForm},
-    {name:"false_color", tag:FalseColorForm},
-    {name:"min_height", tag:MinHeightForm},
-    {name:"max_height", tag:MaxHeightForm},
-    {name:"unit", tag:UnitForm},
-    {name:"opacity", tag:OpacityForm},
-    {name:"report", tag:ReportForm}
+const formGroupMap = [
+    [{name:"description", tag:DescriptionForm}, {name:"unit", tag:UnitForm}],
+    [{name:"opacity", tag:OpacityForm}, {name:"report", tag:ReportForm}],
+    [{name:"color_scale", tag:ColorScaleForm}],
+    [{name:"true_color", tag:TrueColorForm}, {name:"false_color", tag:FalseColorForm}],
+    [{name:"min_height", tag:MinHeightForm}, {name:"max_height", tag:MaxHeightForm}]
 ];
 
-export default function getForm(name) {
-    for (var f of formMap) {
-        if (f.name === name) {
-           return f
-        }
-    }
+export default function getFormFromArgs(args, data, onChange) {
+    let fieldCount = 0;
 
-    return null
+    let fields = formGroupMap.map((formGroup) => {
+        let fieldIncluded = false;
+        for (let field of formGroup) {
+            if (args.includes(field.name)) {
+                fieldIncluded = true
+            }
+        }
+
+        if (fieldIncluded) {
+            let fieldGroup = formGroup.map((form) => {
+                if (args.includes(form.name)) {
+                    const arg = form.name;
+                    fieldCount += 1;
+                    return <form.tag key={arg} data={data} onChange={(e, f, argOverride) => onChange(e, arg, argOverride)}/>
+                } else {
+                    return false
+                }
+            }).filter((arg) => {
+                if (arg) {return true} else {return false}
+            });
+
+            return (
+                <Form.Group widths={2}>
+                    {fieldGroup}
+                </Form.Group>
+            )
+        }
+
+        return null
+    })
+
+    return fields
 }

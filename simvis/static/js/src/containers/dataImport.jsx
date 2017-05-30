@@ -92,7 +92,7 @@ class ImportDataModal extends Component {
             data:null,
             xSeriesIndex:0,
             secondModalOpen:false,
-            firstModalOpen:false
+            firstModalOpen:true
         })
     }
 

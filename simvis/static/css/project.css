@@ -398,6 +398,12 @@ rect {
   border-bottom: none;
   background: #373737; }
 
+.condition-icon {
+  border: 1px solid grey;
+  width: 150px;
+  text-align: center;
+  padding: 25px; }
+
 .ui.styled.accordion {
   border-radius: 0;
   background: #F4F4F4; }

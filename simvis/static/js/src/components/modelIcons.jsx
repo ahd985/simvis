@@ -1,8 +1,8 @@
 import React from 'react'
 
-const cellIcon = <svg viewBox="0 0 100 100" width="100" height="100">
+const animatedCellIcon = <svg viewBox="0 0 100 100" width="100" height="100">
         <defs>
-            <pattern id="cell-btn-pattern" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
+            <pattern id="anim-cell-btn-pattern" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
                 <rect x="0" width="100%" height="100%" y="0" style={{fill: "#EEEEEE", opacity: 1}} />
                 <rect x="0" width="100" height="100" y="80" style={{opacity:1, fill:"#FFF8E1"}}>
                     <animate attributeName="y" values="70;30;70" dur="3s" repeatCount="indefinite" />
@@ -15,41 +15,75 @@ const cellIcon = <svg viewBox="0 0 100 100" width="100" height="100">
             </pattern>
         </defs>
         <rect height="100"
+          style={{opacity:1, fill:"url(#anim-cell-btn-pattern)", fillOpacity:1, stroke:"#000000"}}
+          width="100" x="0" y="0" />
+    </svg>;
+
+const cellIcon = <svg viewBox="0 0 100 100" width="100" height="100">
+        <defs>
+            <pattern id="cell-btn-pattern" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
+                <rect x="0" width="100%" height="100%" y="0" style={{fill: "#EEEEEE", opacity: 1}} />
+                <rect x="0" width="100" height="60" y="60" style={{opacity:1, fill:"#90CAF9"}}></rect>
+                <rect x="0" width="100" height="1" y="60" style={{opacity:1, fill:"#ffffff"}}></rect>
+            </pattern>
+        </defs>
+        <rect height="100"
           style={{opacity:1, fill:"url(#cell-btn-pattern)", fillOpacity:1, stroke:"#000000"}}
           width="100" x="0" y="0" />
     </svg>;
 
-const heatmapIcon = <svg viewBox="0 0 100 100" width="100" height="100">
+const animatedHeatmapIcon = <svg viewBox="0 0 100 100" width="100" height="100">
         <defs>
-            <pattern id="heatmap-btn-pattern-1" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
+            <pattern id="anim-heatmap-btn-pattern-1" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
                 <rect x="0" width="100%" height="100%" y="0">
                     <animate attributeName="fill" values="#FFF176;#FDD835;#F57F17;#FDD835;#FFF176" dur="5s" repeatCount="indefinite" />
                 </rect>
             </pattern>
-            <pattern id="heatmap-btn-pattern-2" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
+            <pattern id="anim-heatmap-btn-pattern-2" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
                 <rect x="0" width="100%" height="100%" y="0">
                     <animate attributeName="fill" values="#FDD835;#F57F17;#BF360C;#F57F17;#FDD835" dur="5s" repeatCount="indefinite" />
                 </rect>
             </pattern>
         </defs>
-        <rect height="33" width="33" x="0" y="0" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
-        <rect height="33" width="33" x="33" y="0" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
-        <rect height="34" width="33" x="66" y="0" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
-        <rect height="33" width="33" x="0" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
-        <rect height="33" width="33" x="33" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
-        <rect height="33" width="33" x="66" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
-        <rect height="33" width="33" x="0" y="66" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
-        <rect height="33" width="33" x="33" y="66" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
-        <rect height="34" width="33" x="66" y="66" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
+        <rect height="33" width="33" x="0" y="0" fill="url(#anim-heatmap-btn-pattern-1)" stroke="#000000" />
+        <rect height="33" width="33" x="33" y="0" fill="url(#anim-heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="33" width="34" x="66" y="0" fill="url(#anim-heatmap-btn-pattern-1)" stroke="#000000" />
+        <rect height="33" width="33" x="0" y="33" fill="url(#anim-heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="33" width="33" x="33" y="33" fill="url(#anim-heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="33" width="34" x="66" y="33" fill="url(#anim-heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="34" width="33" x="0" y="66" fill="url(#anim-heatmap-btn-pattern-1)" stroke="#000000" />
+        <rect height="34" width="33" x="33" y="66" fill="url(#anim-heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="34" width="34" x="66" y="66" fill="url(#anim-heatmap-btn-pattern-1)" stroke="#000000" />
     </svg>;
 
-const lineIcon = <svg viewBox="0 0 100 100" width="100" height="100">
+const heatmapIcon = <svg viewBox="0 0 100 100" width="100" height="100">
         <defs>
-            <pattern id="line-btn-pattern" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
+            <pattern id="heatmap-btn-pattern-1" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
+                <rect x="0" width="100%" height="100%" y="0" fill="#FFF176"></rect>
+            </pattern>
+            <pattern id="heatmap-btn-pattern-2" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
+                <rect x="0" width="100%" height="100%" y="0" fill="#FDD835"></rect>
+            </pattern>
+        </defs>
+        <rect height="33" width="33" x="0" y="0" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
+        <rect height="33" width="33" x="33" y="0" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="33" width="34" x="66" y="0" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
+        <rect height="33" width="33" x="0" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="33" width="33" x="33" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="33" width="34" x="66" y="33" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="34" width="33" x="0" y="66" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
+        <rect height="34" width="33" x="33" y="66" fill="url(#heatmap-btn-pattern-2)" stroke="#000000" />
+        <rect height="34" width="34" x="66" y="66" fill="url(#heatmap-btn-pattern-1)" stroke="#000000" />
+    </svg>;
+
+const animatedLineIcon = <svg viewBox="0 0 100 100" width="100" height="100">
+        <defs>
+            <pattern id="anim-line-btn-pattern" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
                 <rect x="0" width="25" height="100%" y="0">
+                    <animate attributeName="fill" values="#66BB6A;#43A047;#1B5E20;#43A047;#66BB6A" dur="2s" repeatCount="indefinite" />
                 </rect>
                 <rect x="25" width="25" height="100%" y="0">
-                    <animate attributeName="fill" values="#66BB6A;#43A047;#1B5E20;#43A047;#66BB6A" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="fill" values="#A5D6A7;#66BB6A;#43A047;#66BB6A;#A5D6A7" dur="2s" repeatCount="indefinite" />
                 </rect>
                 <rect x="50" width="25" height="100%" y="0">
                     <animate attributeName="fill" values="#66BB6A;#43A047;#1B5E20;#43A047;#66BB6A" dur="2s" repeatCount="indefinite" />
@@ -59,13 +93,29 @@ const lineIcon = <svg viewBox="0 0 100 100" width="100" height="100">
                 </rect>
             </pattern>
         </defs>
+        <line x1="0" y1="50" x2="100" y2="50.01" stroke="url(#anim-line-btn-pattern)" strokeWidth={3}/>
+    </svg>;
+
+const lineIcon = <svg viewBox="0 0 100 100" width="100" height="100">
+        <defs>
+            <pattern id="line-btn-pattern" x="0" y="0" width="100%" height="100%" patternContentUnits="userSpaceOnUse">
+                <rect x="0" width="25" height="100%" y="0" fill="#66BB6A"></rect>
+                <rect x="25" width="25" height="100%" y="0" fill="#A5D6A7"></rect>
+                <rect x="50" width="25" height="100%" y="0" fill="#66BB6A"></rect>
+                <rect x="75" width="25" height="100%" y="0" fill="#A5D6A7"></rect>
+            </pattern>
+        </defs>
         <line x1="0" y1="50" x2="100" y2="50.01" stroke="url(#line-btn-pattern)" strokeWidth={3}/>
     </svg>;
 
-const toggleIcon = <svg viewBox="0 0 100 100" width="100" height="100">
+const animatedToggleIcon = <svg viewBox="0 0 100 100" width="100" height="100">
         <circle cx="50" cy="50" r="45" stroke="#000000" strokeWidth="5">
             <animate attributeName="fill" values="#4CAF50;#F44336" dur="4s" repeatCount="indefinite" calcMode="discrete" />
         </circle>
+    </svg>;
+
+const toggleIcon = <svg viewBox="0 0 100 100" width="100" height="100">
+        <circle cx="50" cy="50" r="45" stroke="#000000" strokeWidth="5" fill="#4CAF50"></circle>
     </svg>;
 
 const legendIcon = <svg viewBox="0 0 100 100" width="100" height="100">
@@ -132,7 +182,17 @@ const tableIcon = <svg width="100" height="100" viewBox="0 0 100 100">
         </foreignObject>
     </svg>;
 
-export default {
+export const animatedModelIconMap = {
+    cell:animatedCellIcon,
+    heatmap:animatedHeatmapIcon,
+    line:animatedLineIcon,
+    toggle:animatedToggleIcon,
+    legend:legendIcon,
+    report:reportIcon,
+    table:tableIcon
+}
+
+export const modelIconMap = {
     cell:cellIcon,
     heatmap:heatmapIcon,
     line:lineIcon,

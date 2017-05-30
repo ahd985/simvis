@@ -523,6 +523,13 @@ rect {
   background:$colorB;
 }
 
+.condition-icon {
+  border: 1px solid grey;
+  width: 150px;
+  text-align: center;
+  padding: 25px;
+}
+
 // Theme overriding
 .ui.styled.accordion {
   border-radius:0;
@@ -573,7 +580,6 @@ rect {
 #right-sidebar .shapes-selected-menu button:hover  {
   background:$colorB;
 }
-
 
 // Data table stuff
 .xaxis-btn {

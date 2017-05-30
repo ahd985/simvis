@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
-import getForm from './modelForm'
+import getFormFromArgs from './modelForm'
 import ConditionPickerModal from './conditionPickerModal'
-import modelIconMap from './modelIcons'
+import { animatedModelIconMap, modelIconMap } from './modelIcons'
 
 import ssv from '../../ssv.min.js'
 
@@ -123,27 +123,21 @@ export default class ModelPickerModal extends Component {
         let modelConditions=null;
         if (this.state.modelRequirements) {
             const name = this.state.form.type[0].toUpperCase() + this.state.form.type.substring(1);
-            
+
             modelSelection = (
                 <div>
                     <div><h3>{name}</h3></div>
                     {modelIconMap[this.state.form.type]}
                     <div style={{position:"absolute", top:"5px", right:"5px"}}>
-                        <Button onClick={this.handleRemoveModel}>Remove</Button>
+                        <Button icon onClick={this.handleRemoveModel}><Icon name='erase' /></Button>
                     </div>
                 </div>
             );
 
-            let modelFormArgs = Object.keys(this.state.modelRequirements.args).map((arg) => {
-                let form = getForm(arg);
-                if (form) {
-                    return <form.tag key={arg} onChange={(e) => {this.handleFormChange(e, arg)}}/>
-                } else {
-                    return false
-                }
-            }).filter((arg) => {
-                if (arg) {return true} else {return false}
-            });
+            const args = Object.keys(this.state.modelRequirements.args);
+            const onChange = (e, f, argOverride) => {this.handleFormChange(e, arg)};
+
+            const modelFormArgs = getFormFromArgs(args, null, onChange)
 
             modelForm = <Form onSubmit={(e) => {e.preventDefault()}}>
                 {modelFormArgs}
@@ -183,7 +177,7 @@ export default class ModelPickerModal extends Component {
                     return <Grid.Column key={i}>
                             <Button onClick={() => this.handleClick(e)}>
                                     <a>
-                                        {modelIconMap[e]}
+                                        {animatedModelIconMap[e]}
                                     </a>
                                 <div>{name}</div>
                             </Button>
@@ -193,7 +187,7 @@ export default class ModelPickerModal extends Component {
         }
 
         return (
-            <Modal trigger={<Button onClick={this.handleOpen}>{"Add Model"}</Button>} open={this.state.open}>
+            <Modal trigger={<Button onClick={this.handleOpen}>{"Add/Edit Model"}</Button>} open={this.state.open}>
                 <Modal.Content>
                     {modelSelection}
                     {modelForm}

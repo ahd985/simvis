@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
-import getForm from '../components/modelForm'
+import getFormFromArgs from '../components/modelForm'
 import conditionIconMap from './conditionIcons'
 
 export default class ConditionPickerModal extends Component {
@@ -102,34 +102,35 @@ export default class ConditionPickerModal extends Component {
         if (this.state.conditionSelected) {
             const name = this.state.form.type[0].toUpperCase() + this.state.form.type.substring(1);
 
-            conditionSelection = (
-                <div>
-                    <div><h3>{name}</h3></div>
-                    {conditionIconMap[this.state.form.type]}
-                    <div style={{position:"absolute", top:"5px", right:"5px"}}>
-                        <Button onClick={this.handleRemoveCondition}>Remove</Button>
-                    </div>
-                </div>
-            );
-
-            let conditionArgs = Object.keys(this.state.conditionSelected.args).map((arg) => {
-                let form = getForm(arg);
-                if (form) {
-                    return <form.tag key={arg} data={this.state.dataSelected} onChange={(e, f, argOverride) => {this.handleFormChange(e, arg, argOverride)}}/>
-                } else {
-                    return false
-                }
-            }).filter((arg) => {
-                if (arg) {return true} else {return false}
-            });
-
             const dataHeaderOptions = this.props.dataHeaders.map((header, i) => {
                 return {key:i, value:i, text:header}
             });
 
-            conditionForm = <Form onSubmit={(e) => {e.preventDefault()}}>
-                <Dropdown placeholder='Header' search selection options={dataHeaderOptions}
+            conditionSelection = (
+                <Grid container columns={2} verticalAlign={"bottom"} centered padded='vertically' textAlign={"center"}>
+                    <Grid.Column style={{paddingLeft:0}}>
+                        <div className="condition-icon">
+                            <div><b>{name}</b></div>
+                            {conditionIconMap[this.state.form.type]}
+                        </div>
+                    </Grid.Column>
+                    <Grid.Column style={{textAlign:"center"}}>
+                        <Dropdown placeholder='Select Data' search selection options={dataHeaderOptions}
                     onChange={this.handleSelectData}/>
+                    </Grid.Column>
+                    <div style={{position:"absolute", top:"5px", right:"5px"}}>
+                        <Button icon onClick={this.handleRemoveCondition}><Icon name='erase' /></Button>
+                    </div>
+                </Grid>
+            );
+
+            const args = Object.keys(this.state.conditionSelected.args);
+            const data = this.state.dataSelected;
+            const onChange = this.handleFormChange;
+
+            const conditionArgs = getFormFromArgs(args, data, onChange)
+
+            conditionForm = <Form onSubmit={(e) => {e.preventDefault()}}>
                 {this.state.dataSelected ? conditionArgs : null}
             </Form>
         } else {

@@ -2,11 +2,11 @@ import React from 'react'
 
 const iconWidth = 50
 const iconHeight = 50
-const iconViewBox = "0 0 50 50"
+const iconViewBox = "0 0 100 100"
 
 const staticLevelIcon = <svg viewBox={iconViewBox} width={iconWidth} height={iconHeight}>
         <g>
-            <rect style={{fill:"#cccccc",stroke:"#000000",strokeWidth:"1.99999988"}} width={iconWidth} height={iconHeight} x="0" y="0" />
+            <rect style={{fill:"#cccccc",stroke:"#000000",strokeWidth:"1.99999988"}} width="100" height="100" x="0" y="0" />
             <rect style={{fill:"#999999",strokeWidth:"1"}} width="98" height="49" x="1" y="50" />
             <path style={{fill:"none",stroke:"#000000",strokeWidth:"1px"}} d="m 0,50 100,0" />
             <path style={{fill:"none",stroke:"#000000",strokeWidth:"2px"}} d="m 50,50 0,-20 m -8,8 8,-8 8,8" />
@@ -17,7 +17,7 @@ const staticLevelIcon = <svg viewBox={iconViewBox} width={iconWidth} height={ico
 const dynamicLevelIcon = <svg viewBox={iconViewBox} width={iconWidth} height={iconHeight}>
         <g>
             <g>
-                <rect style={{fill:"#cccccc",stroke:"#000000",strokeWidth:"1.99999988"}} width={iconWidth} height={iconHeight} x="0" y="0" />
+                <rect style={{fill:"#cccccc",stroke:"#000000",strokeWidth:"1.99999988"}} width="100" height="100" x="0" y="0" />
                 <rect style={{fill:"#999999",strokeWidth:"1"}} width="98" height="49" x="1" y="50" />
                 <path style={{fill:"none",stroke:"#000000",strokeWidth:"1px"}} d="m 0,50 100,0" />
                 <path style={{fill:"none",stroke:"#000000",strokeWidth:"2px"}} d="m 50,50 0,-20 m -8,8 8,-8 8,8" />
@@ -32,13 +32,13 @@ const dynamicLevelIcon = <svg viewBox={iconViewBox} width={iconWidth} height={ic
 
 const backgroundIcon = <svg viewBox={iconViewBox} width={iconWidth} height={iconHeight}>
         <g>
-            <rect y="0" x="0" height={iconHeight} width={iconWidth} style={{fill:"#cccccc",stroke:"#000000",strokeWidth:"1.99999988"}} />
+            <rect y="0" x="0" height="100" width="100" style={{fill:"#cccccc",stroke:"#000000",strokeWidth:"1.99999988"}} />
         </g>
     </svg>;
 
 const zonalYIcon = <svg viewBox={iconViewBox} width={iconWidth} height={iconHeight}>
         <g >
-            <rect y="0" x="0" height={iconHeight} width={iconWidth} style={{fill:"#cccccc",stroke:"#000000",strokeWidth:"1.99999988"}} />
+            <rect y="0" x="0" height="100" width="100" style={{fill:"#cccccc",stroke:"#000000",strokeWidth:"1.99999988"}} />
             <rect y="1" x="1" height="33" width="98" style={{fill:"#4d4d4d",strokeWidth:"1"}} />
             <path d="m 0,34 100,0" style={{fill:"none",stroke:"#000000",strokeWidth:"1px"}} />
             <rect style={{fill:"#999999",strokeWidth:"1"}} width="98" height="33" x="1" y="34" />
@@ -49,7 +49,7 @@ const zonalYIcon = <svg viewBox={iconViewBox} width={iconWidth} height={iconHeig
 const rectIcon = <svg viewBox={iconViewBox} width={iconWidth} height={iconHeight}>
         <g>
             <g>
-                <rect style={{fill:"#cccccc",stroke:"#000000",strokeWidth:"1.99999988"}} width={iconWidth} height={iconHeight} x="0" y="0" />
+                <rect style={{fill:"#cccccc",stroke:"#000000",strokeWidth:"1.99999988"}} width="100" height="100" x="0" y="0" />
                 <path d="m 0,50 100,0" style={{fill:"none",stroke:"#000000",strokeWidth:"1px"}} />
                 <path d="m 50,0 0,100" style={{fill:"none",stroke:"#000000",strokeWidth:"1px"}} />
             </g>
@@ -58,7 +58,7 @@ const rectIcon = <svg viewBox={iconViewBox} width={iconWidth} height={iconHeight
 
 const equalYIcon = <svg viewBox={iconViewBox} width={iconWidth} height={iconHeight}>
         <g style={{strokeWidth:"10"}}>
-            <rect style={{fill:"#f5f5f5",stroke:"#020202",strokeWidth:"1"}} y="0" height={iconHeight} width="40" x="30" />
+            <rect style={{fill:"#f5f5f5",stroke:"#020202",strokeWidth:"1"}} y="0" height="100" width="40" x="30" />
             <path style={{fill:"#d1d1d1",stroke:"#c0c0c0",strokeWidth:"10"}} d="m 50,0 0,25" />
             <path style={{fill:"none",stroke:"#979797",strokeWidth:"10"}} d="m 50,25 0,25" />
             <path style={{fill:"none",stroke:"#3e2d2d",strokeWidth:"10"}} d="m 50,50 0,25" />
@@ -68,7 +68,7 @@ const equalYIcon = <svg viewBox={iconViewBox} width={iconWidth} height={iconHeig
 
 const colorScaleIcon = <svg viewBox={iconViewBox} width={iconWidth} height={iconHeight}>
         <g>
-            <rect style={{fill:"#f5f5f5",stroke:"#020202"}} y="0" height="75" width={iconWidth} x="0" />
+            <rect style={{fill:"#f5f5f5",stroke:"#020202"}} y="0" height="75" width="100" x="0" />
             <path d="m 0,25 25,0" style={{fill:"#d1d1d1",stroke:"#c0c0c0",strokeWidth:"25"}} />
             <path d="m 25,25 25,0" style={{fill:"none",stroke:"#979797",strokeWidth:"25"}} />
             <path d="m 50,25 25,0" style={{fill:"none",stroke:"#3e2d2d",strokeWidth:"25"}} />
