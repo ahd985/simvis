@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
+import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table, Label } from 'semantic-ui-react'
 import getFormFromArgs from './modelForm'
 import ConditionPickerModal from './conditionPickerModal'
 import { animatedModelIconMap, modelIconMap } from './modelIcons'
+import conditionIconMap from './conditionIcons'
 
 import ssv from '../../ssv.min.js'
 
@@ -31,7 +32,7 @@ export default class ModelPickerModal extends Component {
         this.handleOpen = this.handleOpen.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleClick = this.handleClick.bind(this);
-        this.addCondition = this.addCondition.bind(this);
+        this.editCondition = this.editCondition.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
         this.validateForm = this.validateForm.bind(this);
         this.handleRemoveModel = this.handleRemoveModel.bind(this);
@@ -90,24 +91,31 @@ export default class ModelPickerModal extends Component {
         })
     }
 
-    addCondition(condition) {
+    editCondition(condition, index) {
         this.setState((prevState) => {
-            return {
-                form: {
-                    ...prevState.form,
-                    conditions:prevState.form.conditions.slice().concat(condition)
-                }
+            var form = {
+                ...prevState.form,
+                conditions:prevState.form.conditions.slice()
             }
+
+            if (index != null) {
+                form.conditions[index] = condition
+            } else {
+                form.conditions.push(condition)
+            }
+
+            return {form}
         })
     }
 
-    handleFormChange(e, arg) {
+    handleFormChange(e, f, arg) {
         e.persist();
+
         this.setState((prevState) => {
             return {
                 form: {
                     ...prevState.form,
-                    [arg]: e.target ? e.target.value : null
+                    [arg]: f.value ? f.value : null
                 }
             }
         })
@@ -135,41 +143,23 @@ export default class ModelPickerModal extends Component {
             );
 
             const args = Object.keys(this.state.modelRequirements.args);
-            const onChange = (e, f, argOverride) => {this.handleFormChange(e, arg)};
+            const onChange = (e, f, arg, argOverride) => {
+                this.handleFormChange(e, f, arg)
+            };
 
-            const modelFormArgs = getFormFromArgs(args, null, onChange)
+            const modelFormArgs = getFormFromArgs(args, null, onChange, this.state.form)
 
             modelForm = <Form onSubmit={(e) => {e.preventDefault()}}>
                 {modelFormArgs}
             </Form>;
 
-            const formConditions = this.state.form.conditions.map((d) => {
-                return (
-                    <Table.Row key={d.name}>
-                        <Table.Cell key={d.name + "-2"}>
-                            d.name
-                        </Table.Cell>
-                    </Table.Row>
-                )
-            });
-
-            modelConditions = <Table compact celled definition>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell>Condition</Table.HeaderCell>
-                    </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                    {formConditions}
-                </Table.Body>
-                <Table.Footer fullWidth>
-                    <Table.Row>
-                        <Table.HeaderCell>
-                            <ConditionPickerModal conditions={this.state.modelRequirements.conditions} addCondition={this.addCondition} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
-                        </Table.HeaderCell>
-                    </Table.Row>
-                </Table.Footer>
-            </Table>
+            modelConditions = <Grid container columns={6}>
+                {this.state.form.conditions.map((condition, i) => {
+                    return <Grid.Column key={i}>
+                        <ConditionPickerModal triggerIcon={conditionIconMap[condition.type]} conditionIndex={i} condition={condition} conditions={this.state.modelRequirements.conditions} editCondition={this.editCondition} data={this.props.data} dataHeaders={this.props.dataHeaders} />
+                    </Grid.Column>
+                })}
+            </Grid>
         } else {
             modelSelection = <Grid container columns={4}>
                 {this.iconOrder.map((e,i) => {
@@ -188,10 +178,20 @@ export default class ModelPickerModal extends Component {
 
         return (
             <Modal trigger={<Button onClick={this.handleOpen}>{"Add/Edit Model"}</Button>} open={this.state.open}>
+                <Modal.Header>{modelSelection}</Modal.Header>
                 <Modal.Content>
-                    {modelSelection}
                     {modelForm}
-                    {modelConditions}
+                    {
+                        modelConditions ?
+                            <div>
+                                <Segment attached>
+                                    <Label attached='top'>Conditions</Label>
+                                    {modelConditions}
+                                </Segment>
+                                <ConditionPickerModal conditions={this.state.modelRequirements.conditions} editCondition={this.editCondition} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
+                            </div>
+                            : null
+                    }
                 </Modal.Content>
                 <Modal.Actions>
                     <Button content='Cancel' onClick={() => this.handleClose(true)} />

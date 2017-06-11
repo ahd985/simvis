@@ -10,6 +10,7 @@ export default class ConditionPickerModal extends Component {
         this.defaultState = {
             open:false,
             conditionSelected:null,
+            dataIndex:null,
             dataSelected:null,
             form:{
                 report:false,
@@ -34,7 +35,18 @@ export default class ConditionPickerModal extends Component {
     }
 
     handleOpen() {
-        this.setState({open:true})
+        if (this.props.condition) {
+            const dataIndex = this.props.condition.dataIndex
+            this.setState({
+                open:true,
+                conditionSelected:this.props.conditions[this.props.condition.type],
+                dataIndex:dataIndex,
+                dataSelected:this.props.data.map((row) => {return row[dataIndex]}),
+                form:this.props.condition
+            })
+        } else {
+            this.setState({open:true})
+        }
     }
 
     handleClose(canceled) {
@@ -42,7 +54,12 @@ export default class ConditionPickerModal extends Component {
             if (!this.validateForm()) {
                 return
             }
-            this.props.addCondition(this.state.form)
+
+            if (this.props.conditionIndex != null) {
+                this.props.editCondition(this.state.form, this.props.conditionIndex)
+            } else {
+                this.props.editCondition(this.state.form)
+            }
         }
 
         this.setState({open:false})
@@ -64,6 +81,7 @@ export default class ConditionPickerModal extends Component {
         this.setState((prevState) => {
             return {
                 dataSelected:this.props.data.map((row) => {return row[d.value]}),
+                dataIndex:d.value,
                 dataHeader:d.text,
                 form: {
                     ...prevState.form,
@@ -73,13 +91,13 @@ export default class ConditionPickerModal extends Component {
         })
     }
 
-    handleFormChange(e, arg, argOverride) {
+    handleFormChange(e, f, arg, argOverride) {
         e.persist ? e.persist() : null;
         this.setState((prevState) => {
             return {
                 form: {
                     ...prevState.form,
-                    [argOverride ? argOverride : arg]: e.target ? e.target.value : null
+                    [argOverride ? argOverride : arg]: f.value ? f.value : null
                 }
             }
         })
@@ -115,7 +133,7 @@ export default class ConditionPickerModal extends Component {
                         </div>
                     </Grid.Column>
                     <Grid.Column style={{textAlign:"center"}}>
-                        <Dropdown placeholder='Select Data' search selection options={dataHeaderOptions}
+                        <Dropdown placeholder='Select Data' search selection options={dataHeaderOptions} value={this.state.dataIndex ? this.state.dataIndex : ''}
                     onChange={this.handleSelectData}/>
                     </Grid.Column>
                     <div style={{position:"absolute", top:"5px", right:"5px"}}>
@@ -128,7 +146,7 @@ export default class ConditionPickerModal extends Component {
             const data = this.state.dataSelected;
             const onChange = this.handleFormChange;
 
-            const conditionArgs = getFormFromArgs(args, data, onChange)
+            const conditionArgs = getFormFromArgs(args, data, onChange, this.state.form)
 
             conditionForm = <Form onSubmit={(e) => {e.preventDefault()}}>
                 {this.state.dataSelected ? conditionArgs : null}
@@ -157,8 +175,13 @@ export default class ConditionPickerModal extends Component {
             </Grid>
         }
 
+        let trigger = <Button attached="bottom" icon onClick={this.handleOpen}><Icon name="add circle"/></Button>;
+        if (this.props.triggerIcon) {
+            trigger = <Button onClick={this.handleOpen}><a>{this.props.triggerIcon}</a></Button>
+        }
+
         return (
-            <Modal trigger={<Button onClick={this.handleOpen} floated='right'>{"Add Condition"}</Button>} open={this.state.open}>
+            <Modal trigger={trigger} open={this.state.open}>
                 <Modal.Content>
                     {conditionSelection}
                     {conditionForm}

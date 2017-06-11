@@ -12,7 +12,7 @@ class DescriptionForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Description' name='description' type='text' placeholder='' onChange={this.props.onChange}/>
+            <Form.Input value={this.props.value ? this.props.value : ''} label='Description' name='description' type='text' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -24,7 +24,7 @@ class UnitForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Unit' name='unit' type='text' placeholder='' onChange={this.props.onChange}/>
+            <Form.Input value={this.props.value ? this.props.value : ''} label='Unit' name='unit' type='text' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -36,9 +36,6 @@ class OpacityForm extends Component {
 
         this.default = 1;
         this.handleChange = this.handleChange.bind(this);
-
-        // Initialize to a default of 1
-        this.handleChange({target:{value:this.default}})
     }
 
     handleChange(e) {
@@ -48,7 +45,7 @@ class OpacityForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Opacity' name='opacity' placeholder='1' min="0" max ="1" type="number" step="0.01" onChange={this.handleChange}/>
+            <Form.Input value={this.props.value ? this.props.value : this.default} label='Opacity' name='opacity' placeholder='1' min="0" max ="1" type="number" step="0.01" onChange={this.handleChange}/>
         )
     }
 }
@@ -60,7 +57,7 @@ class MinHeightForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Min Height' name='minHeight' placeholder='0' type="number" onChange={this.props.onChange}/>
+            <Form.Input value={this.props.value ? this.props.value : 0} label='Min Height' name='minHeight' placeholder='0' type="number" onChange={this.props.onChange}/>
         )
     }
 }
@@ -72,7 +69,7 @@ class MaxHeightForm extends Component {
 
     render() {
         return (
-            <Form.Input label='Max Height' name='maxHeight' placeholder='1' type={"number"} onChange={this.props.onChange}/>
+            <Form.Input value={this.props.value ? this.props.value : 1} label='Max Height' name='maxHeight' placeholder='1' type={"number"} onChange={this.props.onChange}/>
         )
     }
 }
@@ -92,8 +89,6 @@ class ReportForm extends Component {
         const value = !this.state.value;
         this.setState({value});
 
-        console.log(e)
-
         e.target.value ? e.target.value = true : e.target.value = false;
         this.props.onChange(e)
     }
@@ -102,7 +97,7 @@ class ReportForm extends Component {
         return (
             <Form.Field>
                 <div style={{position:"relative", top:"50%", left:"30%"}}>
-                    <Radio label="Report Values" toggle onChange={(e) => this.handleChange(e)} />
+                    <Radio label="Report Values" toggle onChange={(e) => this.handleChange(e)} checked={this.state.value}/>
                 </div>
             </Form.Field>
         )
@@ -116,7 +111,7 @@ class TrueColorForm extends Component {
 
     render() {
         return (
-            <Form.Input label='True Color' name='trueColor' placeholder='' onChange={this.props.onChange}/>
+            <Form.Input value={this.props.value} label='True Color' name='trueColor' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -128,7 +123,7 @@ class FalseColorForm extends Component {
 
     render() {
         return (
-            <Form.Input label='False Color' name='falseColor' placeholder='' onChange={this.props.onChange}/>
+            <Form.Input value={this.props.value} label='False Color' name='falseColor' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -141,8 +136,7 @@ class ColorScaleForm extends Component {
             open:false,
             colorSteps:5,
             minColorValue:this.props.data[0],
-            maxColorValue:this.props.data[this.props.data.length-1],
-            selectedColors:null
+            maxColorValue:this.props.data[this.props.data.length-1]
         };
 
         this.handleOpen = this.handleOpen.bind(this);
@@ -152,16 +146,18 @@ class ColorScaleForm extends Component {
     }
 
     handleOpen() {
-        this.setState({open:true})
+        this.setState({
+            open:true
+        })
     }
 
-    handleStepChange(e) {
+    handleStepChange(e, f, name) {
         this.setState({
             colorSteps:e.value
         })
     }
 
-    handleBoundsChange(e, name) {
+    handleBoundsChange(e, f, name) {
         this.setState({
             [name]:e.target.value
         });
@@ -176,11 +172,15 @@ class ColorScaleForm extends Component {
             }
 
             // Simulate a typical form change to be consistent with other forms
-            this.props.onChange({target:{value:color_levels}}, null, 'color_levels');
-            this.props.onChange({target:{value:colors}})
+            this.props.onChange({}, {value:color_levels}, 'color_levels');
+            this.props.onChange({}, {value:this.state.colorSteps}, 'colorSteps');
+            this.props.onChange({}, {value:this.state.maxColorValue}, 'maxColorValue');
+            this.props.onChange({}, {value:this.state.minColorValue}, 'minColorValue');
+            this.props.onChange({}, {value:colors})
+
         }
 
-        this.setState({open:false, selectedColors:colors})
+        this.setState({open:false})
     }
 
     render() {
@@ -194,15 +194,15 @@ class ColorScaleForm extends Component {
         });
 
         return (
-            <Modal trigger={<Form.Button style={{height:70, width:175, textAlign:"center"}} className="color-scale-btn" onClick={this.handleOpen}>{this.state.selectedColors ? createColorButtonIcon(this.state.selectedColors, "Color Scale") : <div>{"Color Scale"}</div>}</Form.Button>} open={this.state.open}>
+            <Modal trigger={<Form.Button style={{height:70, width:175, textAlign:"center"}} className="color-scale-btn" onClick={this.handleOpen}>{this.props.value ? createColorButtonIcon(this.props.value.color_scale, "Color Scale") : <div>{"Color Scale"}</div>}</Form.Button>} open={this.state.open}>
                 <Modal.Content>
                     <Form onSubmit={(e) => {e.preventDefault()}}>
                         <Form.Group widths="equal">
-                            <Form.Input label='Lower Bound' name='minColorValue' value={this.state.minColorValue} type={"number"} onChange={(e) => this.handleBoundsChange(e, 'minColorValue')}/>
-                            <Form.Input label='Upper Bound' name='maxColorValue' value={this.state.maxColorValue} type={"number"} onChange={(e) => this.handleBoundsChange(e, 'maxColorValue')}/>
-                            <Form.Field control={NumberPicker} name="colorLevels" label="Color Steps"
-                                   value={this.state.colorSteps}
-                                   onChange={this.handleStepChange}
+                            <Form.Input label='Lower Bound' name='minColorValue' value={this.props.value ? this.props.value.minColorValue : this.state.minColorValue} type={"number"} onChange={(e,f) => this.handleBoundsChange(e, f, 'minColorValue')}/>
+                            <Form.Input label='Upper Bound' name='maxColorValue' value={this.props.value ? this.props.value.maxColorValue : this.state.maxColorValue} type={"number"} onChange={(e,f) => this.handleBoundsChange(e, f, 'maxColorValue')}/>
+                            <Form.Field control={NumberPicker} name="colorSteps" label="Color Steps"
+                                   value={this.props.value ? this.props.value.colorSteps : this.state.colorSteps}
+                                   onChange={(e, f) => this.handleStepChange(e, f, 'colorSteps')}
                                    min={2}
                                    max={10}/>
                         </Form.Group>
@@ -237,15 +237,15 @@ function createColorButtonIcon(colors, name) {
 const formGroupMap = [
     [{name:"description", tag:DescriptionForm}, {name:"unit", tag:UnitForm}],
     [{name:"opacity", tag:OpacityForm}, {name:"report", tag:ReportForm}],
-    [{name:"color_scale", tag:ColorScaleForm}],
+    [{name:"color_scale", extraArgs:["minColorValue", "maxColorValue", "colorSteps"], tag:ColorScaleForm}],
     [{name:"true_color", tag:TrueColorForm}, {name:"false_color", tag:FalseColorForm}],
     [{name:"min_height", tag:MinHeightForm}, {name:"max_height", tag:MaxHeightForm}]
 ];
 
-export default function getFormFromArgs(args, data, onChange) {
+export default function getFormFromArgs(args, data, onChange, valueMap) {
     let fieldCount = 0;
 
-    let fields = formGroupMap.map((formGroup) => {
+    let fields = formGroupMap.map((formGroup,i) => {
         let fieldIncluded = false;
         for (let field of formGroup) {
             if (args.includes(field.name)) {
@@ -257,8 +257,18 @@ export default function getFormFromArgs(args, data, onChange) {
             let fieldGroup = formGroup.map((form) => {
                 if (args.includes(form.name)) {
                     const arg = form.name;
+                    let value = (valueMap && valueMap[arg] ? valueMap[arg] : null)
+
+                    if (form.extraArgs && value) {
+                        value = {[arg]:value}
+                        for (const arg2 of form.extraArgs) {
+                            value[arg2] = valueMap[arg2]
+                        }
+                    }
+
                     fieldCount += 1;
-                    return <form.tag key={arg} data={data} onChange={(e, f, argOverride) => onChange(e, arg, argOverride)}/>
+                    const i = args.indexOf(arg);
+                    return <form.tag key={arg} value={value} data={data} onChange={(e, f, argOverride) => onChange(e, f, arg, argOverride)}/>
                 } else {
                     return false
                 }
@@ -267,7 +277,7 @@ export default function getFormFromArgs(args, data, onChange) {
             });
 
             return (
-                <Form.Group widths={2}>
+                <Form.Group key={i} widths={2}>
                     {fieldGroup}
                 </Form.Group>
             )
