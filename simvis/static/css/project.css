@@ -350,8 +350,7 @@ rect {
 
 .color-set-div {
   height: 15px;
-  width: 10px;
-  float: right; }
+  width: 10px; }
 
 .left-sidebar-resizer {
   position: absolute;
@@ -445,3 +444,11 @@ rect {
 
 .xaxis-btn {
   width: 110px; }
+
+.sketch-picker {
+  display: block;
+  margin: auto; }
+
+.minor-text {
+  font-size: 12px;
+  color: #BDBDBD; }

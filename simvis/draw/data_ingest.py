@@ -65,9 +65,9 @@ def read_file(f):
                                            df.iloc[header_indices].values]
         df.drop(df.index[header_indices], inplace=True)
 
-        # Rename columns
-        df.columns = functools.reduce(lambda x, y: [x[i] + "," + y[i] if y[i] else x[i] for i in range(len(x))],
-                                      df_headers)
+        # TODO - Consider renaming columns
+        #df.columns = functools.reduce(lambda x, y: [x[i] + "," + y[i] if y[i] else x[i] for i in range(len(x))],
+        #                              df_headers)
 
     df = df.fillna(0)
 

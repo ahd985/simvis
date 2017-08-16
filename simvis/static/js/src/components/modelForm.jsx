@@ -1,9 +1,41 @@
 import React, { Component } from 'react'
-import { Form, Modal, Button, Radio, Segment } from 'semantic-ui-react'
+import { Form, Modal, Button, Radio, Segment, Dropdown, Label, Card } from 'semantic-ui-react'
 import { SwatchesPicker } from 'react-color';
 
 import NumberPicker from './numberPicker';
 import chroma from 'chroma-js'
+
+class DataForm extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            dataIndex:null
+        }
+
+        this.handleSelectData = this.handleSelectData.bind(this)
+    }
+
+    handleSelectData(e, f) {
+        this.setState((prevState) => {
+            return {
+                dataIndex:f.value
+            }
+        })
+
+        this.props.onChange(e, f, 'dataIndex')
+    }
+
+    render() {
+        return (
+            <Form.Field>
+                <label>Data</label>
+                <Dropdown placeholder='Select Data' search selection options={this.props.dataHeaderOptions}
+                          value={this.state.dataIndex ? this.state.dataIndex : ''} onChange={this.handleSelectData}/>
+            </Form.Field>
+        )
+    }
+}
 
 class DescriptionForm extends Component {
     constructor(props) {
@@ -12,7 +44,7 @@ class DescriptionForm extends Component {
 
     render() {
         return (
-            <Form.Input value={this.props.value ? this.props.value : ''} label='Description' name='description' type='text' placeholder='' onChange={this.props.onChange}/>
+            <Form.Input value={this.props.valueMap.description ? this.props.valueMap.description : ''} label='Description' name='description' type='text' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -24,7 +56,7 @@ class UnitForm extends Component {
 
     render() {
         return (
-            <Form.Input value={this.props.value ? this.props.value : ''} label='Unit' name='unit' type='text' placeholder='' onChange={this.props.onChange}/>
+            <Form.Input value={this.props.valueMap.unit ? this.props.valueMap.unit : ''} label='Unit' name='unit' type='text' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -33,43 +65,18 @@ class OpacityForm extends Component {
     constructor(props) {
         super(props);
 
-
         this.default = 1;
         this.handleChange = this.handleChange.bind(this);
     }
 
-    handleChange(e) {
+    handleChange(e,f) {
         // Cast as float
-        this.props.onChange({target:{value:parseFloat(e.target.value)}})
+        this.props.onChange(e, {value:parseFloat(f.value)})
     }
 
     render() {
         return (
-            <Form.Input value={this.props.value ? this.props.value : this.default} label='Opacity' name='opacity' placeholder='1' min="0" max ="1" type="number" step="0.01" onChange={this.handleChange}/>
-        )
-    }
-}
-
-class MinHeightForm extends Component {
-    constructor(props) {
-        super(props)
-    }
-
-    render() {
-        return (
-            <Form.Input value={this.props.value ? this.props.value : 0} label='Min Height' name='minHeight' placeholder='0' type="number" onChange={this.props.onChange}/>
-        )
-    }
-}
-
-class MaxHeightForm extends Component {
-    constructor(props) {
-        super(props)
-    }
-
-    render() {
-        return (
-            <Form.Input value={this.props.value ? this.props.value : 1} label='Max Height' name='maxHeight' placeholder='1' type={"number"} onChange={this.props.onChange}/>
+            <Form.Input value={this.props.valueMap.opacity ? this.props.valueMap.opacity : this.default} label='Opacity' name='opacity' placeholder='1' min="0" max ="1" type="number" step="0.01" onChange={this.handleChange}/>
         )
     }
 }
@@ -85,19 +92,18 @@ class ReportForm extends Component {
         this.handleChange = this.handleChange.bind(this)
     }
 
-    handleChange(e) {
+    handleChange(e, f) {
         const value = !this.state.value;
         this.setState({value});
 
-        e.target.value ? e.target.value = true : e.target.value = false;
-        this.props.onChange(e)
+        this.props.onChange(e, f)
     }
 
     render() {
         return (
             <Form.Field>
                 <div style={{position:"relative", top:"50%", left:"30%"}}>
-                    <Radio label="Report Values" toggle onChange={(e) => this.handleChange(e)} checked={this.state.value}/>
+                    <Radio label="Report Values" toggle onChange={this.handleChange} checked={this.state.value}/>
                 </div>
             </Form.Field>
         )
@@ -111,7 +117,7 @@ class TrueColorForm extends Component {
 
     render() {
         return (
-            <Form.Input value={this.props.value} label='True Color' name='trueColor' placeholder='' onChange={this.props.onChange}/>
+            <Form.Input value={this.props.valueMap.true_color ? this.props.valueMap.true_color : ""} label='True Color' name='trueColor' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
@@ -123,35 +129,207 @@ class FalseColorForm extends Component {
 
     render() {
         return (
-            <Form.Input value={this.props.value} label='False Color' name='falseColor' placeholder='' onChange={this.props.onChange}/>
+            <Form.Input value={this.props.valueMap.false_color ? this.props.valueMap.false_color : ""} label='False Color' name='falseColor' placeholder='' onChange={this.props.onChange}/>
         )
     }
 }
 
-class ColorScaleForm extends Component {
+class LevelForm extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            open:false,
+            minHeight:0,
+            maxHeight:1
+        }
+
+        this.handleOpen = this.handleOpen.bind(this);
+        this.handleSelectData = this.handleSelectData.bind(this);
+        this.handleBoundsChange = this.handleBoundsChange.bind(this);
+        this.handleClose = this.handleClose.bind(this)
+    }
+
+    handleOpen(valueMap) {
+        let state = {
+            open: true,
+            levelDataIndex: null,
+            minHeight: 0,
+            maxHeight: 1,
+            dataManipulated: false
+        }
+
+        if (valueMap.levelDataIndex) {
+            state.levelDataIndex = valueMap.levelDataIndex;
+            state.minHeight = valueMap.min_height;
+            state.maxHeight = valueMap.max_height;
+            state.dataManipulated = true
+        }
+
+        this.setState(state)
+    }
+
+    handleSelectData(e, f, dim) {
+        const data = this.props.data
+        this.setState((prevState) => {
+            let levelDataIndex = prevState.levelDataIndex ? prevState.levelDataIndex : []
+            levelDataIndex[dim] = f.value
+            let state = {levelDataIndex};
+            if (!prevState.dataManipulated) {
+                let heightData = [];
+                for (let index of levelDataIndex) {
+                    heightData = heightData.concat(data.map((e) => {return e[index]}))
+                }
+                state.minHeight = Math.min(...heightData);
+                state.maxHeight = Math.max(...heightData);
+            }
+
+            return state
+        })
+    }
+
+    handleBoundsChange(e, f, name) {
+        this.setState({
+            [name]:f.value
+        });
+    }
+
+    handleClose(canceled) {
+        if (!canceled) {
+            this.props.onChange({}, {
+                min_height: this.state.minHeight,
+                max_height: this.state.maxHeight,
+                levelDataIndex: this.state.levelDataIndex
+            }, true);
+        }
+
+        this.setState({open:false})
+    }
+
+    render() {
+        // Determine if we are using a single or multiple dimensions
+        let dims = 1;
+        if (this.props.validators.level_data.maxDims > 1) {
+            dims = 2
+        }
+
+        const valueMap = this.props.valueMap;
+        let levelRange = 'Range: ';
+        let levelSummary = '';
+        let selectedCols = '';
+        if (this.state.levelDataIndex) {
+            let data = [];
+            for (let index of this.state.levelDataIndex) {
+                data = data.concat(this.props.data.map((e) => {return e[index]}))
+            }
+
+            const minVal = Math.min(...data);
+            const maxVal = Math.max(...data);
+            levelRange += minVal + " - " + maxVal
+            const levelDataNames = this.state.levelDataIndex.map((e) => {return this.props.dataHeaderOptions[e]}).join(" ")
+
+            levelSummary = <div>
+                <div>{levelDataNames}
+                    <span className="minor-text">{"("+ levelRange + ")"}</span>
+                </div>
+                <div className="minor-text">{"Bounds: " + this.state.minHeight + " - " + this.state.maxHeight}</div>
+            </div>;
+        }
+
+        return (
+            <Modal trigger={<Button content={"Level Data"} style={{height:70, width:"100%", textAlign:"center"}} label={{as:'a', basic:true, pointing:'left', content:levelSummary}} className="level-btn" onClick={() => this.handleOpen(valueMap)}/>} open={this.state.open}>
+                <Modal.Content>
+                    <Form onSubmit={(e) => {e.preventDefault()}}>
+                        <Form.Group widths="equal">
+                            <Form.Field>
+                                <label>{dims == 1 ? "Data Column" : "Data Column Start"}</label>
+                                <Dropdown placeholder='Select Data' search selection options={this.props.dataHeaderOptions}
+                                    value={this.state.levelDataIndex ? this.state.levelDataIndex[0] : ''} onChange={(e, f) => this.handleSelectData(e, f, 0)}/>
+                            </Form.Field>
+                            {dims == 1 ? <Form.Input label={'\u00A0'} placeholder={levelRange} readOnly/> : null}
+                        </Form.Group>
+                        <Form.Group>
+                            {dims == 2 ? <Form.Group widths="equal"><Form.Field>
+                                    <label>Data Column End</label>
+                                    <Dropdown placeholder='Select Data' search selection options={this.props.dataHeaderOptions}
+                                        value={this.state.levelDataIndex ? this.state.levelDataIndex[1] : ''} onChange={(e, f) => this.handleSelectData(e, f, 1)}/>
+                                    <Form.Input label={'\u00A0'} placeholder={levelRange} readOnly/>
+                                    </Form.Field>
+                                </Form.Group>: null}
+                        </Form.Group>
+                        <Form.Group widths="equal">
+                            <Form.Input label='Lower Bound' name='minHeight' value={this.state.minHeight} type={"number"} onChange={(e,f) => this.handleBoundsChange(e, f, 'minHeight')}/>
+                            <Form.Input label='Upper Bound' name='maxHeight' value={this.state.maxHeight} type={"number"} onChange={(e,f) => this.handleBoundsChange(e, f, 'maxHeight')}/>
+                        </Form.Group>
+                    </Form>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button content='Cancel' onClick={() => this.handleClose(null, true)} />
+                    <Button content='Done' onClick={() => this.handleClose(false)}></Button>
+                </Modal.Actions>
+            </Modal>
+        )
+    }
+}
+
+class ColorDataForm extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
             open:false,
             colorSteps:5,
-            minColorValue:this.props.data[0],
-            maxColorValue:this.props.data[this.props.data.length-1]
+            minColorValue:0,
+            maxColorValue:1,
+            colorSteps:5,
+            color_scale:null
         };
 
         this.handleOpen = this.handleOpen.bind(this);
         this.handleStepChange = this.handleStepChange.bind(this);
         this.handleBoundsChange = this.handleBoundsChange.bind(this);
+        this.handleSelectData = this.handleSelectData.bind(this);
         this.handleClose = this.handleClose.bind(this)
     }
 
-    handleOpen() {
-        this.setState({
-            open:true
+    handleOpen(valueMap) {
+        let state = {
+            open: true,
+            colorDataIndex: null,
+            minColorValue: 0,
+            maxColorValue: 1,
+            colorSteps:5,
+            color_scale: null,
+            dataManipulated: false
+        }
+
+        if (valueMap.colorDataIndex) {
+            state.colorDataIndex = valueMap.colorDataIndex;
+            state.minColorValue = valueMap.minColorValue;
+            state.maxColorValue = valueMap.maxColorValue;
+            state.colorSteps = valueMap.colorSteps;
+            state.color_scale = valueMap.color_scale;
+            state.dataManipulated = true
+        }
+
+        this.setState(state)
+    }
+
+    handleSelectData(e, f) {
+        const data = this.props.data
+        this.setState((prevState) => {
+            let state = {colorDataIndex:f.value};
+            if (!prevState.dataManipulated) {
+                const colorData = data.map((e) => {return e[f.value]})
+                state.minColorValue = Math.min(...colorData);
+                state.maxColorValue = Math.max(...colorData);
+            }
+
+            return state
         })
     }
 
-    handleStepChange(e, f, name) {
+    handleStepChange(e) {
         this.setState({
             colorSteps:e.value
         })
@@ -159,11 +337,13 @@ class ColorScaleForm extends Component {
 
     handleBoundsChange(e, f, name) {
         this.setState({
-            [name]:e.target.value
+            [name]:f.value
         });
     }
 
     handleClose(colors, canceled) {
+        let state = {open:false}
+
         if (!canceled && colors) {
             let color_levels = [];
             const valueStep = Math.abs(this.state.minColorValue - this.state.maxColorValue) / this.state.colorSteps;
@@ -171,16 +351,20 @@ class ColorScaleForm extends Component {
                 color_levels.push(this.state.minColorValue + i * valueStep)
             }
 
-            // Simulate a typical form change to be consistent with other forms
-            this.props.onChange({}, {value:color_levels}, 'color_levels');
-            this.props.onChange({}, {value:this.state.colorSteps}, 'colorSteps');
-            this.props.onChange({}, {value:this.state.maxColorValue}, 'maxColorValue');
-            this.props.onChange({}, {value:this.state.minColorValue}, 'minColorValue');
-            this.props.onChange({}, {value:colors})
+            // Simulate a single form change that captures all variables
+            const color_scale = colors;
+            this.props.onChange({}, {
+                color_levels,
+                colorSteps: this.state.colorSteps,
+                maxColorValue: this.state.maxColorValue,
+                minColorValue: this.state.minColorValue,
+                color_scale,
+            }, true);
 
+            state.color_scale = color_scale;
         }
 
-        this.setState({open:false})
+        this.setState(state)
     }
 
     render() {
@@ -193,24 +377,55 @@ class ColorScaleForm extends Component {
             )
         });
 
+        const valueMap = this.props.valueMap;
+        let colorRange = 'Range: ';
+        let colorSummary = '';
+
+        if (this.state.colorDataIndex) {
+            const data = this.props.data.map((e) => {return e[this.state.colorDataIndex]});
+            const minVal = Math.min(...data);
+            const maxVal = Math.max(...data);
+            colorRange += minVal + " - " + maxVal
+            colorSummary = <div>
+                <div>{this.props.dataHeaderOptions[this.state.colorDataIndex].text + " "}
+                    <span className="minor-text">{"("+ colorRange + ")"}</span>
+                </div>
+                <div className="minor-text">{"Bounds: " + this.state.minColorValue + " - " + this.state.maxColorValue}</div>
+                <div>{this.state.color_scale ? createColorButtonIcon(this.state.color_scale) : null}</div>
+            </div>;
+        }
+
         return (
-            <Modal trigger={<Form.Button style={{height:70, width:175, textAlign:"center"}} className="color-scale-btn" onClick={this.handleOpen}>{this.props.value ? createColorButtonIcon(this.props.value.color_scale, "Color Scale") : <div>{"Color Scale"}</div>}</Form.Button>} open={this.state.open}>
+            <Modal trigger={<Button content={"Color Data"} style={{height:70, width:"100%", textAlign:"center"}} label={{as:'a', basic:true, pointing:'left', content:colorSummary}} className="color-scale-btn" onClick={() => this.handleOpen(valueMap)}/>} open={this.state.open}>
                 <Modal.Content>
                     <Form onSubmit={(e) => {e.preventDefault()}}>
                         <Form.Group widths="equal">
-                            <Form.Input label='Lower Bound' name='minColorValue' value={this.props.value ? this.props.value.minColorValue : this.state.minColorValue} type={"number"} onChange={(e,f) => this.handleBoundsChange(e, f, 'minColorValue')}/>
-                            <Form.Input label='Upper Bound' name='maxColorValue' value={this.props.value ? this.props.value.maxColorValue : this.state.maxColorValue} type={"number"} onChange={(e,f) => this.handleBoundsChange(e, f, 'maxColorValue')}/>
+                            <Form.Field>
+                                <Dropdown placeholder='Select Data' search selection options={this.props.dataHeaderOptions}
+                                    value={this.state.colorDataIndex ? this.state.colorDataIndex : ''} onChange={this.handleSelectData}/>
+                            </Form.Field>
+                            <Form.Input placeholder={colorRange} readOnly/>
+                        </Form.Group>
+                        <Form.Group widths="equal">
+                            <Form.Input label='Lower Bound' name='minColorValue'
+                                        value={this.state.minColorValue}
+                                        type={"number"}
+                                        onChange={(e,f) => this.handleBoundsChange(e, f, 'minColorValue')}/>
+                            <Form.Input label='Upper Bound' name='maxColorValue'
+                                        value={this.state.maxColorValue}
+                                        type={"number"}
+                                        onChange={(e,f) => this.handleBoundsChange(e, f, 'maxColorValue')}/>
                             <Form.Field control={NumberPicker} name="colorSteps" label="Color Steps"
-                                   value={this.props.value ? this.props.value.colorSteps : this.state.colorSteps}
-                                   onChange={(e, f) => this.handleStepChange(e, f, 'colorSteps')}
-                                   min={2}
-                                   max={10}/>
+                                        value={this.state.colorSteps}
+                                        onChange={(e) => this.handleStepChange(e)}
+                                        min={2}
+                                        max={10}/>
                         </Form.Group>
                     </Form>
                     {colorSetButtons}
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button content='Cancel' onClick={() => this.handleClose(null, true)} />
+                    <Button content='Cancel' onClick={() => this.handleClose(null, true)}/>
                 </Modal.Actions>
             </Modal>
         )
@@ -226,24 +441,27 @@ function createColorButtonIcon(colors, name) {
     let icons = [];
 
     for (let i=0; i < colors.length; i++) {
-        icons.push(<div style={{background:colors[i]}} className={"color-set-div"} key={i}></div>)
+        icons.push(<div style={{background:colors[i], display:"inline-block"}} className={"color-set-div"} key={i}></div>)
     }
 
     return (
-        <div style={{display:"inline-block"}} key={-1}>{name ? <div>{name}</div>: null}{icons}</div>
+        <div key={-1}>{name ? <div>{name}</div>: null}<div>{icons}</div></div>
     )
 }
 
 const formGroupMap = [
+    [{name:"data", tag:DataForm}],
+    [{name:"level_data", tag:LevelForm}],
+    [{name:"color_data", tag:ColorDataForm}],
     [{name:"description", tag:DescriptionForm}, {name:"unit", tag:UnitForm}],
     [{name:"opacity", tag:OpacityForm}, {name:"report", tag:ReportForm}],
-    [{name:"color_scale", extraArgs:["minColorValue", "maxColorValue", "colorSteps"], tag:ColorScaleForm}],
     [{name:"true_color", tag:TrueColorForm}, {name:"false_color", tag:FalseColorForm}],
-    [{name:"min_height", tag:MinHeightForm}, {name:"max_height", tag:MaxHeightForm}]
 ];
 
-export default function getFormFromArgs(args, data, onChange, valueMap) {
+export default function getFormFromArgs(args, data, onChange, valueMap, dataHeaderOptions, validators) {
     let fieldCount = 0;
+
+    console.log("val", validators)
 
     let fields = formGroupMap.map((formGroup,i) => {
         let fieldIncluded = false;
@@ -256,19 +474,8 @@ export default function getFormFromArgs(args, data, onChange, valueMap) {
         if (fieldIncluded) {
             let fieldGroup = formGroup.map((form) => {
                 if (args.includes(form.name)) {
-                    const arg = form.name;
-                    let value = (valueMap && valueMap[arg] ? valueMap[arg] : null)
-
-                    if (form.extraArgs && value) {
-                        value = {[arg]:value}
-                        for (const arg2 of form.extraArgs) {
-                            value[arg2] = valueMap[arg2]
-                        }
-                    }
-
-                    fieldCount += 1;
-                    const i = args.indexOf(arg);
-                    return <form.tag key={arg} value={value} data={data} onChange={(e, f, argOverride) => onChange(e, f, arg, argOverride)}/>
+                    const arg = form.name
+                    return <form.tag key={arg} valueMap={valueMap} validators={validators} data={data} dataHeaderOptions={dataHeaderOptions} onChange={(e, f, argOverride) => onChange(e, f, arg, argOverride)}/>
                 } else {
                     return false
                 }

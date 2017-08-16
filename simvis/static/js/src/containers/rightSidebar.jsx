@@ -64,7 +64,7 @@ class RightSideBarMenu extends Component {
                 </Form>
                 <Segment size="mini" attached>Layout</Segment>
                 <Form size="small" style={{padding:5}}>
-                    <Label attached="top">Height x Width</Label>
+                    <Label attached="top">Width x Height</Label>
                     <Form.Group widths='equal'>
                         <Form.Field>
                             <Input labelPosition='right' label='px' name='diagram_width' type='number'  value={this.props.diagramWidth} onChange={(e) => this.props.setLayout("diagramWidth", parseInt(e.target.value))} min={1} max={10000}/>

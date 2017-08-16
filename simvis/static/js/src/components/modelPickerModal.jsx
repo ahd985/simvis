@@ -129,6 +129,9 @@ export default class ModelPickerModal extends Component {
         let modelSelection=null;
         let modelForm=null;
         let modelConditions=null;
+
+        console.log("req", this.state.modelRequirements)
+
         if (this.state.modelRequirements) {
             const name = this.state.form.type[0].toUpperCase() + this.state.form.type.substring(1);
 
@@ -156,7 +159,7 @@ export default class ModelPickerModal extends Component {
             modelConditions = <Grid container columns={6}>
                 {this.state.form.conditions.map((condition, i) => {
                     return <Grid.Column key={i}>
-                        <ConditionPickerModal triggerIcon={conditionIconMap[condition.type]} conditionIndex={i} condition={condition} conditions={this.state.modelRequirements.conditions} editCondition={this.editCondition} data={this.props.data} dataHeaders={this.props.dataHeaders} />
+                        <ConditionPickerModal triggerIcon={conditionIconMap[condition.type]} conditionIndex={i} condition={condition} conditionRequirements={this.state.modelRequirements.conditions} editCondition={this.editCondition} data={this.props.data} dataHeaders={this.props.dataHeaders} />
                     </Grid.Column>
                 })}
             </Grid>
@@ -188,7 +191,7 @@ export default class ModelPickerModal extends Component {
                                     <Label attached='top'>Conditions</Label>
                                     {modelConditions}
                                 </Segment>
-                                <ConditionPickerModal conditions={this.state.modelRequirements.conditions} editCondition={this.editCondition} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
+                                <ConditionPickerModal conditionRequirements={this.state.modelRequirements.conditions} editCondition={this.editCondition} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
                             </div>
                             : null
                     }

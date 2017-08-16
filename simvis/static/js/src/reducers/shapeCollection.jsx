@@ -122,8 +122,8 @@ const shapeCollection = (state = defaultPresent, action) => {
                         return {
                             ...shape,
                             position: {
-                                x:shape.position.x + action.deltaShapePos.x,
-                                y:shape.position.y + action.deltaShapePos.y
+                                x:Math.max(0, shape.position.x + action.deltaShapePos.x),
+                                y:Math.max(0, shape.position.y + action.deltaShapePos.y)
                             }
                         }
                     } else {

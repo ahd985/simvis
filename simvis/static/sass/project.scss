@@ -464,7 +464,6 @@ rect {
 .color-set-div {
   height:15px;
   width:10px;
-  float:right;
 }
 
 .left-sidebar-resizer {
@@ -584,4 +583,15 @@ rect {
 // Data table stuff
 .xaxis-btn {
   width:110px;
+}
+
+// Sketch picker additions
+.sketch-picker {
+  display: block;
+  margin: auto;
+}
+
+.minor-text {
+  font-size: 12px;
+  color: #BDBDBD;
 }

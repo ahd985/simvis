@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
 import getFormFromArgs from '../components/modelForm'
 import conditionIconMap from './conditionIcons'
+import { unwrapValidators } from '../utility/validators'
 
 export default class ConditionPickerModal extends Component {
     constructor(props) {
@@ -10,8 +11,6 @@ export default class ConditionPickerModal extends Component {
         this.defaultState = {
             open:false,
             conditionSelected:null,
-            dataIndex:null,
-            dataSelected:null,
             form:{
                 report:false,
                 opacity:1
@@ -28,7 +27,6 @@ export default class ConditionPickerModal extends Component {
         this.handleOpen = this.handleOpen.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleClick = this.handleClick.bind(this);
-        this.handleSelectData = this.handleSelectData.bind(this);
         this.handleFormChange = this.handleFormChange.bind(this);
         this.handleRemoveCondition = this.handleRemoveCondition.bind(this);
         this.validateForm = this.validateForm.bind(this);
@@ -36,12 +34,9 @@ export default class ConditionPickerModal extends Component {
 
     handleOpen() {
         if (this.props.condition) {
-            const dataIndex = this.props.condition.dataIndex
             this.setState({
                 open:true,
-                conditionSelected:this.props.conditions[this.props.condition.type],
-                dataIndex:dataIndex,
-                dataSelected:this.props.data.map((row) => {return row[dataIndex]}),
+                conditionSelected:this.props.conditionRequirements[this.props.condition.type],
                 form:this.props.condition
             })
         } else {
@@ -68,7 +63,7 @@ export default class ConditionPickerModal extends Component {
     handleClick(type) {
         this.setState((prevState) => {
             return {
-                conditionSelected: this.props.conditions[type],
+                conditionSelected: this.props.conditionRequirements[type],
                 form: {
                     ...prevState.form,
                     type:type,
@@ -77,27 +72,22 @@ export default class ConditionPickerModal extends Component {
         })
     }
 
-    handleSelectData(e, d) {
-        this.setState((prevState) => {
-            return {
-                dataSelected:this.props.data.map((row) => {return row[d.value]}),
-                dataIndex:d.value,
-                dataHeader:d.text,
-                form: {
-                    ...prevState.form,
-                    dataIndex:d.value
-                }
-            }
-        })
-    }
-
     handleFormChange(e, f, arg, argOverride) {
         e.persist ? e.persist() : null;
         this.setState((prevState) => {
-            return {
-                form: {
-                    ...prevState.form,
-                    [argOverride ? argOverride : arg]: f.value ? f.value : null
+            if (argOverride) {
+                return {
+                    form: {
+                        ...prevState.form,
+                        ...f
+                    }
+                }
+            } else {
+                return {
+                    form: {
+                        ...prevState.form,
+                        [arg]: f.value ? f.value : null
+                    }
                 }
             }
         })
@@ -125,16 +115,12 @@ export default class ConditionPickerModal extends Component {
             });
 
             conditionSelection = (
-                <Grid container columns={2} verticalAlign={"bottom"} centered padded='vertically' textAlign={"center"}>
+                <Grid container columns={1} verticalAlign={"bottom"} centered padded='vertically' textAlign={"center"}>
                     <Grid.Column style={{paddingLeft:0}}>
                         <div className="condition-icon">
                             <div><b>{name}</b></div>
                             {conditionIconMap[this.state.form.type]}
                         </div>
-                    </Grid.Column>
-                    <Grid.Column style={{textAlign:"center"}}>
-                        <Dropdown placeholder='Select Data' search selection options={dataHeaderOptions} value={this.state.dataIndex ? this.state.dataIndex : ''}
-                    onChange={this.handleSelectData}/>
                     </Grid.Column>
                     <div style={{position:"absolute", top:"5px", right:"5px"}}>
                         <Button icon onClick={this.handleRemoveCondition}><Icon name='erase' /></Button>
@@ -143,16 +129,17 @@ export default class ConditionPickerModal extends Component {
             );
 
             const args = Object.keys(this.state.conditionSelected.args);
-            const data = this.state.dataSelected;
+            const data = this.props.data;
             const onChange = this.handleFormChange;
+            const validators = unwrapValidators(this.state.conditionSelected.validators);
 
-            const conditionArgs = getFormFromArgs(args, data, onChange, this.state.form)
+            const conditionArgs = getFormFromArgs(args, data, onChange, this.state.form, dataHeaderOptions, validators)
 
             conditionForm = <Form onSubmit={(e) => {e.preventDefault()}}>
-                {this.state.dataSelected ? conditionArgs : null}
+                {conditionArgs}
             </Form>
         } else {
-            const allowedConditions = this.props.conditions;
+            const allowedConditions = this.props.conditionRequirements;
 
             conditionSelection = <Grid container columns={4}>
                 {this.iconOrder.filter((e) => {
