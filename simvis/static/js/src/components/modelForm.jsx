@@ -146,6 +146,7 @@ class LevelForm extends Component {
 
         this.handleOpen = this.handleOpen.bind(this);
         this.handleSelectData = this.handleSelectData.bind(this);
+        this.handleSelectDataSpan = this.handleSelectDataSpan.bind(this);
         this.handleBoundsChange = this.handleBoundsChange.bind(this);
         this.handleClose = this.handleClose.bind(this)
     }
@@ -169,22 +170,22 @@ class LevelForm extends Component {
         this.setState(state)
     }
 
-    handleSelectData(e, f, dim) {
-        const data = this.props.data
+    handleSelectData(e, f) {
         this.setState((prevState) => {
-            let levelDataIndex = prevState.levelDataIndex ? prevState.levelDataIndex : []
-            levelDataIndex[dim] = f.value
-            let state = {levelDataIndex};
+            let state = {levelDataIndex: f.value};
             if (!prevState.dataManipulated) {
-                let heightData = [];
-                for (let index of levelDataIndex) {
-                    heightData = heightData.concat(data.map((e) => {return e[index]}))
-                }
+                const heightData = this.props.data.map((e) => {return e[f.value]})
                 state.minHeight = Math.min(...heightData);
                 state.maxHeight = Math.max(...heightData);
             }
 
             return state
+        })
+    }
+
+    handleSelectDataSpan(e) {
+        this.setState((prevState) => {
+            return {levelDataSpan: Math.min(e.value, this.props.data[0].length - prevState.levelDataIndex)}
         })
     }
 
@@ -217,46 +218,42 @@ class LevelForm extends Component {
         let levelRange = 'Range: ';
         let levelSummary = '';
         let selectedCols = '';
+        let dataSpanSummary = '';
         if (this.state.levelDataIndex) {
-            let data = [];
-            for (let index of this.state.levelDataIndex) {
-                data = data.concat(this.props.data.map((e) => {return e[index]}))
-            }
-
+            const data = this.props.data.map((e) => {return e[this.state.levelDataIndex]})
             const minVal = Math.min(...data);
             const maxVal = Math.max(...data);
             levelRange += minVal + " - " + maxVal
-            const levelDataNames = this.state.levelDataIndex.map((e) => {return this.props.dataHeaderOptions[e]}).join(" ")
+            const levelDataName = this.props.dataHeaderOptions[this.state.levelDataIndex].text
 
             levelSummary = <div>
-                <div>{levelDataNames}
+                <div>{levelDataName}
                     <span className="minor-text">{"("+ levelRange + ")"}</span>
                 </div>
                 <div className="minor-text">{"Bounds: " + this.state.minHeight + " - " + this.state.maxHeight}</div>
             </div>;
+
+            // START HEAR AHD - MAKE DATA SPAN SUMMARY
+            const span = this.state.levelDataSpan ? this.state.levelDataSpan : 1
+            dataSpanSummary = this.props.dataHeaderOptions[this.state.levelDataIndex].text + "..." + this.props.dataHeaderOptions[this.state.levelDataIndex + span - 1].text
         }
 
         return (
             <Modal trigger={<Button content={"Level Data"} style={{height:70, width:"100%", textAlign:"center"}} label={{as:'a', basic:true, pointing:'left', content:levelSummary}} className="level-btn" onClick={() => this.handleOpen(valueMap)}/>} open={this.state.open}>
                 <Modal.Content>
                     <Form onSubmit={(e) => {e.preventDefault()}}>
-                        <Form.Group widths="equal">
+                        <Form.Group widths="2">
                             <Form.Field>
                                 <label>{dims == 1 ? "Data Column" : "Data Column Start"}</label>
                                 <Dropdown placeholder='Select Data' search selection options={this.props.dataHeaderOptions}
-                                    value={this.state.levelDataIndex ? this.state.levelDataIndex[0] : ''} onChange={(e, f) => this.handleSelectData(e, f, 0)}/>
+                                    value={this.state.levelDataIndex ? this.state.levelDataIndex : ''} onChange={(e, f) => this.handleSelectData(e, f)}/>
                             </Form.Field>
-                            {dims == 1 ? <Form.Input label={'\u00A0'} placeholder={levelRange} readOnly/> : null}
+                            <Form.Input label={'\u00A0'} placeholder={levelRange} readOnly/>
                         </Form.Group>
-                        <Form.Group>
-                            {dims == 2 ? <Form.Group widths="equal"><Form.Field>
-                                    <label>Data Column End</label>
-                                    <Dropdown placeholder='Select Data' search selection options={this.props.dataHeaderOptions}
-                                        value={this.state.levelDataIndex ? this.state.levelDataIndex[1] : ''} onChange={(e, f) => this.handleSelectData(e, f, 1)}/>
-                                    <Form.Input label={'\u00A0'} placeholder={levelRange} readOnly/>
-                                    </Form.Field>
-                                </Form.Group>: null}
-                        </Form.Group>
+                        {dims == 2 ? <Form.Group widths="2">
+                                <Form.Field label='Data Column Span' name="dataSpan" control={NumberPicker} disabled={this.state.levelDataIndex ? false : true} min={1} value={this.state.levelDataSpan ? this.state.levelDataSpan : '1'} onChange={this.handleSelectDataSpan}/>
+                                <Form.Input label={'\u00A0'} placeholder={dataSpanSummary} readOnly/>
+                            </Form.Group>: null}
                         <Form.Group widths="equal">
                             <Form.Input label='Lower Bound' name='minHeight' value={this.state.minHeight} type={"number"} onChange={(e,f) => this.handleBoundsChange(e, f, 'minHeight')}/>
                             <Form.Input label='Upper Bound' name='maxHeight' value={this.state.maxHeight} type={"number"} onChange={(e,f) => this.handleBoundsChange(e, f, 'maxHeight')}/>
