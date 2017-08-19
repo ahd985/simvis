@@ -148,6 +148,7 @@ class LevelForm extends Component {
         this.handleSelectData = this.handleSelectData.bind(this);
         this.handleSelectDataSpan = this.handleSelectDataSpan.bind(this);
         this.handleBoundsChange = this.handleBoundsChange.bind(this);
+        this.calculateBounds = this.calculateBounds.bind(this);
         this.handleClose = this.handleClose.bind(this)
     }
 
@@ -173,10 +174,14 @@ class LevelForm extends Component {
     handleSelectData(e, f) {
         this.setState((prevState) => {
             let state = {levelDataIndex: f.value};
+
             if (!prevState.dataManipulated) {
-                const heightData = this.props.data.map((e) => {return e[f.value]})
-                state.minHeight = Math.min(...heightData);
-                state.maxHeight = Math.max(...heightData);
+                const levelDataSpan =  Math.min(prevState.levelDataSpan ? prevState.levelDataSpan : 1, this.props.data[0].length - f.value)
+                const heightDataBounds = this.calculateBounds(f.value, levelDataSpan)
+
+                state.minHeight = heightDataBounds[0];
+                state.maxHeight = heightDataBounds[1];
+                state.levelDataSpan =  levelDataSpan
             }
 
             return state
@@ -185,7 +190,15 @@ class LevelForm extends Component {
 
     handleSelectDataSpan(e) {
         this.setState((prevState) => {
-            return {levelDataSpan: Math.min(e.value, this.props.data[0].length - prevState.levelDataIndex)}
+            let state = {levelDataSpan: Math.min(e.value, this.props.data[0].length - prevState.levelDataIndex)}
+
+            if (!prevState.dataManipulated) {
+                const heightDataBounds = this.calculateBounds(e.value, state.levelDataSpan)
+                state.minHeight = heightDataBounds[0];
+                state.maxHeight = heightDataBounds[1];
+            }
+
+            return state
         })
     }
 
@@ -207,6 +220,19 @@ class LevelForm extends Component {
         this.setState({open:false})
     }
 
+    calculateBounds(levelDataIndex, levelDataSpan) {
+        let data = [];
+        if (this.props.validators.level_data.maxDims > 1) {
+            for (let j=0; j<levelDataSpan; j++) {
+                data = data.concat(this.props.data.map((e) => {return e[levelDataIndex + j]}))
+            }
+        } else {
+            data = this.props.data.map((e) => {return e[levelDataIndex]})
+        }
+
+        return[Math.min(...data), Math.max(...data)]
+    }
+
     render() {
         // Determine if we are using a single or multiple dimensions
         let dims = 1;
@@ -220,22 +246,29 @@ class LevelForm extends Component {
         let selectedCols = '';
         let dataSpanSummary = '';
         if (this.state.levelDataIndex) {
-            const data = this.props.data.map((e) => {return e[this.state.levelDataIndex]})
+            let data = [];
+            if (dims > 1) {
+                for (let j=0; j<this.state.levelDataSpan; j++) {
+                    data = data.concat(this.props.data.map((e) => {return e[this.state.levelDataIndex + j]}))
+                }
+            } else {
+                data = this.props.data.map((e) => {return e[this.state.levelDataIndex]})
+            }
+
             const minVal = Math.min(...data);
             const maxVal = Math.max(...data);
             levelRange += minVal + " - " + maxVal
             const levelDataName = this.props.dataHeaderOptions[this.state.levelDataIndex].text
 
+            const span = this.state.levelDataSpan ? this.state.levelDataSpan : 1
+            dataSpanSummary = levelDataName + "..." + this.props.dataHeaderOptions[this.state.levelDataIndex + span - 1].text
+
             levelSummary = <div>
-                <div>{levelDataName}
+                <div>{dims > 1 ? dataSpanSummary : levelDataName}
                     <span className="minor-text">{"("+ levelRange + ")"}</span>
                 </div>
                 <div className="minor-text">{"Bounds: " + this.state.minHeight + " - " + this.state.maxHeight}</div>
             </div>;
-
-            // START HEAR AHD - MAKE DATA SPAN SUMMARY
-            const span = this.state.levelDataSpan ? this.state.levelDataSpan : 1
-            dataSpanSummary = this.props.dataHeaderOptions[this.state.levelDataIndex].text + "..." + this.props.dataHeaderOptions[this.state.levelDataIndex + span - 1].text
         }
 
         return (
