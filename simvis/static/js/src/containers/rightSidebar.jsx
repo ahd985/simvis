@@ -45,10 +45,30 @@ class RightSideBarMenu extends Component {
 
     render() {
         const { visible } = this.state;
-        const { activeItem } = this.state;
-        const textEditorAvailable = true;
+        let { activeItem } = this.state;
 
         const style = {width:this.props.rightSideBarWidth, right:0, textAlign:"center"};
+
+        let styleEditable = true;
+        let modelEditable = true;
+        let textEditable = true;
+
+        // Loop through shapes and see if any shape is not editable for style, model, or text
+        for (let shapeData of this.props.shapes) {
+            if (this.props.selectedShapes.indexOf(shapeData.uuid) > -1) {
+                const shape = shapeData.shape
+                if (shape.editable) {
+                    if (shape.editable.style == false) {styleEditable = false}
+                    if (shape.editable.text == false) {textEditable = false}
+                    if (shape.editable.model == false) {modelEditable = false}
+                }
+            }
+        }
+
+        // TODO - this isn't perfect
+        activeItem == 'model' && modelEditable == false ? activeItem = 'style' : null
+        activeItem == 'style' && styleEditable == false ? activeItem = 'model' : null
+        activeItem == 'text' && textEditable == false ? activeItem = 'model' : null
 
         let submenu, menu;
         if (!this.props.selectedShapes.length) {
@@ -146,9 +166,9 @@ class RightSideBarMenu extends Component {
 
             menu = <div id="right-sidebar" style={style}>
                 <Menu attached='top' tabular>
-                    <Menu.Item name='model' active={activeItem === 'model'} onClick={this.handleTabClick} />
-                    <Menu.Item name='style' active={activeItem === 'style'} onClick={this.handleTabClick} />
-                    {textEditorAvailable ? <Menu.Item name='text' active={activeItem === 'text'} onClick={this.handleTabClick} /> : null}
+                    {modelEditable ? <Menu.Item name='model' active={activeItem === 'model'} onClick={this.handleTabClick} /> : null}
+                    {styleEditable ? <Menu.Item name='style' active={activeItem === 'style'} onClick={this.handleTabClick} /> : null}
+                    {textEditable ? <Menu.Item name='text' active={activeItem === 'text'} onClick={this.handleTabClick} /> : null}
                 </Menu>
                 {submenu}
             </div>

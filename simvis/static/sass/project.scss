@@ -317,7 +317,7 @@ body {
   fill: #ffffff;
   pointer-events: all;
   stroke: #000000;
-  stroke-width: 2;
+  stroke-width: 1;
 }
 
 .diagram-mat {
@@ -594,4 +594,9 @@ rect {
 .minor-text {
   font-size: 12px;
   color: #BDBDBD;
+}
+
+// color sets
+.color-set-btn {
+  margin: 5px !important;
 }

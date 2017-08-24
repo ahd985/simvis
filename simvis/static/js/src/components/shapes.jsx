@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import Shape, {Rect, Circle, Ellipse, Path, Text} from './shapeElements'
+import Shape, {Rect, Circle, Ellipse, Path, EditableText, StaticText} from './shapeElements'
 
 var defaultBBox = {x0:0, y0:0, w0:100, h0:100};
 
@@ -40,7 +40,21 @@ class TextBox extends Component {
     render() {
         return (
             <Shape objectBBox={defaultTextBBox} dObject={this.props.dObject}>
-                <Text x={0} y={0} height={40} width={40} id={"element"} editActive={this.props.editActive}/>
+                <EditableText x={0} y={0} height={40} width={40} id={"element"} editActive={this.props.editActive}/>
+            </Shape>
+        )
+    }
+}
+class Content extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <Shape objectBBox={defaultBBox} dObject={this.props.dObject} >
+                <Rect x={0} y={0} height={100} width={100} id={"element"} />
+                <StaticText x={50} y={50} height={100} width={100} id={"element"} text="CONTENT"/>
             </Shape>
         )
     }
@@ -107,15 +121,31 @@ class pathInBox extends Component {
 }
 
 export default [
-    {name:"General", shapes:[
-        {name:"Rectangle", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple rectangle."},
-        {name:"Circle", tag:CircleSimple, bbox:defaultBBox, ratioLock:true, description:"A simple circle."},
-        {name:"Text", tag:TextBox, bbox:defaultTextBBox, ratioLock:false, description:"A text box.", style:{stroke:"none", fill:"none", fontSize:12}, textEditable:{true}}
+    {name:"Nodes", shapes:[
+        {name:"Rectangle", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple rectangle.", allowedConditions:['cell']},
+        {name:"Circle", tag:CircleSimple, bbox:defaultBBox, ratioLock:true, description:"A simple circle."}
     ]},
-    {name:"Special", shapes:[
-        {name:"skewedRound", tag:SkewedRound, bbox:skewedRoundBBox, ratioLock:false},
-        //{name:"line", tag:Line, bbox:lineBBox, ratioLock:false},
-        {name:"circleInBox", tag:circleInBox, bbox:defaultBBox, ratioLock:false},
-        {name:"pathInBox", tag:pathInBox, bbox:defaultBBox, ratioLock:false}
+    {name:"Annotation", shapes:[
+        {name:"Text", tag:TextBox, bbox:defaultTextBBox, ratioLock:false, description:"A text box.", style:{stroke:"none", fill:"none", fontSize:12}, editable:{model:false}},
+        {name:"Content", tag:Content, bbox:defaultBBox, ratioLock:false, description:"Legend, table, or reports.", editable:{text:false, style:false}}
+    ]},
+    {name:"Equipment", shapes:[
+        {name:"Vertical Tank", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple vertical tank."},
+        {name:"Horizontal Tank", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple horizontal tank."},
+        {name:"Pump", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple pump."},
+        {name:"Valve", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple valve."}
+    ]},{name:"Barriers", shapes:[
+        {name:"Vertical Barrier", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple vertical barrier."},
+        {name:"Horizontal Barrier", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple horizontal barrier."}
+    ]},{name:"Pipes", shapes:[
+        {name:"Vertical Pipe", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple vertical pipe."},
+        {name:"Horizontal Pipe", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A simple horizontal pipe."}
+    ]},
+    {name:"Heatmaps", shapes:[
+        {name:"Rectangular Heatmap", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A rectangular heatmap."}
+    ]},
+    {name:"Indicators", shapes:[
+        {name:"Toggle", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A two-state toggle."},
+        {name:"Fire", tag:Rectangle, bbox:defaultBBox, ratioLock:false, description:"A fire."}
     ]}
 ]
