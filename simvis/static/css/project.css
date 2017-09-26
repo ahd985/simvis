@@ -273,6 +273,12 @@ body {
   stroke-width: 2px;
   stroke-dasharray: 5,5; }
 
+.line-outline {
+  fill: none;
+  stroke: #FFE082;
+  stroke-width: 2px;
+  stroke-dasharray: 5,5; }
+
 .resizer-circle {
   fill: #FFE082;
   stroke: #373737;

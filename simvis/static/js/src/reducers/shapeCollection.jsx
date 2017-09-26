@@ -139,25 +139,30 @@ const shapeCollection = (state = defaultPresent, action) => {
                 ...state,
                 shapes:state.shapes.map((shapeData) => {
                     if (state.selectedShapes.indexOf(shapeData.uuid) > -1) {
-                        var dX, dY;
+                        let dH = action.deltaShapeSize.height;
+                        let dW = action.deltaShapeSize.width;
+                        let dX = action.deltaShapeSize.x;
+                        let dY = action.deltaShapeSize.y;
+
                         if (shapeData.shape.ratioLock) {
                             if (Math.abs(action.deltaShapeSize.width) > Math.abs(action.deltaShapeSize.height)) {
-                                dY = action.deltaShapeSize.width * shapeData.dims.height / shapeData.dims.width;
-                                dX = action.deltaShapeSize.width
+                                dH = action.deltaShapeSize.width * shapeData.dims.height / shapeData.dims.width;
+                                dW = action.deltaShapeSize.width
                             } else {
-                                dX = action.deltaShapeSize.height * shapeData.dims.width / shapeData.dims.height;
-                                dY = action.deltaShapeSize.height
+                                dH = action.deltaShapeSize.height * shapeData.dims.width / shapeData.dims.height;
+                                dW = action.deltaShapeSize.height
                             }
-                        } else {
-                            dX = action.deltaShapeSize.width;
-                            dY = action.deltaShapeSize.height
                         }
 
                         return {
                             ...shapeData,
                             deltaDims:{
-                                width:shapeData.deltaDims.width + dX,
-                                height:shapeData.deltaDims.height + dY
+                                width:shapeData.deltaDims.width + dW,
+                                height:shapeData.deltaDims.height + dH
+                            },
+                            position:{
+                                x:shapeData.position.x + dX,
+                                y:shapeData.position.y + dY
                             }
                         }
                     } else {
@@ -263,6 +268,20 @@ const shapeCollection = (state = defaultPresent, action) => {
                 ...state,
                 selectedShapes,
                 selectedStyle:topShapeStyle
+            };
+        case 'CHANGE_PATH':
+            return {
+                ...state,
+                shapes:state.shapes.map((shape) => {
+                    if (shape.uuid == action.uuid) {
+                        var newShape = {...shape}
+                        newShape.shape.elements[0].d = action.path
+                        return newShape
+                    } else {
+                        return shape
+                    }
+                }),
+                editActive:false
             };
         case 'SELECT_SHAPES_IN_OUTLINE':
             var outlinedShapes = state.shapes.filter((shapeData) => {

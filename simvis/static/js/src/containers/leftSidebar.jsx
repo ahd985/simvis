@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Draggable from 'react-draggable';
 
 import shapeSets from '../components/shapes'
-
+import Shape from '../components/shapeElements'
 import { addShape, setLayout } from '../actions'
 
 class LeftSideBarMenu extends Component {
@@ -70,8 +70,8 @@ class GriddedSubMenu extends Component {
                     const a = <a id={shape.id} className="menu-item" name={shape.name} onClick={(e) => getShape(e, shape)}>
                         <svg className="menu-icon" width="40" height="40" viewBox={viewbox} preserveAspectRatio="xMidYMid">
                             <g className="shape-svg-container">
-                                <g className="shape-svg" style={shape.style ? shape.style : null}>
-                                    <shape.tag />
+                                <g className="shape-svg" style={shape.iconStyle ? shape.iconStyle : null}>
+                                    <Shape elements={shape.elements} objectBBox={shape.bbox}/>
                                 </g>
                             </g>
                         </svg>

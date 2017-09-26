@@ -13,6 +13,7 @@ export const setData = (data, dataHeaders, xSeriesIndex) => ({type:'SET_DATA', d
 export const clearData = () => ({type:'CLEAR_DATA'});
 export const setSelectedStyle = (style) => ({type:'SET_SELECTED_STYLE', style});
 export const setShapeStyle = (style) => ({type:'SET_SHAPE_STYLE', style});
+export const changePath = (path, uuid) => ({type:'CHANGE_PATH', path, uuid});
 export const addSelectedShape = (uuid, overwriteIfNotPresent) => ({
     type:'ADD_SELECTED_SHAPE', uuid, overwriteIfNotPresent
 });

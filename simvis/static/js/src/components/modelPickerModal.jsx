@@ -164,8 +164,12 @@ export default class ModelPickerModal extends Component {
                 })}
             </Grid>
         } else {
+            const allowedModels = this.props.allowedModels;
             modelSelection = <Grid container columns={4}>
-                {this.iconOrder.map((e,i) => {
+                {this.iconOrder.filter((e) => {
+                    if (allowedModels && allowedModels.indexOf(e) > -1) {return true};
+                    return false
+                }).map((e,i) => {
                     const name = e[0].toUpperCase() + e.substring(1);
                     return <Grid.Column key={i}>
                             <Button onClick={() => this.handleClick(e)}>

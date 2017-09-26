@@ -374,6 +374,13 @@ body {
   stroke-dasharray: 5,5
 }
 
+.line-outline {
+  fill: none;
+  stroke: $colorG;
+  stroke-width: 2px;
+  stroke-dasharray: 5,5
+}
+
 .resizer-circle {
   fill: $colorG;
   stroke: $colorB;

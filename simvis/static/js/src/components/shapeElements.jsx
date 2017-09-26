@@ -38,7 +38,7 @@ export class Rect extends Component {
         };
 
         return (
-            <rect {...attr} id={this.props.id}/>
+            <rect {...attr} id={this.props.id} className={`${this.props.ignore ? "ignore" : ""} ${this.props.static ? "static" : ""}`}/>
         )
     }
 }
@@ -86,11 +86,11 @@ export class EditableText extends Component {
         this.props.text ? text = this.props.text : text = "Text";
 
         return (
-            <g transform={`translate(${x}, ${y})`}>
+            <g transform={`translate(${x}, ${y})`} className={`${this.props.ignore ? "ignore" : ""} ${this.props.static ? "static" : ""}`}>
                 <rect x={0} y={0} height={height} width={width}></rect>
                 <foreignObject style={{overflow:"visible"}} width={width}>
                     <div className="text-container">
-                        <div className="text" xmlns="http://www.w3.org/1999/xhtml" style={{lineHeight:height + "px"}} contentEditable={this.props.editActive} suppressContentEditableWarning={true}>{text}</div>
+                        <div className="text" xmlns="http://www.w3.org/1999/xhtml" style={{lineHeight:height + "px", fontSize:`${scale*100}%`}} contentEditable={this.props.editActive} suppressContentEditableWarning={true}>{text}</div>
                     </div>
                 </foreignObject>
             </g>
@@ -124,8 +124,8 @@ export class StaticText extends Component {
         y = y + yFrac * dDY;
 
         return (
-            <g transform={`translate(${x}, ${y})`}>
-                <text style={{textAnchor: "middle"}}>{this.props.text}</text>
+            <g transform={`translate(${x}, ${y})`} style={this.props.style} className={`${this.props.ignore ? "ignore" : ""} ${this.props.static ? "static" : ""}`}>
+                <text style={{textAnchor: "middle", transform:`scale(${scale},${scale})`, alignmentBaseline:"middle"}}>{this.props.text}</text>
             </g>
         )
     }
@@ -177,7 +177,7 @@ export class Circle extends Component {
         };
 
         return(
-            <circle {...attr} id={this.props.id} />
+            <circle {...attr} style={this.props.style} id={this.props.id} className={`${this.props.ignore ? "ignore" : ""} ${this.props.static ? "static" : ""}`}/>
         )
     }
 }
@@ -225,7 +225,7 @@ export class Ellipse extends Component {
         };
 
         return(
-            <ellipse {...attr} id={this.props.id} />
+            <ellipse {...attr} id={this.props.id} style={this.props.style} className={`${this.props.ignore ? "ignore" : ""} ${this.props.static ? "static" : ""}`}/>
         )
     }
 }
@@ -248,26 +248,61 @@ export class Path extends Component {
         let d = this.props.d;
 
         d = svgpath(d).rel();
-        let x1, x2, y1, y2;
-        let x1Temp, x2Temp, y1Temp, y2Temp;
+        let x1, x2, y1, y2, xLoc, yLoc;
 
         // Get height/width
         d.iterate((segment, index, xs, ys) => {
             if (index == 1) {
-                x1Temp = xs;
-                y1Temp = ys
-            }
-
-            if (index == d.segments.length - 1) {
-                segment[0] != "v" ? x2Temp = xs + segment[segment.length-2] : x2Temp = xs;
-                segment[0] != "h" ? y2Temp = ys + segment[segment.length-1] : y2Temp = ys;
+                x1 = xs;
+                y1 = ys;
+                x2 = xs;
+                y2 = ys;
+            } else if (index < d.segments.length - 1) {
+                x1 = Math.min(x1, xs)
+                x2 = Math.max(x2, xs)
+                y1 = Math.min(y1, ys)
+                y2 = Math.max(y2, ys)
+            } else if (index > 1) {
+                let posX = xs, posY = ys;
+                switch(segment[0]) {
+                    case 'h':
+                        posX += segment[1]
+                        break
+                    case 'H':
+                        posX = segment[1]
+                        break
+                    case 'v':
+                        posY += segment[2]
+                        break
+                    case 'V':
+                        posY = segment[2]
+                        break
+                    case 'z':
+                    case 'Z':
+                        posX += 0
+                        posY += 0
+                        break
+                    case 'M':
+                    case 'L':
+                    case 'A':
+                    case 'Q':
+                    case 'C':
+                    case 'T':
+                    case 'S':
+                        posX = segment[segment.length - 2]
+                        posY = segment[segment.length - 1]
+                        break
+                    default:
+                        posX += segment[segment.length - 2]
+                        posY += segment[segment.length - 1]
+                        break
+                }
+                x1 = Math.min(x1, posX)
+                x2 = Math.max(x2, posX)
+                y1 = Math.min(y1, posY)
+                y2 = Math.max(y2, posY)
             }
         });
-
-        x1 = Math.min(x1Temp, x2Temp);
-        x2 = Math.max(x1Temp, x2Temp);
-        y1 = Math.min(y1Temp, y2Temp);
-        y2 = Math.max(y1Temp, y2Temp);
 
         const width = x2 - x1;
         const height = y2 - y1;
@@ -276,14 +311,16 @@ export class Path extends Component {
         const xFrac = (x1 - x0) / (x1 + width - x0);
         const yFrac = (y1 - y0) / (y1 + height - y0);
 
-        d = d.scale((1 + (1-xFrac) * dX / w0)*scale, (1 + (1-yFrac) * dY / h0)*scale)
-            .translate(xFrac * dX, yFrac * dY)
-            .toString();
+        d = d.scale((1 + (1-xFrac) * dX / w0)*scale, (1 + (1-yFrac) * dY / h0)*scale).toString();
 
         const attr = {d: d};
 
+        // Add in a second no-stroke path for clicking purposes
         return(
-            <path {...attr} id={this.props.id} />
+            <g>
+                <path {...attr} stroke="none" strokeWidth="10"/>
+                <path {...attr} id={this.props.id} style={this.props.style} className={`${this.props.ignore ? "ignore" : ""} ${this.props.static ? "static" : ""}`}/>
+            </g>
         )
     }
 }
@@ -292,31 +329,32 @@ Path.propTypes = {
     d: React.PropTypes.any.isRequired
 };
 
+const elementMap = {
+    Rect,
+    EditableText,
+    StaticText,
+    Circle,
+    Ellipse,
+    Path
+}
+
 export default class Shape extends Component {
     constructor(props) {
         super(props)
     }
 
     render() {
-        let shape;
-        if (this.props.children.constructor === Array)  {
-            shape = this.props.children.map((child, i) => {
-                return React.cloneElement(child, {
-                    objectBBox: this.props.objectBBox,
-                    dObject: this.props.dObject,
-                    key: i
-                })
-            })
-        } else {
-            shape = React.cloneElement(this.props.children, {
-                objectBBox: this.props.objectBBox,
-                dObject: this.props.dObject
-            })
-        }
+        const elements = this.props.elements;
+
+        const renderedElements = elements.map((e,i) => {
+            let Tag = elementMap[e.tag];
+            let key = e.d;
+            return <Tag objectBBox={this.props.objectBBox} dObject={this.props.dObject} editActive={this.props.editActive} key={key} {...e}/>
+        })
 
         return (
             <g>
-                {shape}
+                {renderedElements}
             </g>
         )
     }
@@ -324,7 +362,8 @@ export default class Shape extends Component {
 
 Shape.propTypes = {
     objectBBox: React.PropTypes.object.isRequired,
-    dObject: React.PropTypes.object
+    dObject: React.PropTypes.object,
+    elements: React.PropTypes.array
 };
 
 Shape.defaultProps = {

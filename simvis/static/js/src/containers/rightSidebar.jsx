@@ -50,20 +50,25 @@ class RightSideBarMenu extends Component {
         const style = {width:this.props.rightSideBarWidth, right:0, textAlign:"center"};
 
         let styleEditable = true;
+        let fillEditable = true;
         let modelEditable = true;
         let textEditable = true;
 
-        // Loop through shapes and see if any shape is not editable for style, model, or text
+        // Loop through shapes and see if any shape is not editable for style or text
         for (let shapeData of this.props.shapes) {
             if (this.props.selectedShapes.indexOf(shapeData.uuid) > -1) {
                 const shape = shapeData.shape
                 if (shape.editable) {
                     if (shape.editable.style == false) {styleEditable = false}
+                    if (shape.editable.fill == false) {fillEditable = false}
                     if (shape.editable.text == false) {textEditable = false}
                     if (shape.editable.model == false) {modelEditable = false}
                 }
             }
         }
+
+        // Greater than one shape and we can't edit model
+        if (this.props.selectedShapes.length > 1) {modelEditable = false}
 
         // TODO - this isn't perfect
         activeItem == 'model' && modelEditable == false ? activeItem = 'style' : null
@@ -117,11 +122,13 @@ class RightSideBarMenu extends Component {
                         return false
                     });
 
-                    const selectedModel = selectedShapes[0].model;
+                    const selectedShapeData = selectedShapes[0];
+                    const selectedModel = selectedShapeData.model;
+                    const allowedModels = selectedShapeData.shape.allowedModels;
 
                     submenu = <Segment attached='bottom' className="shapes-selected-menu">
                         <Form size="small" style={{padding:5}} as="none">
-                            <ModelPickerModal model={selectedModel} setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
+                            <ModelPickerModal allowedModels={allowedModels} model={selectedModel} setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
                         </Form>
                     </Segment>;
                 }
@@ -129,9 +136,12 @@ class RightSideBarMenu extends Component {
                 submenu = <Segment attached='bottom' className="shapes-selected-menu">
                     <Form size="small" style={{padding:5}} as="none">
                         <Form.Group widths='equal'>
-                            <Form.Field>
-                                <ColorPickerModal color={this.props.selectedStyle.fill} setShapeStyle={this.props.setShapeStyle} desc="Fill" attr="fill"/>
-                            </Form.Field>
+                            {  fillEditable ?
+                                <Form.Field>
+                                    <ColorPickerModal color={this.props.selectedStyle.fill}
+                                                      setShapeStyle={this.props.setShapeStyle} desc="Fill" attr="fill"/>
+                                </Form.Field> : null
+                            }
                             <Form.Field>
                                <ColorPickerModal color={this.props.selectedStyle.stroke} setShapeStyle={this.props.setShapeStyle} desc="Stroke" attr="stroke"/>
                             </Form.Field>
