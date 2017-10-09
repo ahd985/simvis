@@ -7,7 +7,7 @@ export const addShape = (shape) => ({type:'ADD_SHAPE', shape});
 export const removeShapes = () => ({type:'REMOVE_SHAPES'});
 export const startMoveShapes = () => ({type:'START_MOVE_SHAPES'});
 export const moveShapes = (deltaShapePos) => ({type:'MOVE_SHAPES', deltaShapePos});
-export const resizeShapes = (deltaShapeSize) => ({type:'RESIZE_SHAPES', deltaShapeSize});
+export const resizeShapes = (deltaShapeSize, reset) => ({type:'RESIZE_SHAPES', deltaShapeSize, reset});
 export const reorderShapes = (step) => ({type:'REORDER_SHAPES', step});
 export const setData = (data, dataHeaders, xSeriesIndex) => ({type:'SET_DATA', data, dataHeaders, xSeriesIndex});
 export const clearData = () => ({type:'CLEAR_DATA'});

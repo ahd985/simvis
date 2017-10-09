@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import Draggable from 'react-draggable';
 import { connect } from 'react-redux'
 import { addTodo } from '../actions'
@@ -41,6 +41,14 @@ class ShapeContainer extends Component {
         this.handleContextMenu = this.handleContextMenu.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (~nextProps.selectedShapes.indexOf(nextProps.uuid) || nextProps.toggled != this.props.toggled) {
+            return true
+        }
+
+        return false
     }
 
     handleDragStart(e, ui) {
@@ -120,7 +128,7 @@ class ShapeContainer extends Component {
         const scale = this.props.scale;
         const deltaX = ui.x - this.lastPos.x;
         const deltaY = ui.y - this.lastPos.y;
-        this.props.resizeShapes(this.getResizeDims(deltaX, deltaY, scale, dir));
+        this.props.resizeShapes(this.getResizeDims(deltaX, deltaY, scale, dir), true);
         this.lastPos = null;
     }
 
@@ -282,7 +290,7 @@ class ShapeContainer extends Component {
         return (
             <g transform={translate}>
                 <Draggable onStart={this.handleDragStart} onDrag={this.handleMove} onStop={this.handleDragStop} position={position} axis={"none"}>
-                    <g onContextMenu={this.handleContextMenu} id={this.props.uuid} style={{...this.props.style, 'pointerEvents':"all"}} onClick={this.handleClick} onDoubleClick={this.handleDoubleClick}>
+                    <g className="shape-container" onContextMenu={this.handleContextMenu} id={this.props.uuid} style={{...this.props.style, 'pointerEvents':"all"}} onClick={this.handleClick} onDoubleClick={this.handleDoubleClick}>
                         <Shape elements={this.props.elements} objectBBox={this.props.bbox} dObject={dObject} editActive={editActive}/>
                     </g>
                 </Draggable>

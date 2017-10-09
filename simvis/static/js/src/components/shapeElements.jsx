@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component, PureComponent } from 'react'
 import svgpath from 'svgpath'
 
-export class Rect extends Component {
+export class Rect extends PureComponent {
     constructor(props) {
         super(props)
     }
@@ -55,7 +55,7 @@ Rect.defaultProps = {
     ry: 0
 };
 
-export class EditableText extends Component {
+export class EditableText extends PureComponent {
     constructor(props) {
         super(props);
     }
@@ -98,7 +98,7 @@ export class EditableText extends Component {
     }
 }
 
-export class StaticText extends Component {
+export class StaticText extends PureComponent {
     constructor(props) {
         super(props);
     }
@@ -143,7 +143,7 @@ Rect.defaultProps = {
     ry: 0
 };
 
-export class Circle extends Component {
+export class Circle extends PureComponent {
     constructor(props) {
         super(props)
     }
@@ -188,7 +188,7 @@ Circle.propTypes = {
     r: React.PropTypes.any.isRequired
 };
 
-export class Ellipse extends Component {
+export class Ellipse extends PureComponent {
     constructor(props) {
         super(props)
     }
@@ -237,7 +237,7 @@ Ellipse.propTypes = {
     ry: React.PropTypes.any.isRequired
 };
 
-export class Path extends Component {
+export class Path extends PureComponent {
     constructor(props) {
         super(props)
     }
@@ -338,7 +338,7 @@ const elementMap = {
     Path
 }
 
-export default class Shape extends Component {
+export default class Shape extends PureComponent {
     constructor(props) {
         super(props)
     }

@@ -37,7 +37,8 @@
     "gulp-util": "^3.0.7",
     "redux-devtools": "^3.3.2",
     "run-sequence": "^1.2.1",
-    "semantic-ui-react": "^0.68.0"
+    "semantic-ui-react": "^0.68.0",
+    "why-did-you-update": "0.0.8"
   },
   "engines": {
     "node": ">=0.8.0"

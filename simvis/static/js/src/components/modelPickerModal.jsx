@@ -130,8 +130,6 @@ export default class ModelPickerModal extends Component {
         let modelForm=null;
         let modelConditions=null;
 
-        console.log("req", this.state.modelRequirements)
-
         if (this.state.modelRequirements) {
             const name = this.state.form.type[0].toUpperCase() + this.state.form.type.substring(1);
 
@@ -195,7 +193,7 @@ export default class ModelPickerModal extends Component {
                                     <Label attached='top'>Conditions</Label>
                                     {modelConditions}
                                 </Segment>
-                                <ConditionPickerModal conditionRequirements={this.state.modelRequirements.conditions} editCondition={this.editCondition} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
+                                <ConditionPickerModal allowedConditions={this.props.allowedConditions} conditionRequirements={this.state.modelRequirements.conditions} editCondition={this.editCondition} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
                             </div>
                             : null
                     }

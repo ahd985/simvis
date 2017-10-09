@@ -1,7 +1,7 @@
 import uuidV4 from 'uuid/v4'
 import ssv from '../../ssv.min.js'
 
-const defaultShapeStyle = {fill: "#F4F4F4", stroke: "black", strokeWidth: 1, cursor: "move", color:"black", fontSize:12};
+const defaultShapeStyle = {fill: "#F4F4F4", stroke: "black", strokeWidth: 1, color:"black", fontSize:12};
 
 const defaultPresent = {
     shapes: [],
@@ -145,20 +145,50 @@ const shapeCollection = (state = defaultPresent, action) => {
                         let dY = action.deltaShapeSize.y;
 
                         if (shapeData.shape.ratioLock) {
-                            if (Math.abs(action.deltaShapeSize.width) > Math.abs(action.deltaShapeSize.height)) {
-                                dH = action.deltaShapeSize.width * shapeData.dims.height / shapeData.dims.width;
-                                dW = action.deltaShapeSize.width
+                            if (Math.abs(dW) > Math.abs(dH)) {
+                                dH = dW;
+                                dY = dX;
                             } else {
-                                dH = action.deltaShapeSize.height * shapeData.dims.width / shapeData.dims.height;
-                                dW = action.deltaShapeSize.height
+                                dW = dH;
+                                dX = dY;
                             }
                         }
+
+                        let width = shapeData.deltaDims.width + dW;
+                        let height = shapeData.deltaDims.height + dH;
+                        const minH = (shapeData.shape.minY || 25);
+                        const minW = (shapeData.shape.minX || 25);
+
+                        // Check if H or W is at min value transition
+                        const yMinPre = shapeData.dims.height + shapeData.deltaDims.height < minH;
+                        const yMinPost = shapeData.dims.height + height < minH;
+                        if (dY != 0) {
+                            if (yMinPre && yMinPost) {
+                                dY = 0
+                            } else if (yMinPre) {
+                                dY += minH - (shapeData.dims.height + shapeData.deltaDims.height);
+                            } else if (yMinPost) {
+                                dY = Math.max(0, shapeData.dims.height + shapeData.deltaDims.height - minH);
+                            }
+                        };
+
+                        const xMinPre = shapeData.dims.width + shapeData.deltaDims.width < minW;
+                        const xMinPost = shapeData.dims.width + width < minW;
+                        if (dX != 0) {
+                            if (xMinPre && xMinPost) {
+                                dX = 0
+                            } else if (xMinPre) {
+                                dX += minW - (shapeData.dims.width + shapeData.deltaDims.width);
+                            } else if (xMinPost) {
+                                dX = Math.max(0, shapeData.dims.width + shapeData.deltaDims.width - minW);
+                            }
+                        };
 
                         return {
                             ...shapeData,
                             deltaDims:{
-                                width:shapeData.deltaDims.width + dW,
-                                height:shapeData.deltaDims.height + dH
+                                width: action.reset ? Math.max(width, minW - shapeData.dims.width) : width,
+                                height: action.reset ? Math.max(height, minH - shapeData.dims.height) : height,
                             },
                             position:{
                                 x:shapeData.position.x + dX,

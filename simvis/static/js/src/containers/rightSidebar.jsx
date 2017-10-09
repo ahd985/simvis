@@ -53,6 +53,7 @@ class RightSideBarMenu extends Component {
         let fillEditable = true;
         let modelEditable = true;
         let textEditable = true;
+        let selectedShape = null;
 
         // Loop through shapes and see if any shape is not editable for style or text
         for (let shapeData of this.props.shapes) {
@@ -64,6 +65,7 @@ class RightSideBarMenu extends Component {
                     if (shape.editable.text == false) {textEditable = false}
                     if (shape.editable.model == false) {modelEditable = false}
                 }
+                selectedShape = shapeData;
             }
         }
 
@@ -125,10 +127,11 @@ class RightSideBarMenu extends Component {
                     const selectedShapeData = selectedShapes[0];
                     const selectedModel = selectedShapeData.model;
                     const allowedModels = selectedShapeData.shape.allowedModels;
+                    const allowedConditions = selectedShapeData.shape.allowedConditions;
 
                     submenu = <Segment attached='bottom' className="shapes-selected-menu">
                         <Form size="small" style={{padding:5}} as="none">
-                            <ModelPickerModal allowedModels={allowedModels} model={selectedModel} setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
+                            <ModelPickerModal allowedModels={allowedModels} allowedConditions={allowedConditions} model={selectedModel} setShapeModel={this.props.setShapeModel} ids={this.props.selectedShapes} data={this.props.data} dataHeaders={this.props.dataHeaders}/>
                         </Form>
                     </Segment>;
                 }
@@ -172,6 +175,25 @@ class RightSideBarMenu extends Component {
                         </Form.Group>
                     </Form>
                 </Segment>;
+            } else if (activeItem === 'dimension') {
+                const x = selectedShape.position.x
+                const y = selectedShape.position.y
+                const width = selectedShape.dims.width + selectedShape.deltaDims.width
+                const height = selectedShape.dims.height + selectedShape.deltaDims.height
+                submenu = <Segment attached='bottom' className="shapes-selected-menu">
+                    <Form size="small" style={{padding:5}}>
+                        <Form.Group widths='equal'>
+                            <Form.Input label='X' name='x' type='number' value={x} onChange={this.handlePositionChange}/>
+                            <Form.Input label='Y' name='y' type='number' value={y} onChange={this.handlePositionChange}/>
+                        </Form.Group>
+                    </Form>
+                    <Form size="small" style={{padding:5}}>
+                        <Form.Group widths='equal'>
+                            <Form.Input label='Width' name='width' type='number' value={width} onChange={this.handleDimChange}/>
+                            <Form.Input label='Height' name='height' type='number' value={height} onChange={this.handleDimChange}/>
+                        </Form.Group>
+                    </Form>
+                </Segment>
             }
 
             menu = <div id="right-sidebar" style={style}>
@@ -179,6 +201,7 @@ class RightSideBarMenu extends Component {
                     {modelEditable ? <Menu.Item name='model' active={activeItem === 'model'} onClick={this.handleTabClick} /> : null}
                     {styleEditable ? <Menu.Item name='style' active={activeItem === 'style'} onClick={this.handleTabClick} /> : null}
                     {textEditable ? <Menu.Item name='text' active={activeItem === 'text'} onClick={this.handleTabClick} /> : null}
+                    {this.props.selectedShapes.length == 1 ? <Menu.Item name='dimension' active={activeItem === 'dimension'} onClick={this.handleTabClick} /> : null}
                 </Menu>
                 {submenu}
             </div>

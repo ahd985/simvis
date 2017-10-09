@@ -7,6 +7,9 @@ import reducer from './reducers'
 
 import { Menu } from 'semantic-ui-react'
 
+//import { whyDidYouUpdate } from 'why-did-you-update'
+//whyDidYouUpdate(React);
+
 const store = createStore(reducer);
 render(
     <Provider store={store}>
