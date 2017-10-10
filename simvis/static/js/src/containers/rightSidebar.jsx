@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table, Label } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { setShapeStyle, setShapeModel, setOverview, setLayout } from '../actions'
+import { setShapeStyle, setShapeModel, setOverview, setLayout, resizeShapes } from '../actions'
 
 import NumberPicker from '../components/numberPicker';
 import ColorPickerModal from '../components/colorPickerModal'
@@ -21,6 +21,8 @@ class RightSideBarMenu extends Component {
         this.handleStrokeWidthChange = this.handleStrokeWidthChange.bind(this);
         this.handleFontSizeChange = this.handleFontSizeChange.bind(this);
         this.handleOverviewChange = this.handleOverviewChange.bind(this);
+        this.handlePositionChange = this.handlePositionChange.bind(this);
+        this.handleDimChange = this.handleDimChange.bind(this);
     }
 
     handleTabClick(e, {name}) {
@@ -41,6 +43,18 @@ class RightSideBarMenu extends Component {
             ...this.props.overview,
             [arg]:e.value ? e.value : e.target.value
         })
+    }
+
+    handlePositionChange(prop, val) {
+        let deltaShapeSize = {x:0, y:0, width:0, height:0};
+        deltaShapeSize[prop] = val
+        this.props.resizeShapes(deltaShapeSize)
+    }
+
+    handleDimChange(prop, val) {
+        let deltaShapeSize = {x:0, y:0, width:0, height:0};
+        deltaShapeSize[prop] = val
+        this.props.resizeShapes(deltaShapeSize)
     }
 
     render() {
@@ -183,14 +197,14 @@ class RightSideBarMenu extends Component {
                 submenu = <Segment attached='bottom' className="shapes-selected-menu">
                     <Form size="small" style={{padding:5}}>
                         <Form.Group widths='equal'>
-                            <Form.Input label='X' name='x' type='number' value={x} onChange={this.handlePositionChange}/>
-                            <Form.Input label='Y' name='y' type='number' value={y} onChange={this.handlePositionChange}/>
+                            <Form.Input label='X' type='number' value={x} onChange={(e,f) => this.handlePositionChange('x', f.value - x)}/>
+                            <Form.Input label='Y' type='number' value={y} onChange={(e,f) => this.handlePositionChange('y', f.value - y)}/>
                         </Form.Group>
                     </Form>
                     <Form size="small" style={{padding:5}}>
                         <Form.Group widths='equal'>
-                            <Form.Input label='Width' name='width' type='number' value={width} onChange={this.handleDimChange}/>
-                            <Form.Input label='Height' name='height' type='number' value={height} onChange={this.handleDimChange}/>
+                            <Form.Input label='Width' name='width' type='number' value={width} onChange={(e,f) => this.handleDimChange('width', f.value - width)}/>
+                            <Form.Input label='Height' name='height' type='number' value={height} onChange={(e,f) => this.handleDimChange('height', f.value - height)}/>
                         </Form.Group>
                     </Form>
                 </Segment>
@@ -230,7 +244,8 @@ const mapDispatchToProps = {
     setShapeStyle:setShapeStyle,
     setShapeModel:setShapeModel,
     setOverview:setOverview,
-    setLayout:setLayout
+    setLayout:setLayout,
+    resizeShapes:resizeShapes
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(RightSideBarMenu)
