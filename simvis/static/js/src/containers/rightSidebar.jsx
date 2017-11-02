@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table, Label } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { setShapeStyle, setShapeModel, setOverview, setLayout, resizeShapes } from '../actions'
+import { setShapeStyle, setShapeModel, setOverview, setLayout, resizeShapes } from '../actions/index.jsx'
 
-import NumberPicker from '../components/numberPicker';
-import ColorPickerModal from '../components/colorPickerModal'
-import ModelPickerModal from '../components/modelPickerModal'
-import ImportDataModal from './dataImport'
+import NumberPicker from '../components/numberPicker.jsx';
+import ColorPickerModal from '../components/colorPickerModal.jsx'
+import ModelPickerModal from '../components/modelPickerModal.jsx'
+import ImportDataModal from './dataImport.jsx'
 
 class RightSideBarMenu extends Component {
     constructor(props) {
@@ -196,13 +196,11 @@ class RightSideBarMenu extends Component {
                 const height = selectedShape.dims.height + selectedShape.deltaDims.height
                 submenu = <Segment attached='bottom' className="shapes-selected-menu">
                     <Form size="small" style={{padding:5}}>
-                        <Form.Group widths='equal'>
+                        <Form.Group widths={6}>
                             <Form.Input label='X' type='number' value={x} onChange={(e,f) => this.handlePositionChange('x', f.value - x)}/>
                             <Form.Input label='Y' type='number' value={y} onChange={(e,f) => this.handlePositionChange('y', f.value - y)}/>
                         </Form.Group>
-                    </Form>
-                    <Form size="small" style={{padding:5}}>
-                        <Form.Group widths='equal'>
+                        <Form.Group widths={6}>
                             <Form.Input label='Width' name='width' type='number' value={width} onChange={(e,f) => this.handleDimChange('width', f.value - width)}/>
                             <Form.Input label='Height' name='height' type='number' value={height} onChange={(e,f) => this.handleDimChange('height', f.value - height)}/>
                         </Form.Group>
@@ -215,7 +213,7 @@ class RightSideBarMenu extends Component {
                     {modelEditable ? <Menu.Item name='model' active={activeItem === 'model'} onClick={this.handleTabClick} /> : null}
                     {styleEditable ? <Menu.Item name='style' active={activeItem === 'style'} onClick={this.handleTabClick} /> : null}
                     {textEditable ? <Menu.Item name='text' active={activeItem === 'text'} onClick={this.handleTabClick} /> : null}
-                    {this.props.selectedShapes.length == 1 ? <Menu.Item name='dimension' active={activeItem === 'dimension'} onClick={this.handleTabClick} /> : null}
+                    {this.props.selectedShapes.length == 1 ? <Menu.Item name='dims' active={activeItem === 'dims'} onClick={this.handleTabClick} /> : null}
                 </Menu>
                 {submenu}
             </div>

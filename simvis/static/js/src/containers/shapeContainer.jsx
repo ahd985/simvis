@@ -1,12 +1,12 @@
 import React, { Component, PureComponent } from 'react'
 import Draggable from 'react-draggable';
 import { connect } from 'react-redux'
-import { addTodo } from '../actions'
+import { addTodo } from '../actions/index.jsx'
 import { Menu, Popup } from 'semantic-ui-react';
 import { debounce } from 'underscore';
 
-import Shape from '../components/shapeElements'
-import { moveShapes, addSelectedShape, resizeShapes, startMoveShapes, clearSelectedShapes, toggleEdit, changePath } from '../actions'
+import Shape from '../components/shapeElements.jsx'
+import { moveShapes, addSelectedShape, resizeShapes, startMoveShapes, clearSelectedShapes, toggleEdit, changePath } from '../actions/index.jsx'
 
 import svgpath from 'svgpath'
 

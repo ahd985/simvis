@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import request from 'superagent'
 import 'superagent-django-csrf'
 
-import { setData, clearData } from '../actions'
+import { setData, clearData } from '../actions/index.jsx'
 
 //import Handsontable from 'handsontable/dist/handsontable.full'
 

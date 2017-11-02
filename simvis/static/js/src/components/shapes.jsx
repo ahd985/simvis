@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import Shape from './shapeElements'
+import Shape from './shapeElements.jsx'
 
 var defaultBBox = {x0:0, y0:0, w0:100, h0:100};
 const defaultTextBBox = {x0:0, y0:0, w0:40, h0:40};

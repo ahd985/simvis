@@ -3,13 +3,13 @@ import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Inpu
 import { SketchPicker } from 'react-color';
 import { connect } from 'react-redux'
 
-import Diagram from './diagram'
-import TopMenu from './topMenu'
-import ShapeContextMenu from '../components/shapeContextMenu'
-import RightSideBarMenu from './rightSidebar'
-import LeftSideBarMenu from './leftSidebar'
-import {reorderShapes } from '../actions'
-import {generateB64Grid} from '../utility/utility'
+import Diagram from './diagram.jsx'
+import TopMenu from './topMenu.jsx'
+import ShapeContextMenu from '../components/shapeContextMenu.jsx'
+import RightSideBarMenu from './rightSidebar.jsx'
+import LeftSideBarMenu from './leftSidebar.jsx'
+import {reorderShapes } from '../actions/index.jsx'
+import {generateB64Grid} from '../utility/utility.jsx'
 
 class DrawContainer extends Component {
     constructor(props) {

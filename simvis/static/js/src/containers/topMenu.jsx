@@ -1,13 +1,18 @@
+import axios from 'axios'
+import Cookies from 'js-cookie'
+
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { compileModel, setLayout, reorderShapes, removeShapes, undo, redo } from '../actions'
+import { compileModel, setLayout, reorderShapes, removeShapes, undo, redo } from '../actions/index.jsx'
 
-import ImportDataModal from './dataImport'
+import ImportDataModal from './dataImport.jsx'
 
 class TopMenu extends Component {
     constructor(props) {
         super(props);
+
+        this.state = {};
 
         this.zoomLevels = [25, 50, 75, 100, 200, 300];
         this.zoomLevelOptions = this.zoomLevels.map((e, i) => {
@@ -64,12 +69,35 @@ class TopMenu extends Component {
             ...this.props.overview
         };
 
-        var form = document.getElementById("ssv-submit");
-        var field = document.createElement("input");
-        field.setAttribute("name", "model");
-        field.setAttribute("value", JSON.stringify(output));
-        form.appendChild(field);
-        form.submit();
+       const csrftoken = Cookies.get('csrftoken');
+
+        // Async call for validation
+        var self = this;
+        axios({
+            method: 'post',
+            url: '/draw/validate_model',
+            data: {output},
+            headers: {"X-CSRFToken": csrftoken},
+        })
+        .then(function (response) {
+            if (response.data.success) {
+                console.log(response.data);
+            } else {
+                console.log(response.data.message)
+                self.setState({message: "Lack of model data."})
+            }
+
+        })
+        .catch(function (error) {
+            self.setState({message: "Bad server response.  Please try again."})
+        });
+
+        //var form = document.getElementById("ssv-submit");
+        //var field = document.createElement("input");
+        //field.setAttribute("name", "model");
+        //field.setAttribute("value", JSON.stringify(output));
+        //form.appendChild(field);
+        //form.submit();
     }
 
     handleZoom(type, value) {
@@ -104,8 +132,17 @@ class TopMenu extends Component {
     }
 
     render() {
+        let message;
+        if (this.state.message) {
+            message = <Message id="submit-error-message" negative attached="bottom" floating={true} onDismiss={() => {this.setState({message:null})}} compact>
+                <Message.Header>Error submitting file:</Message.Header>
+                <p>{this.state.message}</p>
+            </Message>
+        }
+
         return (
             <div>
+                { message }
                 <Menu inverted id="header-container">
                     <Menu.Menu name='importOrEditData'>
                         <ImportDataModal />

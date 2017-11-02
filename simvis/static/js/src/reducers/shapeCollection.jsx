@@ -347,11 +347,21 @@ const shapeCollection = (state = defaultPresent, action) => {
                 }),
                 ...action.model,
                 conditions: action.model.conditions.map((condition) => {
-                    return {
+                    // Convert data indicies to short data arrays
+                    let c = {
                         ...condition,
-                        id: "s" + uuidV4().substring(0,8),
-                        data:state.data.map((row) => {return row[condition.dataIndex]})
+                        id: "s" + uuidV4().substring(0,8)
                     }
+
+                    if (condition.colorDataIndex) {
+                        c.color_data = state.data.map((row) => {return row[condition.colorDataIndex]})
+                    }
+
+                    if (condition.levelDataIndex) {
+                        c.level_data = state.data.map((row) => {return row[condition.levelDataIndex]})
+                    }
+
+                    return condition
                 }),
                 ids:["element"]
             };

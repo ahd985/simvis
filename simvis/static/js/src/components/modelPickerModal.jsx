@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table, Label } from 'semantic-ui-react'
-import getFormFromArgs from './modelForm'
-import ConditionPickerModal from './conditionPickerModal'
-import { animatedModelIconMap, modelIconMap } from './modelIcons'
-import conditionIconMap from './conditionIcons'
+import getFormFromArgs from './modelForm.jsx'
+import ConditionPickerModal from './conditionPickerModal.jsx'
+import { animatedModelIconMap, modelIconMap } from './modelIcons.jsx'
+import conditionIconMap from './conditionIcons.jsx'
 
 import ssv from '../../ssv.min.js'
 

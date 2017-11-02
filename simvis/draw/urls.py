@@ -21,5 +21,10 @@ urlpatterns = [
         regex=r'^ssv$',
         view=views.ssv,
         name='ssv'
+    ),
+    url(
+        regex=r'^validate_model$',
+        view=views.validate_model,
+        name='validate_model'
     )
 ]

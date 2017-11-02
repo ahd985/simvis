@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { Button, Icon, Menu, Grid, Segment, Sidebar, Modal, Message, Popup, Input, Form, Dropdown, Table } from 'semantic-ui-react'
-import getFormFromArgs from '../components/modelForm'
-import conditionIconMap from './conditionIcons'
-import { unwrapValidators } from '../utility/validators'
+import getFormFromArgs from '../components/modelForm.jsx'
+import conditionIconMap from './conditionIcons.jsx'
+import { unwrapValidators } from '../utility/validators.jsx'
 
 export default class ConditionPickerModal extends Component {
     constructor(props) {

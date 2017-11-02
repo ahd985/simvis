@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Form, Modal, Button, Radio, Segment, Dropdown, Label, Card } from 'semantic-ui-react'
 import { SwatchesPicker } from 'react-color';
 
-import NumberPicker from './numberPicker';
+import NumberPicker from './numberPicker.jsx';
 import chroma from 'chroma-js'
 
 class DataForm extends Component {
@@ -459,6 +459,7 @@ class ColorDataForm extends Component {
                 maxColorValue: this.state.maxColorValue,
                 minColorValue: this.state.minColorValue,
                 color_scale,
+                colorDataIndex: this.state.colorDataIndex,
             }, true);
 
             state.color_scale = color_scale;

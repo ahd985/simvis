@@ -3,9 +3,9 @@ import { Button, Icon, Menu, Grid, Segment, Modal, Message, Popup, Input, Form, 
 import { connect } from 'react-redux'
 import Draggable from 'react-draggable';
 
-import shapeSets from '../components/shapes'
-import Shape from '../components/shapeElements'
-import { addShape, setLayout } from '../actions'
+import shapeSets from '../components/shapes.jsx'
+import Shape from '../components/shapeElements.jsx'
+import { addShape, setLayout } from '../actions/index.jsx'
 
 class LeftSideBarMenu extends Component {
     constructor(props) {

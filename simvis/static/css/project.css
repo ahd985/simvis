@@ -404,6 +404,7 @@ rect {
 
 #header-container {
   margin-bottom: 0;
+  margin-top: 0;
   border-bottom: none;
   background: #373737; }
 
@@ -465,3 +466,10 @@ rect {
 
 .color-set-btn {
   margin: 5px !important; }
+
+#submit-error-message {
+  position: fixed;
+  top: 20px;
+  right: 10px;
+  width: 50%;
+  z-index: 1000; }

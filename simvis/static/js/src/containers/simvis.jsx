@@ -3,9 +3,9 @@ import { createStore } from 'redux'
 import { connect } from 'react-redux'
 
 import { Menu } from 'semantic-ui-react'
-import { removeShapes } from '../actions'
+import { removeShapes } from '../actions/index.jsx'
 
-import DrawContainer from './drawContainer'
+import DrawContainer from './drawContainer.jsx'
 
 class SimVis extends Component {
     constructor(props) {

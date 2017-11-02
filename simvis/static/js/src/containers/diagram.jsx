@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import ShapeContainer from './shapeContainer'
+import ShapeContainer from './shapeContainer.jsx'
 import { connect } from 'react-redux'
 
-import { clearSelectedShapes, selectShapesInOutline } from '../actions'
+import { clearSelectedShapes, selectShapesInOutline } from '../actions/index.jsx'
 
 class Diagram extends Component {
     constructor(props) {

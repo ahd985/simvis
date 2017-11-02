@@ -1,9 +1,12 @@
 import json
 import sys
+import traceback
 
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.http import JsonResponse
+
 import pandas as pd
 
 from .forms import UploadFileForm, ModelForm
@@ -65,8 +68,18 @@ def ssv(request):
                 model['x_series'] = list(data[x_series_index].values)
                 for element in model['elements']:
                     for condition in element['conditions']:
-                        data_index = condition.pop('dataIndex')
-                        condition['data'] = list(data[data_index].values)
+                        if 'levelDataIndex' in condition:
+                            level_index = condition.pop('levelDataIndex')
+                            level_span = condition.get('levelDataSpan', 1)
+                            condition['level_data'] = list(data[level_index:level_index+level_span].values)
+                        if 'colorDataIndex' in condition:
+                            color_index = condition.pop('colorDataIndex')
+                            color_span = condition.get('colorDataSpan', 1)
+                            condition['color_data'] = list(data[color_index:color_index+color_span].values)
+                        if 'dataIndex' in condition:
+                            data_index = condition.pop('dataIndex')
+                            data_span = condition.get('dataSpan', 1)
+                            condition['data'] = list(data[data_index:data_index+data_span].values)
 
                 ssv_model = SSV.from_json(model)
 
@@ -75,3 +88,47 @@ def ssv(request):
     else:
         # TODO - return error
         pass
+
+def validate_model(request):
+    response = {}
+
+    if request.session.get('data'):
+        try:
+            data = pd.read_json(request.session.get('data'))
+            # Swap any dataIndex or xSeriesIndex with actual data
+            x_series_index = model.pop('xSeriesIndex')
+            model['x_series'] = list(data[x_series_index].values)
+            for element in model['elements']:
+                for condition in element['conditions']:
+                    if 'levelDataIndex' in condition:
+                        level_index = condition.pop('levelDataIndex')
+                        level_span = condition.get('levelDataSpan', 1)
+                        condition['level_data'] = list(data[level_index:level_index + level_span].values)
+                    if 'colorDataIndex' in condition:
+                        color_index = condition.pop('colorDataIndex')
+                        color_span = condition.get('colorDataSpan', 1)
+                        condition['color_data'] = list(data[color_index:color_index + color_span].values)
+                    if 'dataIndex' in condition:
+                        data_index = condition.pop('dataIndex')
+                        data_span = condition.get('dataSpan', 1)
+                        condition['data'] = list(data[data_index:data_index + data_span].values)
+
+                    print("XXX")
+                    print("XXX")
+                    print(condition)
+                    print("XXX")
+                    print("XXX")
+
+
+
+            ssv_model = SSV.from_json(model)
+            response['success'] = True
+        except:
+            tb = traceback.format_exc()
+            response['success'] = False
+            response['message'] = str(tb)
+    else:
+        response['success'] = False
+        response['message'] = 'Error: Lack of model data provided'
+
+    return JsonResponse(response)
