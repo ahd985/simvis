@@ -12,9 +12,7 @@ import pandas as pd
 from .forms import UploadFileForm, ModelForm
 from .data_ingest import read_file, summarize
 
-# Temporary way to get SSV functionality
-sys.path.append('/Users/Alex/Documents/Python Projects/ssv')
-from ssv import SSV
+from ssv.ssv import SSV
 
 
 MAX_DATA_ROWS = 10
