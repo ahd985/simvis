@@ -58,6 +58,7 @@ htmlcov
 
 # npm
 node_modules/
+ssv/node_modules
 
 # Compass
 .sass-cache

@@ -42,10 +42,10 @@ pytz==2016.6.1
 django-redis==4.4.4
 redis>=2.10.0
 
-
-
-
-
-
+# Data analytics
+pandas==0.22.0
+scipy==1.0.0
+xlrd==1.1.0
 
 # Your custom requirements go here
+selenium==3.8.1
