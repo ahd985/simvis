@@ -1,3 +1,3 @@
 #!/bin/bash
 
-rm -rf /home/ubuntu/simvis/*
+rm -rf /home/ubuntu/simvis*
