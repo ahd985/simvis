@@ -8,7 +8,7 @@ files:
 hooks:
   BeforeInstall:
     - location: utility/before_install.sh
-      runas: root
+      runas: ubuntu
   AfterInstall:
     - location: utility/after_install.sh
-      runas: root
+      runas: ubuntu
