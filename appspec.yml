@@ -11,4 +11,4 @@ hooks:
       runas: root
   AfterInstall:
     - location: utility/after_install.sh
-      runas: root
+      runas: ubuntu
