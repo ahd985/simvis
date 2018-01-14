@@ -1,5 +1,4 @@
 #!/bin/bash
 
-source /home/ubuntu/.bashrc
-workon simvis
+source /home/ubuntu/.profile
 python /home/ubuntu/simvis/manage.py collectstatic
