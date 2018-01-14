@@ -5,6 +5,14 @@ files:
   - source: /
     destination: /home/ubuntu/simvis
 
+permissions:
+  - object: /home/ubuntu/simvis
+    pattern: "**"
+    owner: ubuntu
+    mode: 777
+    type:
+      - file
+
 hooks:
   BeforeInstall:
     - location: utility/before_install.sh
