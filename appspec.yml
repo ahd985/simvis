@@ -6,7 +6,7 @@ files:
     destination: /home/ubuntu/simvis
 
 permissions:
-  - object: /home/ubuntu/simvis
+  - object: /home/ubuntu/simvis/staticfiles
     pattern: "**"
     owner: ubuntu
     group: ubuntu
