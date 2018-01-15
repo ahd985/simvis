@@ -6,12 +6,10 @@ files:
     destination: /home/ubuntu/simvis
 
 permissions:
-  - object: /home/ubuntu/simvis/staticfiles
+  - object: /home/ubuntu/simvis
     owner: ubuntu
     group: ubuntu
     mode: 755
-    type:
-      - directory
 
 hooks:
   BeforeInstall:
