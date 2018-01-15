@@ -9,14 +9,15 @@ permissions:
   - object: /home/ubuntu/simvis
     pattern: "**"
     owner: ubuntu
-    mode: 777
+    group: ubuntu
+    mode: 755
     type:
       - file
 
 hooks:
   BeforeInstall:
     - location: utility/before_install.sh
-      runas: root
+      runas: ubuntu
   AfterInstall:
     - location: utility/after_install.sh
       runas: ubuntu
