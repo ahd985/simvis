@@ -9,9 +9,7 @@ permissions:
   - object: /home/ubuntu/simvis
     owner: ubuntu
     mode: 755
-    type:
-      - directory
-
+    
 hooks:
   BeforeInstall:
     - location: utility/before_install.sh
