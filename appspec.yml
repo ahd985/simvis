@@ -9,11 +9,13 @@ permissions:
   - object: /home/ubuntu/simvis
     owner: ubuntu
     mode: 755
-    
+
 hooks:
   BeforeInstall:
     - location: utility/before_install.sh
       runas: ubuntu
   AfterInstall:
+    - location: utility/change_permissions.sh
+      runas: root
     - location: utility/after_install.sh
       runas: ubuntu
